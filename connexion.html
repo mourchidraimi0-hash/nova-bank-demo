@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Connectez-vous à votre espace client NOVA BANK. Site de démonstration technique, aucune opération bancaire réelle.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Connexion — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar scrolled">
+  <div class="container">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+  </div>
+</nav>
+
+<div class="form-page">
+  <div class="form-card">
+    <h1>Connexion</h1>
+    <p class="sub">Accédez à votre espace client NOVA BANK.</p>
+
+    <div class="alert alert-error hidden" id="login-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="login-error-text"></span>
+    </div>
+
+    <div class="alert alert-warn hidden" id="reset-notice">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Pour réinitialiser votre mot de passe, veuillez contacter notre support. Aucune réinitialisation automatique n'est disponible sur ce site de démonstration.</span>
+    </div>
+
+    <form id="login-form" novalidate>
+      <div class="form-row">
+        <label for="identifier">Identifiant ou e-mail</label>
+        <input type="text" id="identifier" class="form-control" required>
+        <div class="field-error" id="error-identifier"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" class="form-control" required>
+        <div class="field-error" id="error-password"></div>
+        <div style="text-align:right;margin-top:8px;">
+          <a href="#" id="forgot-link" class="text-sm">Mot de passe oublié ?</a>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+    </form>
+
+    <p class="text-sm text-muted mt-24" style="text-align:center;">Pas encore de compte ? <a href="inscription.html">Ouvrir un compte</a></p>
+    <p class="text-sm text-muted" style="text-align:center;"><a href="index.html">Retour à l'accueil</a></p>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function () {
+  const existing = DB.getCurrentUser();
+  if (existing) { window.location.href = 'espace-client.html'; return; }
+
+  const form = document.getElementById('login-form');
+  const errorBox = document.getElementById('login-error');
+  const errorText = document.getElementById('login-error-text');
+  const forgotLink = document.getElementById('forgot-link');
+  const resetNotice = document.getElementById('reset-notice');
+
+  forgotLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    resetNotice.classList.remove('hidden');
+  });
+
+  function showLoginError(msg) {
+    errorText.innerHTML = msg;
+    errorBox.classList.remove('hidden');
+  }
+  function clearErrors() {
+    errorBox.classList.add('hidden');
+    document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+  }
+  function setFieldError(field, msg) {
+    const el = document.getElementById('error-' + field);
+    if (el) { el.textContent = msg; el.classList.add('show'); }
+    const input = document.getElementById(field);
+    if (input) input.classList.add('error');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const identifier = document.getElementById('identifier').value.trim();
+    const password = document.getElementById('password').value;
+
+    let hasError = false;
+    if (!identifier) { setFieldError('identifier', 'Merci de renseigner votre identifiant ou e-mail.'); hasError = true; }
+    if (!password) { setFieldError('password', 'Merci de renseigner votre mot de passe.'); hasError = true; }
+    if (hasError) return;
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Connexion en cours…';
+
+    const res = await DB.login(identifier, password);
+
+    if (res.ok) {
+      window.location.href = 'espace-client.html';
+      return;
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Se connecter';
+
+    if (res.error === 'not_found') {
+      showLoginError('Aucun compte ne correspond à cet identifiant ou cet e-mail.');
+    } else if (res.error === 'wrong_password') {
+      showLoginError('Mot de passe incorrect.');
+    } else if (res.error === 'suspended') {
+      showLoginError('Votre compte a été suspendu. Motif : ' + escapeHtml(res.reason || 'non précisé') + '. Contactez notre support pour plus d\'informations.');
+    } else {
+      showLoginError('Une erreur est survenue. Merci de réessayer.');
+    }
+  });
+})();
+</script>
+</body>
+</html>

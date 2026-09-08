@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gestion des comptes clients NOVA BANK depuis le back-office administrateur.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Clients — Back-office NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<div class="admin-mobile-topbar">
+  <button data-sidebar-toggle class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <span class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></span>
+  <button data-theme-toggle class="theme-toggle"></button>
+</div>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="admin-dashboard.html" class="nav-logo"><span class="logo-mark">NB</span> Back-office</a>
+    <span class="admin-role-tag" data-admin-role></span>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="admin-clients.html" class="active"><i class="fa-solid fa-users"></i> Clients</a>
+      <a href="admin-operations.html"><i class="fa-solid fa-arrow-right-arrow-left"></i> Opérations</a>
+      <a href="admin-journal.html"><i class="fa-solid fa-scroll"></i> Journal d'activité</a>
+    </nav>
+    <div class="bottom-links">
+      <span class="text-sm" style="color:rgba(255,255,255,.6)">Connecté : <span data-admin-name></span></span>
+      <a href="#" data-admin-logout><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Clients</h1>
+      <button data-theme-toggle class="theme-toggle"></button>
+    </div>
+
+    <div class="admin-card">
+      <div class="filters-row">
+        <input type="text" class="form-control" id="searchInput" placeholder="Rechercher par nom, identifiant ou e-mail…">
+        <select class="form-control" id="statusFilter">
+          <option value="all">Tous les statuts</option>
+          <option value="active">Actif</option>
+          <option value="suspended">Suspendu</option>
+          <option value="pending_info">Infos requises</option>
+        </select>
+      </div>
+      <div id="tableWrap"></div>
+    </div>
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  const session = ADMIN_UI.guard();
+  if (session) {
+    let allUsers = DB.getUsers();
+
+    function render() {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      let list = allUsers.filter(u => {
+        if (status !== 'all' && u.status !== status) return false;
+        if (!q) return true;
+        const haystack = `${u.firstName} ${u.lastName} ${u.id} ${u.accountNumber} ${u.email}`.toLowerCase();
+        return haystack.includes(q);
+      });
+
+      const wrap = document.getElementById('tableWrap');
+      if (!list.length) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-user-slash"></i><p>Aucun client ne correspond à ces critères.</p></div>';
+        return;
+      }
+
+      const rows = list.map(u => `
+        <tr>
+          <td><b>${escapeHtml(u.firstName)} ${escapeHtml(u.lastName)}</b></td>
+          <td>${escapeHtml(u.id)}</td>
+          <td>${escapeHtml(u.email)}</td>
+          <td>${escapeHtml(u.phone || '—')}</td>
+          <td>${timeAgo(u.createdAt)}</td>
+          <td>${statusBadge(u.status)}</td>
+          <td>${u.lastLogin ? timeAgo(u.lastLogin) : 'Jamais'}</td>
+          <td><a class="btn btn-ghost btn-sm" href="admin-client-detail.html?id=${encodeURIComponent(u.id)}">Voir la fiche</a></td>
+        </tr>
+      `).join('');
+
+      wrap.innerHTML = `
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th><th>Identifiant</th><th>E-mail</th><th>Téléphone</th>
+                <th>Date d'inscription</th><th>Statut</th><th>Dernière connexion</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', render);
+    document.getElementById('statusFilter').addEventListener('change', render);
+    render();
+  }
+</script>
+</body>
+</html>

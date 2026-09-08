@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Changez votre mot de passe, consultez votre historique de connexions et vos paramètres de sécurité NOVA BANK.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Sécurité — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html" class="active"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1>Sécurité</h1>
+      <p>Gérez votre mot de passe, vos connexions et vos préférences de sécurité.</p>
+    </div>
+
+    <div class="alert alert-warn" style="align-items:flex-start;">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div>
+        <b>NOVA BANK est une plateforme de démonstration technique.</b><br>
+        Elle ne détient aucune licence bancaire réelle, n'est certifiée par aucun organisme de sécurité ou de conformité, et ne bénéficie d'aucun fonds de garantie des dépôts. Toutes les données (comptes, soldes, cartes, historiques) sont générées et stockées uniquement dans le navigateur de chaque visiteur, via <code>localStorage</code> — rien n'est envoyé à un serveur. Merci de ne jamais utiliser vos véritables identifiants bancaires, mots de passe habituels ou informations personnelles sensibles sur ce site.
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <h3 class="mb-16">Changer le mot de passe</h3>
+      <div id="pwdAlertWrap"></div>
+      <form id="pwdForm" novalidate>
+        <div class="form-row">
+          <label for="currentPassword">Mot de passe actuel</label>
+          <input type="password" id="currentPassword" class="form-control" autocomplete="current-password" required>
+          <div class="field-error" id="err-currentPassword"></div>
+        </div>
+        <div class="form-row">
+          <label for="password">Nouveau mot de passe</label>
+          <input type="password" id="password" class="form-control" autocomplete="new-password" required>
+          <div class="pw-strength"><span></span><span></span><span></span><span></span></div>
+          <div class="pw-strength-label"></div>
+          <div class="field-hint">8 caractères minimum.</div>
+          <div class="field-error" id="err-password"></div>
+        </div>
+        <div class="form-row">
+          <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+          <input type="password" id="confirmPassword" class="form-control" autocomplete="new-password" required>
+          <div class="field-error" id="err-confirmPassword"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Mettre à jour le mot de passe</button>
+      </form>
+    </div>
+
+    <div class="mb-24">
+      <h3 class="mb-16">Historique des connexions</h3>
+      <div class="table-wrap">
+        <div id="loginHistoryWrap"></div>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <h3 class="mb-16">Bonnes pratiques de sécurité</h3>
+      <div class="info-grid">
+        <div class="info-item"><span><i class="fa-solid fa-lock"></i> Mot de passe</span><b>Ne partagez jamais votre mot de passe, même avec le support.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-link"></i> Adresse du site</span><b>Vérifiez toujours l'URL avant de saisir vos identifiants.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-right-from-bracket"></i> Appareil partagé</span><b>Déconnectez-vous systématiquement sur un ordinateur partagé.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-wifi"></i> Réseaux publics</span><b>Évitez de vous connecter via un Wi-Fi public non sécurisé.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-envelope-open-text"></i> Hameçonnage</span><b>Méfiez-vous des e-mails ou messages demandant vos identifiants.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-rotate"></i> Mise à jour</span><b>Utilisez un mot de passe unique, différent de vos autres comptes.</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="mb-16">Alertes de sécurité</h3>
+      <div class="switch-row">
+        <div class="switch-label">
+          <b>M'alerter par e-mail à chaque nouvelle connexion</b>
+          <span>Préférence d'interface uniquement — démonstration, aucun e-mail n'est réellement envoyé.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="alertNewLogin">
+          <span class="track"></span>
+        </label>
+      </div>
+      <div class="switch-row">
+        <div class="switch-label">
+          <b>Recevoir un résumé hebdomadaire de mon activité</b>
+          <span>Préférence d'interface uniquement — démonstration, aucun e-mail n'est réellement envoyé.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="alertWeeklySummary">
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    const PREFS_KEY = 'novabank_security_prefs_' + user.id;
+
+    // ---------------------------------------------------------------- historique des connexions
+    function guessDevice(userAgent) {
+      const ua = String(userAgent || '');
+      let browser = 'Navigateur inconnu';
+      if (ua.includes('Edg/')) browser = 'Edge';
+      else if (ua.includes('Chrome/') && !ua.includes('Chromium')) browser = 'Chrome';
+      else if (ua.includes('Firefox/')) browser = 'Firefox';
+      else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari';
+
+      let os = '';
+      if (ua.includes('Windows')) os = 'Windows';
+      else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iPhone';
+      else if (ua.includes('Android')) os = 'Android';
+      else if (ua.includes('Mac OS')) os = 'Mac';
+      else if (ua.includes('Linux')) os = 'Linux';
+
+      if (browser === 'Navigateur inconnu' && !os) return 'Navigateur inconnu';
+      return os ? `${browser} sur ${os}` : browser;
+    }
+
+    function renderLoginHistory() {
+      const fresh = DB.getUserById(user.id) || user;
+      const history = fresh.loginHistory || [];
+      const wrap = document.getElementById('loginHistoryWrap');
+      if (!history.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <p>Aucune connexion enregistrée pour le moment.</p>
+          </div>`;
+        return;
+      }
+      const rows = history.map(entry => `
+        <tr>
+          <td>${timeAgo(entry.date)}</td>
+          <td>${escapeHtml(guessDevice(entry.userAgent))}</td>
+        </tr>`).join('');
+      wrap.innerHTML = `
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Appareil / Navigateur</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+    renderLoginHistory();
+
+    // ---------------------------------------------------------------- changement de mot de passe
+    function clearPwdErrors() {
+      ['currentPassword', 'password', 'confirmPassword'].forEach(id => {
+        const el = document.getElementById('err-' + id);
+        if (el) { el.textContent = ''; el.classList.remove('show'); }
+        document.getElementById(id).classList.remove('error');
+      });
+    }
+    function showPwdError(id, msg) {
+      const el = document.getElementById('err-' + id);
+      if (el) { el.textContent = msg; el.classList.add('show'); }
+      document.getElementById(id).classList.add('error');
+    }
+
+    document.getElementById('pwdForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearPwdErrors();
+      document.getElementById('pwdAlertWrap').innerHTML = '';
+
+      const current = document.getElementById('currentPassword').value;
+      const newPwd = document.getElementById('password').value;
+      const confirm = document.getElementById('confirmPassword').value;
+
+      let hasError = false;
+      if (!current) { showPwdError('currentPassword', 'Veuillez saisir votre mot de passe actuel.'); hasError = true; }
+      if (!newPwd || newPwd.length < 8) { showPwdError('password', 'Le nouveau mot de passe doit contenir au moins 8 caractères.'); hasError = true; }
+      if (confirm !== newPwd || !confirm) { showPwdError('confirmPassword', 'La confirmation ne correspond pas au nouveau mot de passe.'); hasError = true; }
+      if (hasError) return;
+
+      try {
+        await DB.changePassword(user.id, current, newPwd);
+        document.getElementById('pwdAlertWrap').innerHTML = `
+          <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>Mot de passe modifié avec succès.</div>
+          </div>`;
+        e.target.reset();
+        document.querySelectorAll('.pw-strength span').forEach(s => s.style.background = '');
+        document.querySelector('.pw-strength-label').textContent = '';
+      } catch (err) {
+        showPwdError('currentPassword', err.message || 'Une erreur est survenue.');
+      }
+    });
+
+    // ---------------------------------------------------------------- alertes de sécurité (préférences cosmétiques)
+    function loadPrefs() {
+      try {
+        const raw = localStorage.getItem(PREFS_KEY);
+        return raw ? JSON.parse(raw) : { newLogin: false, weeklySummary: false };
+      } catch (e) { return { newLogin: false, weeklySummary: false }; }
+    }
+    function savePrefs(prefs) {
+      try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
+    }
+
+    const prefs = loadPrefs();
+    const alertNewLogin = document.getElementById('alertNewLogin');
+    const alertWeeklySummary = document.getElementById('alertWeeklySummary');
+    alertNewLogin.checked = !!prefs.newLogin;
+    alertWeeklySummary.checked = !!prefs.weeklySummary;
+
+    alertNewLogin.addEventListener('change', () => savePrefs({ ...loadPrefs(), newLogin: alertNewLogin.checked }));
+    alertWeeklySummary.addEventListener('change', () => savePrefs({ ...loadPrefs(), weeklySummary: alertWeeklySummary.checked }));
+  }
+</script>
+</body>
+</html>

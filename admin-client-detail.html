@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Fiche client détaillée : identité, solde, opérations et actions administrateur sur NOVA BANK.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Fiche client — Back-office NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<div class="admin-mobile-topbar">
+  <button data-sidebar-toggle class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <span class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></span>
+  <button data-theme-toggle class="theme-toggle"></button>
+</div>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="admin-dashboard.html" class="nav-logo"><span class="logo-mark">NB</span> Back-office</a>
+    <span class="admin-role-tag" data-admin-role></span>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="admin-clients.html" class="active"><i class="fa-solid fa-users"></i> Clients</a>
+      <a href="admin-operations.html"><i class="fa-solid fa-arrow-right-arrow-left"></i> Opérations</a>
+      <a href="admin-journal.html"><i class="fa-solid fa-scroll"></i> Journal d'activité</a>
+    </nav>
+    <div class="bottom-links">
+      <span class="text-sm" style="color:rgba(255,255,255,.6)">Connecté : <span data-admin-name></span></span>
+      <a href="#" data-admin-logout><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1><a href="admin-clients.html" style="color:inherit;text-decoration:none;margin-right:10px;"><i class="fa-solid fa-arrow-left"></i></a>Fiche client</h1>
+      <button data-theme-toggle class="theme-toggle"></button>
+    </div>
+
+    <div id="notFoundState" class="admin-card hidden">
+      <div class="empty-state">
+        <i class="fa-solid fa-user-slash"></i>
+        <p>Client introuvable. Il a peut-être été supprimé, ou l'identifiant dans le lien est incorrect.</p>
+        <a href="admin-clients.html" class="btn btn-outline btn-sm" style="margin-top:14px;display:inline-block;">Retour à la liste des clients</a>
+      </div>
+    </div>
+
+    <div id="clientContent" class="hidden">
+
+      <div class="admin-card">
+        <h3>En-tête identité</h3>
+        <div class="info-grid">
+          <div class="info-item"><span>Nom complet</span><b id="f-fullname"></b></div>
+          <div class="info-item"><span>E-mail</span><b id="f-email"></b></div>
+          <div class="info-item"><span>Téléphone</span><b id="f-phone"></b></div>
+          <div class="info-item"><span>Date de naissance</span><b id="f-birthdate"></b></div>
+          <div class="info-item"><span>Adresse</span><b id="f-address"></b></div>
+          <div class="info-item"><span>Date d'inscription</span><b id="f-createdat"></b></div>
+        </div>
+        <h3 style="margin-top:22px;">Aperçu du compte</h3>
+        <div class="info-grid">
+          <div class="info-item"><span>Numéro de compte</span><b id="f-accountnumber"></b></div>
+          <div class="info-item"><span>Devise</span><b id="f-currency"></b></div>
+          <div class="info-item"><span>Solde actuel</span><b id="f-balance"></b></div>
+          <div class="info-item"><span>Statut</span><b id="f-status"></b></div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Sécurité</h3>
+        <div class="info-item">
+          <span>Mot de passe (haché)</span>
+          <b><code id="f-passwordhash"></code></b>
+        </div>
+        <p class="field-hint">Le mot de passe est haché (SHA-256) et n'est jamais stocké ni affiché en clair, y compris par les administrateurs.</p>
+      </div>
+
+      <div class="admin-card">
+        <h3>Documents d'identité</h3>
+        <div class="info-grid">
+          <div class="info-item"><span>Photo d'identité</span><b id="f-idphoto"></b></div>
+          <div class="info-item"><span>Document d'identité</span><b id="f-iddocument"></b></div>
+          <div class="info-item"><span>Statut KYC</span><b id="f-kycstatus"></b></div>
+        </div>
+        <p class="field-hint">Seules les métadonnées des documents sont conservées dans cet environnement de démonstration ; leur contenu n'est jamais stocké côté serveur (il n'existe pas de serveur).</p>
+      </div>
+
+      <div class="admin-card">
+        <h3>Historique des connexions</h3>
+        <div id="loginHistoryWrap"></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Historique des opérations</h3>
+        <div id="transactionsWrap"></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Notifications envoyées</h3>
+        <div id="notificationsWrap"></div>
+      </div>
+
+      <div class="admin-card" data-requires="manage">
+        <h3>Actions sur le compte</h3>
+        <p class="field-hint" id="actionsRoleHint" style="margin-bottom:14px;">Ces actions modifient immédiatement l'accès du client et lui envoient une notification.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-danger btn-sm hidden" id="btnSuspend" data-requires="manage"><i class="fa-solid fa-ban"></i> Suspendre le compte</button>
+          <button class="btn btn-cyan btn-sm hidden" id="btnReactivate" data-requires="manage"><i class="fa-solid fa-rotate-left"></i> Réactiver le compte</button>
+          <button class="btn btn-cyan btn-sm hidden" id="btnActivate" data-requires="manage"><i class="fa-solid fa-circle-check"></i> Activer le compte</button>
+          <button class="btn btn-outline btn-sm" id="btnRequestInfo" data-requires="manage"><i class="fa-solid fa-circle-question"></i> Demander des informations complémentaires</button>
+        </div>
+      </div>
+
+      <div class="admin-card" data-requires="manage">
+        <h3>Gestion du solde</h3>
+        <form id="balanceForm">
+          <div class="form-row two">
+            <div>
+              <label>Type d'opération</label>
+              <select class="form-control" id="balanceType" data-requires="manage">
+                <option value="credit">Crédit</option>
+                <option value="debit">Débit</option>
+              </select>
+            </div>
+            <div>
+              <label>Montant</label>
+              <input type="number" class="form-control" id="balanceAmount" min="0.01" step="0.01" placeholder="0.00" data-requires="manage">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Motif / référence</label>
+            <input type="text" class="form-control" id="balanceReason" placeholder="Ex : Régularisation manuelle, remboursement…" data-requires="manage">
+            <p class="field-hint">Un crédit ne peut jamais être effectué sans motif — aucune création de solde non justifiée n'est possible.</p>
+          </div>
+          <p class="field-hint" id="balanceFormError" style="display:none;color:var(--danger);"></p>
+          <button type="submit" class="btn btn-primary btn-sm" data-requires="manage">Ajuster le solde</button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h3>Notes internes</h3>
+        <div id="notesWrap"></div>
+        <div class="form-row" style="margin-top:16px;">
+          <label>Ajouter une note</label>
+          <textarea class="form-control" id="newNoteText" rows="3" placeholder="Note visible par tous les administrateurs…"></textarea>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btnAddNote">Ajouter la note</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Generic action confirmation modal (suspend / reactivate / activate / request info) -->
+<div class="modal-overlay" id="actionModal">
+  <div class="modal">
+    <h3 id="actionModalTitle">Confirmer l'action</h3>
+    <div id="actionModalBody"></div>
+    <p class="field-hint" id="actionModalError" style="display:none;color:var(--danger);"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="actionModalCancel">Annuler</button>
+      <button class="btn btn-primary btn-sm" id="actionModalConfirm">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Balance adjustment recap/confirmation modal -->
+<div class="modal-overlay" id="balanceModal">
+  <div class="modal">
+    <h3>Confirmer l'ajustement de solde</h3>
+    <div id="balanceModalBody"></div>
+    <p class="field-hint" id="balanceModalError" style="display:none;color:var(--danger);"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="balanceModalCancel">Annuler</button>
+      <button class="btn btn-primary btn-sm" id="balanceModalConfirm">Confirmer l'ajustement</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  const session = ADMIN_UI.guard();
+  if (session) {
+    const params = new URLSearchParams(location.search);
+    const clientId = params.get('id');
+    let clientUser = DB.getUserById(clientId);
+
+    const KYC_LABELS = { none: 'Aucun document', submitted: 'Documents soumis', verified: 'Vérifié' };
+    const SUSPEND_REASONS = [
+      "Documents d'identité manquants",
+      'Activité inhabituelle détectée',
+      'Demande du client',
+      'Autre'
+    ];
+
+    let currentActionType = null; // 'suspend' | 'reactivate' | 'activate' | 'requestInfo'
+    let pendingBalanceOp = null;
+
+    function refresh() { clientUser = DB.getUserById(clientId); }
+
+    function fmtDoc(meta) {
+      if (!meta) return 'Aucun document déposé';
+      const kb = (meta.size / 1024).toFixed(0);
+      return `${escapeHtml(meta.name)} (${escapeHtml(meta.type)}, ${kb} Ko)`;
+    }
+
+    function renderIdentity() {
+      document.getElementById('f-fullname').textContent = `${clientUser.firstName} ${clientUser.lastName}`;
+      document.getElementById('f-email').textContent = clientUser.email;
+      document.getElementById('f-phone').textContent = clientUser.phone || '—';
+      document.getElementById('f-birthdate').textContent = clientUser.birthDate || '—';
+      document.getElementById('f-address').textContent = clientUser.address || '—';
+      document.getElementById('f-createdat').textContent = timeAgo(clientUser.createdAt);
+      document.getElementById('f-accountnumber').textContent = clientUser.accountNumber;
+      document.getElementById('f-currency').textContent = clientUser.currency;
+      document.getElementById('f-balance').textContent = DB.formatMoney(clientUser.balance, clientUser.currency);
+      const statusHtml = statusBadge(clientUser.status) +
+        (clientUser.status === 'suspended' && clientUser.suspendReason
+          ? ` <span class="field-hint" style="display:inline;">— motif : ${escapeHtml(clientUser.suspendReason)}</span>`
+          : '');
+      document.getElementById('f-status').innerHTML = statusHtml;
+    }
+
+    function renderSecurity() {
+      const hash = clientUser.passwordHash || '';
+      document.getElementById('f-passwordhash').textContent = hash.slice(0, 16) + '…';
+    }
+
+    function renderDocuments() {
+      document.getElementById('f-idphoto').innerHTML = fmtDoc(clientUser.kyc && clientUser.kyc.idPhoto);
+      document.getElementById('f-iddocument').innerHTML = fmtDoc(clientUser.kyc && clientUser.kyc.idDocument);
+      document.getElementById('f-kycstatus').textContent = KYC_LABELS[(clientUser.kyc && clientUser.kyc.status) || 'none'];
+    }
+
+    function renderLoginHistory() {
+      const wrap = document.getElementById('loginHistoryWrap');
+      const history = clientUser.loginHistory || [];
+      if (!history.length) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>Aucune connexion enregistrée.</p></div>';
+        return;
+      }
+      const rows = history.map(h => `
+        <tr>
+          <td>${timeAgo(h.date)}</td>
+          <td>${escapeHtml((h.userAgent || '').slice(0, 90))}</td>
+        </tr>
+      `).join('');
+      wrap.innerHTML = `
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Appareil / Navigateur</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function renderTransactions() {
+      const wrap = document.getElementById('transactionsWrap');
+      const trx = clientUser.transactions || [];
+      if (!trx.length) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-receipt"></i><p>Aucune opération enregistrée pour ce client.</p></div>';
+        return;
+      }
+      const rows = trx.map(t => {
+        const sign = t.type === 'credit' ? '+' : '-';
+        const desc = escapeHtml(t.description || '') + (t.adminName ? ` — par ${escapeHtml(t.adminName)}` : '');
+        return `
+        <tr>
+          <td><code>${escapeHtml(t.ref)}</code></td>
+          <td>${desc}</td>
+          <td>${timeAgo(t.createdAt)}</td>
+          <td>${sign}${DB.formatMoney(Math.abs(t.amount), t.currency)}</td>
+          <td>${statusBadge(t.status)}</td>
+        </tr>`;
+      }).join('');
+      wrap.innerHTML = `
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Référence</th><th>Description</th><th>Date</th><th>Montant</th><th>Statut</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function renderNotifications() {
+      const wrap = document.getElementById('notificationsWrap');
+      const notifs = clientUser.notifications || [];
+      if (!notifs.length) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-bell-slash"></i><p>Aucune notification envoyée à ce client.</p></div>';
+        return;
+      }
+      wrap.innerHTML = notifs.map(n => `
+        <div class="log-item">
+          <div>${escapeHtml(n.message)}</div>
+          <div class="meta">${timeAgo(n.date)} — ${n.read ? 'Lue' : 'Non lue'}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderActionButtons() {
+      const btnSuspend = document.getElementById('btnSuspend');
+      const btnReactivate = document.getElementById('btnReactivate');
+      const btnActivate = document.getElementById('btnActivate');
+      btnSuspend.classList.add('hidden');
+      btnReactivate.classList.add('hidden');
+      btnActivate.classList.add('hidden');
+      if (clientUser.status === 'active') btnSuspend.classList.remove('hidden');
+      else if (clientUser.status === 'suspended') btnReactivate.classList.remove('hidden');
+      else if (clientUser.status === 'pending_info') btnActivate.classList.remove('hidden');
+    }
+
+    function renderNotes() {
+      const wrap = document.getElementById('notesWrap');
+      const notes = clientUser.notes || [];
+      if (!notes.length) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-note-sticky"></i><p>Aucune note interne pour ce client.</p></div>';
+        return;
+      }
+      wrap.innerHTML = notes.map(n => `
+        <div class="log-item">
+          <div>${escapeHtml(n.text)}</div>
+          <div class="meta">${escapeHtml(n.author || 'Administrateur')} (${escapeHtml(n.role ? DB.roleLabel(n.role) : '—')}) — ${timeAgo(n.date)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderAll() {
+      refresh();
+      if (!clientUser) {
+        document.getElementById('notFoundState').classList.remove('hidden');
+        document.getElementById('clientContent').classList.add('hidden');
+        return;
+      }
+      document.getElementById('notFoundState').classList.add('hidden');
+      document.getElementById('clientContent').classList.remove('hidden');
+      renderIdentity();
+      renderSecurity();
+      renderDocuments();
+      renderLoginHistory();
+      renderTransactions();
+      renderNotifications();
+      renderActionButtons();
+      renderNotes();
+    }
+
+    // ---------------------------------------------------------- generic action modal
+    const actionModal = document.getElementById('actionModal');
+    const actionModalTitle = document.getElementById('actionModalTitle');
+    const actionModalBody = document.getElementById('actionModalBody');
+    const actionModalError = document.getElementById('actionModalError');
+
+    function openActionModal(type) {
+      currentActionType = type;
+      actionModalError.style.display = 'none';
+      actionModalError.textContent = '';
+      if (type === 'suspend') {
+        actionModalTitle.textContent = `Suspendre le compte de ${clientUser.firstName} ${clientUser.lastName}`;
+        actionModalBody.innerHTML = `
+          <div class="form-row">
+            <label>Motif de la suspension</label>
+            <select class="form-control" id="suspendReasonSelect">
+              ${SUSPEND_REASONS.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row" id="suspendCustomWrap" style="display:none;">
+            <label>Précisez le motif</label>
+            <input type="text" class="form-control" id="suspendCustomReason" placeholder="Motif détaillé…">
+          </div>
+          <div class="form-row">
+            <label>Note interne <span class="opt">(optionnel)</span></label>
+            <textarea class="form-control" id="suspendNote" rows="2" placeholder="Note visible par les administrateurs…"></textarea>
+          </div>`;
+        const sel = document.getElementById('suspendReasonSelect');
+        sel.addEventListener('change', () => {
+          document.getElementById('suspendCustomWrap').style.display = sel.value === 'Autre' ? '' : 'none';
+        });
+      } else if (type === 'reactivate') {
+        actionModalTitle.textContent = 'Réactiver le compte';
+        actionModalBody.innerHTML = `<p>Voulez-vous réactiver le compte de <b>${escapeHtml(clientUser.firstName)} ${escapeHtml(clientUser.lastName)}</b> ? Le client retrouvera immédiatement l'accès à son espace.</p>`;
+      } else if (type === 'activate') {
+        actionModalTitle.textContent = 'Activer le compte';
+        actionModalBody.innerHTML = `<p>Voulez-vous activer le compte de <b>${escapeHtml(clientUser.firstName)} ${escapeHtml(clientUser.lastName)}</b> ?</p>`;
+      } else if (type === 'requestInfo') {
+        actionModalTitle.textContent = 'Demander des informations complémentaires';
+        actionModalBody.innerHTML = `
+          <div class="form-row">
+            <label>Message au client</label>
+            <textarea class="form-control" id="requestInfoMessage" rows="3" placeholder="Précisez les informations ou documents attendus…"></textarea>
+          </div>`;
+      }
+      actionModal.classList.add('open');
+    }
+
+    function closeActionModal() {
+      actionModal.classList.remove('open');
+      currentActionType = null;
+    }
+
+    function showActionError(msg) {
+      actionModalError.textContent = msg;
+      actionModalError.style.display = '';
+    }
+
+    document.getElementById('btnSuspend').addEventListener('click', () => {
+      if (!DB.canManageAccounts(session.role)) return;
+      openActionModal('suspend');
+    });
+    document.getElementById('btnReactivate').addEventListener('click', () => {
+      if (!DB.canManageAccounts(session.role)) return;
+      openActionModal('reactivate');
+    });
+    document.getElementById('btnActivate').addEventListener('click', () => {
+      if (!DB.canManageAccounts(session.role)) return;
+      openActionModal('activate');
+    });
+    document.getElementById('btnRequestInfo').addEventListener('click', () => {
+      if (!DB.canManageAccounts(session.role)) return;
+      openActionModal('requestInfo');
+    });
+    document.getElementById('actionModalCancel').addEventListener('click', closeActionModal);
+
+    document.getElementById('actionModalConfirm').addEventListener('click', () => {
+      if (!DB.canManageAccounts(session.role)) { closeActionModal(); return; }
+      if (currentActionType === 'suspend') {
+        const sel = document.getElementById('suspendReasonSelect');
+        let reason = sel.value;
+        if (reason === 'Autre') {
+          const custom = (document.getElementById('suspendCustomReason').value || '').trim();
+          if (!custom) { showActionError('Veuillez préciser le motif.'); return; }
+          reason = custom;
+        }
+        const note = (document.getElementById('suspendNote').value || '').trim();
+        DB.suspendUser(clientId, reason);
+        if (note) DB.addAdminNote(clientId, note);
+      } else if (currentActionType === 'reactivate') {
+        DB.reactivateUser(clientId);
+      } else if (currentActionType === 'activate') {
+        DB.activateUser(clientId);
+      } else if (currentActionType === 'requestInfo') {
+        const message = (document.getElementById('requestInfoMessage').value || '').trim();
+        if (!message) { showActionError('Veuillez saisir un message.'); return; }
+        DB.requestMoreInfo(clientId, message);
+      }
+      closeActionModal();
+      renderAll();
+    });
+
+    // ---------------------------------------------------------- balance adjustment
+    const balanceModal = document.getElementById('balanceModal');
+    const balanceModalBody = document.getElementById('balanceModalBody');
+    const balanceModalError = document.getElementById('balanceModalError');
+    const balanceFormError = document.getElementById('balanceFormError');
+
+    document.getElementById('balanceForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      balanceFormError.style.display = 'none';
+      if (!DB.canManageAccounts(session.role)) return;
+      const type = document.getElementById('balanceType').value;
+      const amount = parseFloat(document.getElementById('balanceAmount').value);
+      const reason = (document.getElementById('balanceReason').value || '').trim();
+      if (!amount || amount <= 0) { balanceFormError.textContent = 'Veuillez saisir un montant valide.'; balanceFormError.style.display = ''; return; }
+      if (!reason) { balanceFormError.textContent = 'Un motif est obligatoire.'; balanceFormError.style.display = ''; return; }
+      pendingBalanceOp = { type, amount, reason };
+      balanceModalError.style.display = 'none';
+      balanceModalBody.innerHTML = `
+        <div class="info-grid">
+          <div class="info-item"><span>Client</span><b>${escapeHtml(clientUser.firstName)} ${escapeHtml(clientUser.lastName)}</b></div>
+          <div class="info-item"><span>Type</span><b>${type === 'credit' ? 'Crédit' : 'Débit'}</b></div>
+          <div class="info-item"><span>Montant</span><b>${DB.formatMoney(amount, clientUser.currency)}</b></div>
+          <div class="info-item"><span>Motif</span><b>${escapeHtml(reason)}</b></div>
+        </div>`;
+      balanceModal.classList.add('open');
+    });
+
+    document.getElementById('balanceModalCancel').addEventListener('click', () => {
+      balanceModal.classList.remove('open');
+      pendingBalanceOp = null;
+    });
+
+    document.getElementById('balanceModalConfirm').addEventListener('click', () => {
+      if (!DB.canManageAccounts(session.role)) { balanceModal.classList.remove('open'); return; }
+      if (!pendingBalanceOp) return;
+      try {
+        DB.adjustBalance(clientId, pendingBalanceOp.type, pendingBalanceOp.amount, pendingBalanceOp.reason);
+      } catch (err) {
+        balanceModalError.textContent = err.message;
+        balanceModalError.style.display = '';
+        return;
+      }
+      pendingBalanceOp = null;
+      balanceModal.classList.remove('open');
+      document.getElementById('balanceForm').reset();
+      renderAll();
+    });
+
+    // ---------------------------------------------------------- internal notes (all roles)
+    document.getElementById('btnAddNote').addEventListener('click', () => {
+      const textarea = document.getElementById('newNoteText');
+      const text = (textarea.value || '').trim();
+      if (!text) return;
+      DB.addAdminNote(clientId, text);
+      textarea.value = '';
+      renderAll();
+    });
+
+    renderAll();
+  }
+</script>
+</body>
+</html>

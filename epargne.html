@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Créez des objectifs d'épargne et suivez votre progression avec l'espace client NOVA BANK.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Épargne — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html" class="active"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head flex-between" style="align-items:flex-start;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h1>Épargne</h1>
+        <p>Créez des objectifs et mettez de l'argent de côté à votre rythme.</p>
+      </div>
+      <button class="btn btn-primary" id="newGoalBtn"><i class="fa-solid fa-plus"></i> Nouvel objectif</button>
+    </div>
+
+    <div class="alert alert-warn">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div>Mettre de l'argent de côté débite réellement votre solde disponible ; vous pouvez le récupérer à tout moment en retirant depuis un objectif.</div>
+    </div>
+
+    <div class="tile-grid" id="tileGridWrap" data-animate-group></div>
+
+    <div class="grid grid-3" id="goalsWrap" data-animate-group></div>
+
+  </main>
+</div>
+
+<!-- Modale : nouvel objectif -->
+<div class="modal-overlay" id="goalModalOverlay">
+  <div class="modal">
+    <h3>Nouvel objectif d'épargne</h3>
+    <form id="goalForm">
+      <div class="form-row">
+        <label>Nom de l'objectif</label>
+        <input type="text" class="form-control" id="goalName" maxlength="60" placeholder="Ex. Vacances d'été" required>
+      </div>
+      <div class="form-row">
+        <label>Montant cible</label>
+        <input type="number" class="form-control" id="goalTarget" min="1" step="0.01" placeholder="1000" required>
+      </div>
+      <div class="form-row">
+        <label>Icône</label>
+        <select class="form-control" id="goalIcon">
+          <option value="fa-piggy-bank">Tirelire</option>
+          <option value="fa-plane">Voyage</option>
+          <option value="fa-house">Maison</option>
+          <option value="fa-car">Voiture</option>
+          <option value="fa-graduation-cap">Études</option>
+          <option value="fa-umbrella-beach">Vacances</option>
+          <option value="fa-gift">Cadeau</option>
+        </select>
+      </div>
+      <div class="field-error" id="goalFormError"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline btn-sm" id="goalCancelBtn">Annuler</button>
+        <button type="submit" class="btn btn-primary btn-sm">Créer l'objectif</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modale générique : mettre de côté / retirer -->
+<div class="modal-overlay" id="amountModalOverlay">
+  <div class="modal">
+    <h3 id="amountModalTitle">Mettre de côté</h3>
+    <form id="amountForm">
+      <div class="form-row">
+        <label id="amountModalLabel">Montant</label>
+        <input type="number" class="form-control" id="amountInput" min="0.01" step="0.01" placeholder="0.00" required>
+      </div>
+      <div class="field-error" id="amountFormError"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline btn-sm" id="amountCancelBtn">Annuler</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="amountSubmitBtn">Confirmer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    let currentAmountAction = null; // { goalId, mode: 'contribute' | 'withdraw' }
+
+    function renderPage() {
+      const fresh = DB.getUserById(user.id) || user;
+      const goals = DB.getSavingsGoals(fresh);
+
+      // ---- tuiles récapitulatives
+      const totalSaved = goals.reduce((s, g) => s + Number(g.currentAmount), 0);
+      let closest = null;
+      goals.forEach(g => {
+        const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0;
+        if (!closest || pct > closest.pct) closest = { name: g.name, pct };
+      });
+      document.getElementById('tileGridWrap').innerHTML = `
+        <div class="stat-tile">
+          <div class="top"><div class="icon"><i class="fa-solid fa-piggy-bank"></i></div></div>
+          <div class="value">${DB.formatMoney(totalSaved, fresh.currency)}</div>
+          <div class="label">Total épargné</div>
+        </div>
+        <div class="stat-tile">
+          <div class="top"><div class="icon"><i class="fa-solid fa-bullseye"></i></div></div>
+          <div class="value">${goals.length}</div>
+          <div class="label">Objectifs actifs</div>
+        </div>
+        <div class="stat-tile">
+          <div class="top"><div class="icon"><i class="fa-solid fa-chart-line"></i></div></div>
+          <div class="value">${closest ? Math.round(Math.min(100, closest.pct)) + '%' : '—'}</div>
+          <div class="label">${closest ? 'Plus proche du but : ' + escapeHtml(closest.name) : 'Aucun objectif pour le moment'}</div>
+        </div>`;
+
+      // ---- grille des objectifs
+      const wrap = document.getElementById('goalsWrap');
+      if (!goals.length) {
+        wrap.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <i class="fa-solid fa-piggy-bank"></i>
+            <p>Vous n'avez pas encore d'objectif d'épargne.</p>
+            <button class="btn btn-primary btn-sm mt-16" id="emptyNewGoalBtn">Créer mon premier objectif</button>
+          </div>`;
+        document.getElementById('emptyNewGoalBtn')?.addEventListener('click', openGoalModal);
+        return;
+      }
+
+      wrap.innerHTML = goals.map(g => {
+        const pct = g.targetAmount > 0 ? Math.max(0, Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100))) : 0;
+        return `
+          <div class="goal-card">
+            <div class="goal-head">
+              <div class="goal-icon"><i class="fa-solid ${escapeHtml(g.icon)}"></i></div>
+              <button class="btn btn-sm btn-outline btn-icon" title="Supprimer l'objectif" data-delete="${g.id}"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <h3>${escapeHtml(g.name)}</h3>
+            <div class="goal-amounts"><b>${DB.formatMoney(g.currentAmount, fresh.currency)}</b><span class="text-muted">sur ${DB.formatMoney(g.targetAmount, fresh.currency)}</span></div>
+            <div class="progress-bar"><span data-width="${pct}" style="width:${pct}%"></span></div>
+            <div class="card-actions-row">
+              <button class="btn btn-sm btn-ghost" data-contribute="${g.id}">Mettre de côté</button>
+              <button class="btn btn-sm btn-outline" data-withdraw="${g.id}">Retirer</button>
+            </div>
+          </div>`;
+      }).join('');
+
+      wrap.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const goalId = btn.getAttribute('data-delete');
+          const goal = goals.find(x => x.id === goalId);
+          if (!goal) return;
+          const extra = goal.currentAmount > 0
+            ? ` Le montant déjà mis de côté (${DB.formatMoney(goal.currentAmount, fresh.currency)}) sera automatiquement recrédité sur votre solde disponible.`
+            : '';
+          if (confirm(`Supprimer l'objectif « ${goal.name} » ?${extra}`)) {
+            DB.deleteSavingsGoal(fresh.id, goalId);
+            renderPage();
+          }
+        });
+      });
+      wrap.querySelectorAll('[data-contribute]').forEach(btn => {
+        btn.addEventListener('click', () => openAmountModal(btn.getAttribute('data-contribute'), 'contribute'));
+      });
+      wrap.querySelectorAll('[data-withdraw]').forEach(btn => {
+        btn.addEventListener('click', () => openAmountModal(btn.getAttribute('data-withdraw'), 'withdraw'));
+      });
+    }
+
+    // ---- modale : nouvel objectif
+    function openGoalModal() {
+      document.getElementById('goalForm').reset();
+      const err = document.getElementById('goalFormError');
+      err.textContent = '';
+      err.classList.remove('show');
+      document.getElementById('goalModalOverlay').classList.add('open');
+    }
+    function closeGoalModal() { document.getElementById('goalModalOverlay').classList.remove('open'); }
+
+    document.getElementById('newGoalBtn').addEventListener('click', openGoalModal);
+    document.getElementById('goalCancelBtn').addEventListener('click', closeGoalModal);
+    document.getElementById('goalModalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'goalModalOverlay') closeGoalModal();
+    });
+
+    document.getElementById('goalForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('goalName').value.trim();
+      const target = Number(document.getElementById('goalTarget').value);
+      const icon = document.getElementById('goalIcon').value;
+      const err = document.getElementById('goalFormError');
+      if (!name || !target || target <= 0) {
+        err.textContent = 'Merci de renseigner un nom et un montant cible valide.';
+        err.classList.add('show');
+        return;
+      }
+      DB.createSavingsGoal(user.id, { name, targetAmount: target, icon });
+      closeGoalModal();
+      renderPage();
+    });
+
+    // ---- modale générique : mettre de côté / retirer
+    function openAmountModal(goalId, mode) {
+      currentAmountAction = { goalId, mode };
+      document.getElementById('amountModalTitle').textContent = mode === 'contribute' ? 'Mettre de côté' : 'Retirer';
+      document.getElementById('amountModalLabel').textContent = mode === 'contribute' ? 'Montant à mettre de côté' : 'Montant à retirer';
+      document.getElementById('amountSubmitBtn').textContent = mode === 'contribute' ? 'Mettre de côté' : 'Retirer';
+      document.getElementById('amountForm').reset();
+      const err = document.getElementById('amountFormError');
+      err.textContent = '';
+      err.classList.remove('show');
+      document.getElementById('amountModalOverlay').classList.add('open');
+    }
+    function closeAmountModal() {
+      document.getElementById('amountModalOverlay').classList.remove('open');
+      currentAmountAction = null;
+    }
+
+    document.getElementById('amountCancelBtn').addEventListener('click', closeAmountModal);
+    document.getElementById('amountModalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'amountModalOverlay') closeAmountModal();
+    });
+
+    document.getElementById('amountForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!currentAmountAction) return;
+      const amt = Number(document.getElementById('amountInput').value);
+      const err = document.getElementById('amountFormError');
+      try {
+        if (currentAmountAction.mode === 'contribute') {
+          DB.contributeToSavingsGoal(user.id, currentAmountAction.goalId, amt);
+        } else {
+          DB.withdrawFromSavingsGoal(user.id, currentAmountAction.goalId, amt);
+        }
+        closeAmountModal();
+        renderPage();
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.classList.add('show');
+      }
+    });
+
+    renderPage();
+  }
+</script>
+</body>
+</html>

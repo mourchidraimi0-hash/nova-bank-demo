@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NOVA BANK, banque d'affaires fictive basée à Hong Kong : banque d'investissement, gestion d'actifs et marchés de capitaux. Site de démonstration technique.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>NOVA BANK — Banque d'affaires à Hong Kong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <div class="nav-links">
+      <a href="forum.html">Forum</a>
+      <a href="a-propos.html">À propos</a>
+      <a href="index.html#services">Nos services</a>
+      <a href="carriere.html">Carrière</a>
+    </div>
+    <div class="nav-actions">
+      <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+      <a href="inscription.html" class="btn btn-primary btn-sm">Ouvrir un compte</a>
+    </div>
+    <button class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="drawer-overlay"></div>
+<div class="mobile-drawer">
+  <a href="forum.html">Forum</a>
+  <a href="a-propos.html">À propos</a>
+  <a href="index.html#services">Nos services</a>
+  <a href="carriere.html">Carrière</a>
+  <div class="drawer-cta">
+    <a href="connexion.html" class="btn btn-outline btn-block">Connexion</a>
+    <a href="inscription.html" class="btn btn-primary btn-block">Ouvrir un compte</a>
+  </div>
+</div>
+
+<section class="hero" style="background-image:url('images/hero-hongkong-night.jpg')">
+  <canvas class="particles"></canvas>
+  <div class="container hero-content">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Institution fictive de démonstration — Hong Kong</div>
+        <h1>Structurer <span class="gradient-text" id="typewriter">votre ambition à l'échelle mondiale.</span></h1>
+        <p class="lead">NOVA BANK accompagne entreprises, institutions et particuliers fortunés avec des solutions de banque d'affaires, de gestion d'actifs et de marchés de capitaux pensées pour l'Asie et le monde.</p>
+        <div class="hero-ctas">
+          <a href="inscription.html" class="btn btn-primary">Ouvrir un compte</a>
+          <a href="index.html#services" class="btn btn-outline-light">Découvrir nos services</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><b data-counter="120" data-suffix="+">0</b><span>Md$ d'actifs sous gestion</span></div>
+          <div class="hero-stat"><b data-counter="18">0</b><span>Années d'expertise</span></div>
+          <div class="hero-stat"><b data-counter="3200" data-suffix="+">0</b><span>Collaborateurs dans le monde</span></div>
+        </div>
+        <div class="hero-cities">
+          <span class="city-chip"><i class="fa-solid fa-location-dot"></i> Hong Kong</span>
+          <span class="city-chip"><i class="fa-solid fa-location-dot"></i> Singapour</span>
+          <span class="city-chip"><i class="fa-solid fa-location-dot"></i> Londres</span>
+          <span class="city-chip"><i class="fa-solid fa-location-dot"></i> New York</span>
+        </div>
+      </div>
+      <div class="hero-card-wrap">
+        <div class="bank-card">
+          <div class="chip"></div>
+          <div class="num">•••• •••• •••• 4471</div>
+          <div class="row">
+            <div>Titulaire<b>NOVA BANK</b></div>
+            <div>Expire<b>09/29</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panorama" style="background-image:url('images/hongkong-day.jpg')">
+  <div class="container">
+    <div class="panorama-content">
+      <h2>Notre ancrage</h2>
+      <p>Implantée au cœur de Central, à Hong Kong, NOVA BANK opère à la croisée des flux de capitaux entre l'Asie, l'Europe et les Amériques, au service d'une clientèle exigeante et internationale.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-head center" data-aos="fade-up">
+      <span class="eyebrow">Nos services</span>
+      <h2 class="section-title">Une offre complète pour chaque ambition</h2>
+      <p class="section-lead" style="margin-left:auto;margin-right:auto;">Des solutions sur mesure conçues pour les entreprises, les institutions et les investisseurs privés.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card" data-aos="fade-up">
+        <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+        <h3>Banque d'investissement</h3>
+        <p>Fusions-acquisitions, levées de capitaux et conseil stratégique pour accompagner la croissance des entreprises.</p>
+      </div>
+      <div class="card" data-aos="fade-up" data-aos-delay="80">
+        <div class="icon-box"><i class="fa-solid fa-coins"></i></div>
+        <h3>Gestion d'actifs</h3>
+        <p>Des stratégies d'investissement diversifiées, pilotées par des experts, pour faire fructifier votre patrimoine sur le long terme.</p>
+      </div>
+      <div class="card" data-aos="fade-up" data-aos-delay="160">
+        <div class="icon-box"><i class="fa-solid fa-handshake"></i></div>
+        <h3>Conseil financier</h3>
+        <p>Un accompagnement personnalisé pour structurer vos décisions financières et optimiser votre allocation de capital.</p>
+      </div>
+      <div class="card" data-aos="fade-up">
+        <div class="icon-box"><i class="fa-solid fa-building-columns"></i></div>
+        <h3>Financement de projets</h3>
+        <p>Montages financiers sur mesure pour les infrastructures, l'énergie et les grands projets industriels en Asie et au-delà.</p>
+      </div>
+      <div class="card" data-aos="fade-up" data-aos-delay="80">
+        <div class="icon-box"><i class="fa-solid fa-chart-pie"></i></div>
+        <h3>Marchés de capitaux</h3>
+        <p>Accès aux marchés actions et obligataires, émissions de titres et solutions de couverture des risques financiers.</p>
+      </div>
+      <div class="card" data-aos="fade-up" data-aos-delay="160">
+        <div class="icon-box"><i class="fa-solid fa-layer-group"></i></div>
+        <h3>Solutions institutionnelles</h3>
+        <p>Des services dédiés aux fonds, family offices et institutions financières nécessitant une exécution à grande échelle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="why-grid">
+      <div data-aos="fade-right">
+        <span class="eyebrow">Pourquoi nous choisir</span>
+        <h2 class="section-title">Une exigence de résultat, une culture de la confiance</h2>
+        <p class="section-lead">Depuis Hong Kong, nos équipes conjuguent rigueur financière et sens du service pour offrir à nos clients une expérience bancaire fluide, sécurisée et résolument tournée vers l'international.</p>
+      </div>
+      <div class="panel" data-aos="fade-left">
+        <div class="progress-item">
+          <div class="label"><span>Sécurité des données</span><span>96%</span></div>
+          <div class="progress-bar"><span data-width="96"></span></div>
+        </div>
+        <div class="progress-item">
+          <div class="label"><span>Rapidité d'ouverture de compte</span><span>88%</span></div>
+          <div class="progress-bar"><span data-width="88"></span></div>
+        </div>
+        <div class="progress-item">
+          <div class="label"><span>Satisfaction client</span><span>94%</span></div>
+          <div class="progress-bar"><span data-width="94"></span></div>
+        </div>
+        <div class="progress-item">
+          <div class="label"><span>Disponibilité du support</span><span>99%</span></div>
+          <div class="progress-bar"><span data-width="99"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head center" data-aos="fade-up">
+      <span class="eyebrow">Présence</span>
+      <h2 class="section-title">Présents sur les marchés</h2>
+      <p class="section-lead" style="margin-left:auto;margin-right:auto;">Une empreinte internationale, des équipes proches des places financières qui comptent.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="photo-tile" data-aos="fade-up" style="background-image:url('images/bangkok-twilight.jpg')">
+        <div class="tile-text">
+          <h4>Notre siège à Hong Kong</h4>
+          <p>Le cœur battant de nos activités, au centre des flux financiers asiatiques.</p>
+        </div>
+      </div>
+      <div class="photo-tile" data-aos="fade-up" data-aos-delay="80" style="background-image:url('images/nyse-trading-floor.jpg')">
+        <div class="tile-text">
+          <h4>Au cœur des marchés financiers</h4>
+          <p>Une exécution rapide et rigoureuse sur les principales places boursières mondiales.</p>
+        </div>
+      </div>
+      <div class="photo-tile" data-aos="fade-up" data-aos-delay="160" style="background-image:url('images/office-meeting.jpg')">
+        <div class="tile-text">
+          <h4>Des équipes dédiées</h4>
+          <p>Des conseillers expérimentés, disponibles pour accompagner chaque étape de votre projet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head center" data-aos="fade-up">
+      <span class="eyebrow">Simplicité</span>
+      <h2 class="section-title">Comment ça marche</h2>
+      <p class="section-lead" style="margin-left:auto;margin-right:auto;">Ouvrir un compte chez NOVA BANK ne prend que quelques minutes.</p>
+    </div>
+    <div class="steps">
+      <div class="step" data-aos="fade-up">
+        <div class="num">1</div>
+        <h4>Inscription en ligne</h4>
+        <p class="text-muted text-sm">Renseignez vos informations depuis notre formulaire sécurisé.</p>
+      </div>
+      <div class="step" data-aos="fade-up" data-aos-delay="80">
+        <div class="num">2</div>
+        <h4>Vérification d'identité</h4>
+        <p class="text-muted text-sm">Téléversez vos documents pour une vérification simulée rapide.</p>
+      </div>
+      <div class="step" data-aos="fade-up" data-aos-delay="160">
+        <div class="num">3</div>
+        <h4>Numéro de compte généré</h4>
+        <p class="text-muted text-sm">Un identifiant de compte vous est attribué instantanément.</p>
+      </div>
+      <div class="step" data-aos="fade-up" data-aos-delay="240">
+        <div class="num">4</div>
+        <h4>Accès à votre espace client</h4>
+        <p class="text-muted text-sm">Gérez vos opérations depuis votre tableau de bord personnel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head center" data-aos="fade-up">
+      <span class="eyebrow">Témoignages</span>
+      <h2 class="section-title">Ce que nos clients en disent</h2>
+    </div>
+    <div class="testi-wrap" data-aos="fade-up">
+      <div class="testi active">
+        <p>"NOVA BANK a structuré notre levée de fonds avec une rigueur et une réactivité remarquables. Un partenaire de confiance."</p>
+        <div class="avatar"><img src="images/testimonial-1.jpg" alt="Laura Wong"></div>
+        <b>Laura Wong</b>
+        <div class="text-muted text-sm">Directrice financière, Meridian Textiles (fictif)</div>
+      </div>
+      <div class="testi">
+        <p>"L'équipe de gestion d'actifs a su adapter sa stratégie à nos objectifs de long terme. Un accompagnement personnalisé et transparent."</p>
+        <div class="avatar"><img src="images/testimonial-2.jpg" alt="David Kwan"></div>
+        <b>David Kwan</b>
+        <div class="text-muted text-sm">Investisseur privé (fictif)</div>
+      </div>
+      <div class="testi">
+        <p>"Ouvrir un compte a été d'une simplicité déconcertante. L'espace client est clair et les équipes toujours disponibles."</p>
+        <div class="avatar"><img src="images/testimonial-3.jpg" alt="Sofia Nakamura"></div>
+        <b>Sofia Nakamura</b>
+        <div class="text-muted text-sm">Fondatrice, Orion Logistics (fictif)</div>
+      </div>
+      <div class="testi">
+        <p>"Un conseil financier de haut niveau et une compréhension fine des marchés asiatiques. Nous recommandons sans hésiter."</p>
+        <div class="avatar"><img src="images/testimonial-4.jpg" alt="Marco Rossi"></div>
+        <b>Marco Rossi</b>
+        <div class="text-muted text-sm">Directeur général, Altura Holdings (fictif)</div>
+      </div>
+      <div class="testi-dots"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-band" data-aos="zoom-in">
+      <h2>Prêt à structurer votre avenir financier ?</h2>
+      <p>Ouvrez un compte en quelques minutes et accédez à l'ensemble des services de NOVA BANK.</p>
+      <a href="inscription.html" class="btn btn-primary">Ouvrir un compte</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+        <p>Institution financière fictive présentée à des fins de démonstration. Aucune opération bancaire réelle n'est effectuée sur ce site.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Produits</h5>
+        <a href="index.html#services">Banque d'investissement</a>
+        <a href="index.html#services">Gestion d'actifs</a>
+        <a href="index.html#services">Marchés de capitaux</a>
+      </div>
+      <div class="footer-col">
+        <h5>Entreprise</h5>
+        <a href="a-propos.html">À propos</a>
+        <a href="carriere.html">Carrière</a>
+        <a href="forum.html">Forum</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="#">Central, Hong Kong</a>
+        <a href="#">contact@novabank.demo</a>
+        <a href="connexion.html">Espace client</a>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <strong>NOVA BANK</strong> est une marque et une institution entièrement fictives, créées à des fins de démonstration technique uniquement. Ce site ne représente aucune banque réelle, n'effectue aucune opération bancaire réelle et ne doit pas être utilisé pour de véritables transactions financières. Toutes les données saisies restent stockées localement dans votre navigateur et ne sont transmises à aucun serveur.
+      <br><br>
+      Crédits photo : panorama nocturne de Hong Kong, par Diliff, licence CC BY-SA 3.0 — vue diurne de Hong Kong depuis le Star Ferry, par Ben Herzberg, licence CC BY-SA 3.0 — crépuscule sur les gratte-ciel du quartier de Ratchadamri à Bangkok, par Sergei Gussev, licence CC BY 4.0 — parquet de la Bourse de New York, par Carol M. Highsmith, domaine public — réunion de travail en bureau, photo de Tim Gouw, licence CC0 — portraits de témoignages (personnes anonymes, modèles libres de droits) par rawpixel.com, Foto Sushi, REASONS ART et Yingchou Han, licence CC0. Toutes ces photographies proviennent de Wikimedia Commons.
+    </div>
+  </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function(){
+  var el = document.getElementById('typewriter');
+  if (!el) return;
+  var words = [
+    "votre ambition à l'échelle mondiale.",
+    'vos opérations sur les marchés mondiaux.',
+    "l'avenir de votre patrimoine."
+  ];
+  var wi = 0, ci = 0, deleting = false;
+  function tick(){
+    var word = words[wi];
+    if (!deleting) {
+      ci++;
+      el.textContent = word.slice(0, ci);
+      if (ci === word.length) { deleting = true; setTimeout(tick, 1800); return; }
+    } else {
+      ci--;
+      el.textContent = word.slice(0, ci);
+      if (ci === 0) { deleting = false; wi = (wi + 1) % words.length; }
+    }
+    setTimeout(tick, deleting ? 30 : 55);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>

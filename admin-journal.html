@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Journal d'activité administrateur NOVA BANK, permanent et non modifiable.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Journal d'activité — Back-office NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<div class="admin-mobile-topbar">
+  <button data-sidebar-toggle class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <span class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></span>
+  <button data-theme-toggle class="theme-toggle"></button>
+</div>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="admin-dashboard.html" class="nav-logo"><span class="logo-mark">NB</span> Back-office</a>
+    <span class="admin-role-tag" data-admin-role></span>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="admin-clients.html"><i class="fa-solid fa-users"></i> Clients</a>
+      <a href="admin-operations.html"><i class="fa-solid fa-arrow-right-arrow-left"></i> Opérations</a>
+      <a href="admin-journal.html" class="active"><i class="fa-solid fa-scroll"></i> Journal d'activité</a>
+    </nav>
+    <div class="bottom-links">
+      <span class="text-sm" style="color:rgba(255,255,255,.6)">Connecté : <span data-admin-name></span></span>
+      <a href="#" data-admin-logout><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Journal d'activité</h1>
+      <button data-theme-toggle class="theme-toggle"></button>
+    </div>
+
+    <div class="admin-card">
+      <div class="filters-row">
+        <input type="text" class="form-control" id="searchInput" placeholder="Rechercher par action, détail ou administrateur…">
+      </div>
+      <p class="field-hint">Ce journal est permanent et non modifiable : aucune entrée ne peut être supprimée ou éditée, y compris par un Super Admin.</p>
+      <div id="logWrap"></div>
+    </div>
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  const session = ADMIN_UI.guard();
+  if (session) {
+    const ACTION_LABELS = {
+      inscription_client: "Inscription d'un client",
+      connexion_admin: 'Connexion administrateur',
+      deconnexion_admin: 'Déconnexion administrateur',
+      virement_initie: 'Virement initié',
+      suspension_compte: 'Suspension de compte',
+      reactivation_compte: 'Réactivation de compte',
+      activation_compte: 'Activation de compte',
+      demande_informations: "Demande d'informations",
+      ajustement_solde: 'Ajustement de solde',
+      changement_statut_operation: "Changement de statut d'opération",
+      note_ajoutee: 'Note ajoutée'
+    };
+
+    function render() {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const entries = DB.getActivityLog().filter(e => {
+        if (!q) return true;
+        const haystack = `${e.action} ${e.detail} ${e.adminName}`.toLowerCase();
+        return haystack.includes(q);
+      });
+
+      const wrap = document.getElementById('logWrap');
+      if (!entries.length) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-scroll"></i><p>Aucune entrée ne correspond à ces critères.</p></div>';
+        return;
+      }
+
+      wrap.innerHTML = entries.map(e => `
+        <div class="log-item">
+          <div><b>${escapeHtml(ACTION_LABELS[e.action] || e.action)}</b></div>
+          <div>${escapeHtml(e.detail)}</div>
+          <div class="meta">${escapeHtml(e.adminName || 'Système')} (${escapeHtml(e.role ? DB.roleLabel(e.role) : 'Système')}) — ${timeAgo(e.date)}</div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('searchInput').addEventListener('input', render);
+    render();
+  }
+</script>
+</body>
+</html>

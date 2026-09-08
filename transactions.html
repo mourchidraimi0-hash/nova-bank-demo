@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Historique complet et filtrable de vos transactions NOVA BANK, avec export CSV.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Transactions — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html" class="active"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1>Transactions</h1>
+      <p>Historique complet et filtrable de toutes vos opérations.</p>
+    </div>
+
+    <div class="filters-row">
+      <input type="text" class="form-control" id="searchInput" placeholder="Rechercher par description, référence ou bénéficiaire…" style="max-width:340px">
+      <select class="form-control" id="statusFilter">
+        <option value="">Tous les statuts</option>
+        <option value="pending">En attente</option>
+        <option value="processing">En cours</option>
+        <option value="confirmed">Confirmée</option>
+        <option value="rejected">Rejetée</option>
+        <option value="cancelled">Annulée</option>
+      </select>
+      <select class="form-control" id="typeFilter">
+        <option value="">Tous les types</option>
+        <option value="transfer_out">Virements sortants</option>
+        <option value="credit">Crédits</option>
+        <option value="debit">Débits</option>
+      </select>
+      <button class="btn btn-outline btn-sm" id="exportBtn" style="margin-left:auto"><i class="fa-solid fa-download"></i> Exporter en CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <div id="tableWrap"></div>
+    </div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    const TYPE_LABELS = { transfer_out: 'Virement sortant', credit: 'Crédit', debit: 'Débit' };
+    function humanType(t) { return TYPE_LABELS[t] || t; }
+
+    function getFiltered(all) {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      return all.filter(t => {
+        if (status && t.status !== status) return false;
+        if (type && t.type !== type) return false;
+        if (q) {
+          const hay = [t.description, t.ref, t.beneficiary].filter(Boolean).join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderTable() {
+      const fresh = DB.getUserById(user.id) || user;
+      const all = fresh.transactions || [];
+      const filtered = getFiltered(all);
+      const wrap = document.getElementById('tableWrap');
+
+      if (!all.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-inbox"></i>
+            <p>Aucune opération pour le moment.</p>
+          </div>`;
+        return;
+      }
+      if (!filtered.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            <p>Aucune opération ne correspond à ces filtres.</p>
+          </div>`;
+        return;
+      }
+
+      const rows = filtered.map(t => {
+        const isOut = t.type === 'transfer_out' || t.type === 'debit';
+        const sign = isOut ? '-' : '+';
+        const cls = isOut ? 'amount-neg' : 'amount-pos';
+        const benef = t.beneficiary ? ` <span class="text-muted text-sm">(${escapeHtml(t.beneficiary)})</span>` : '';
+        return `
+          <tr>
+            <td><code>${escapeHtml(t.ref)}</code></td>
+            <td>${escapeHtml(t.description)}${benef}</td>
+            <td>${timeAgo(t.createdAt)}</td>
+            <td>${escapeHtml(humanType(t.type))}</td>
+            <td>${statusBadge(t.status)}</td>
+            <td class="${cls}">${sign}${DB.formatMoney(t.amount, t.currency)}</td>
+          </tr>`;
+      }).join('');
+
+      wrap.innerHTML = `
+        <table class="data-table">
+          <thead>
+            <tr><th>Référence</th><th>Description</th><th>Date</th><th>Type</th><th>Statut</th><th>Montant</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    function exportCsv() {
+      const fresh = DB.getUserById(user.id) || user;
+      const filtered = getFiltered(fresh.transactions || []);
+      const header = ['Référence', 'Description', 'Date', 'Type', 'Statut', 'Montant', 'Devise'];
+      const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const lines = [header.map(esc).join(';')];
+      filtered.forEach(t => {
+        const isOut = t.type === 'transfer_out' || t.type === 'debit';
+        const amount = (isOut ? '-' : '+') + Number(t.amount).toFixed(2);
+        lines.push([t.ref, t.description, timeAgo(t.createdAt), humanType(t.type), t.status, amount, t.currency].map(esc).join(';'));
+      });
+      const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `transactions_${fresh.accountNumber || 'nova-bank'}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderTable);
+    document.getElementById('statusFilter').addEventListener('change', renderTable);
+    document.getElementById('typeFilter').addEventListener('change', renderTable);
+    document.getElementById('exportBtn').addEventListener('click', exportCsv);
+
+    renderTable();
+  }
+</script>
+</body>
+</html>

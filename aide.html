@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Centre d'aide NOVA BANK : questions fréquentes, recherche et formulaire de contact de l'assistance.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Centre d'aide — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html" class="active"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1>Centre d'aide</h1>
+      <p>Trouvez rapidement une réponse, ou contactez-nous.</p>
+    </div>
+
+    <div class="help-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="helpSearch" class="form-control" placeholder="Rechercher une question, un mot-clé…" autocomplete="off">
+    </div>
+
+    <div class="grid grid-3 mb-24" id="helpCatsWrap" data-animate-group>
+      <div class="help-cat" data-target="cat-compte">
+        <div class="icon-box"><i class="fa-solid fa-user-lock"></i></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Compte &amp; Connexion</h4><span class="text-sm text-muted">Accès, mot de passe, infos</span></div>
+      </div>
+      <div class="help-cat" data-target="cat-virements">
+        <div class="icon-box"><i class="fa-solid fa-paper-plane"></i></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Virements</h4><span class="text-sm text-muted">Envoyer, suivre, annuler</span></div>
+      </div>
+      <div class="help-cat" data-target="cat-cartes">
+        <div class="icon-box"><i class="fa-solid fa-credit-card"></i></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Cartes bancaires</h4><span class="text-sm text-muted">Geler, sécuriser</span></div>
+      </div>
+      <div class="help-cat" data-target="cat-epargne">
+        <div class="icon-box"><i class="fa-solid fa-piggy-bank"></i></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Épargne</h4><span class="text-sm text-muted">Objectifs, mises de côté</span></div>
+      </div>
+      <div class="help-cat" data-target="cat-securite">
+        <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Sécurité</h4><span class="text-sm text-muted">Compte, données, connexions</span></div>
+      </div>
+      <div class="help-cat" data-target="cat-facturation">
+        <div class="icon-box"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Facturation &amp; Frais</h4><span class="text-sm text-muted">Opérations, relevés</span></div>
+      </div>
+    </div>
+
+    <div id="faqEmptyState" class="empty-state hidden">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <p>Aucune question ne correspond à votre recherche.</p>
+    </div>
+
+    <section id="cat-compte" class="mb-24">
+      <h3 class="mb-16">Compte &amp; Connexion</h3>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment créer un compte NOVA BANK ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Cliquez sur « Ouvrir un compte » depuis la page d'accueil et suivez les étapes du formulaire d'inscription (identité, coordonnées, choix de devise). Un compte de démonstration est créé instantanément dans votre navigateur, sans vérification bancaire réelle.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>J'ai oublié mon mot de passe, que faire ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Dans cet environnement de démonstration, il n'existe pas de procédure de récupération par e-mail. Si vous êtes déjà connecté, rendez-vous sur la page Sécurité pour définir un nouveau mot de passe. Sinon, il faudra recréer un compte de test.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment mettre à jour mes informations personnelles ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Rendez-vous dans « Profil &amp; paramètres » pour modifier vos coordonnées. Ces informations restent stockées localement dans votre navigateur et ne sont partagées avec aucun tiers.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Pourquoi mon compte est-il suspendu ou en attente d'informations ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Dans la maquette, un compte administrateur de démonstration peut simuler une suspension ou une demande d'informations complémentaires, afin d'illustrer le fonctionnement d'un vrai back-office bancaire. Un message vous explique alors le motif dans vos notifications.</div></div>
+      </div>
+    </section>
+
+    <section id="cat-virements" class="mb-24">
+      <h3 class="mb-16">Virements</h3>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment effectuer un virement ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Depuis le menu « Virement », renseignez le bénéficiaire, son IBAN, le montant et le motif, puis validez à l'aide du code de confirmation affiché à l'écran. Le virement est ensuite placé en attente de validation.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Pourquoi mon virement est-il en attente de validation ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Pour reproduire fidèlement un vrai parcours bancaire, chaque virement sortant est d'abord créé au statut « En attente ». Il est ensuite confirmé, mis en cours de traitement ou rejeté par le back-office de démonstration, ce qui met à jour votre solde en conséquence.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Puis-je annuler un virement après l'avoir envoyé ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Un virement encore « en attente » ou « en cours » peut être annulé par le back-office de démonstration ; le montant, s'il avait déjà été débité, est alors recrédité automatiquement sur votre compte. Il n'existe pas d'action d'annulation directe côté client dans cette version.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Quels sont les délais d'exécution d'un virement ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Il s'agit d'une simulation : les délais affichés (immédiat, jour ouvré suivant, etc.) sont uniquement indicatifs et ne correspondent à aucun traitement bancaire réel.</div></div>
+      </div>
+    </section>
+
+    <section id="cat-cartes" class="mb-24">
+      <h3 class="mb-16">Cartes bancaires</h3>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment geler ou dégeler ma carte ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Rendez-vous dans « Cartes » et utilisez le bouton dédié sur votre carte. Le gel est immédiat et purement local à votre navigateur ; il ne bloque aucune transaction réelle puisque la carte n'existe pas physiquement.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Où puis-je voir le numéro complet de ma carte ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Pour cette démonstration, seuls les 4 derniers chiffres de votre carte sont générés et affichés. Aucun numéro de carte complet, aucune date d'expiration ni cryptogramme réels ne sont créés ou stockés.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Que faire si ma carte semble compromise ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Comme il s'agit d'un prototype, aucune carte réelle n'est jamais associée à votre compte : vous pouvez geler la carte de démonstration à tout moment depuis la page Cartes, sans conséquence financière.</div></div>
+      </div>
+    </section>
+
+    <section id="cat-epargne" class="mb-24">
+      <h3 class="mb-16">Épargne</h3>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment créer un objectif d'épargne ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Depuis la page « Épargne », cliquez sur « Nouvel objectif », donnez-lui un nom et un montant cible, puis alimentez-le quand vous le souhaitez depuis votre solde disponible.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>La mise de côté est-elle un vrai virement bancaire ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Non : il s'agit d'un mouvement interne à votre compte de démonstration. Le montant est simplement déplacé de votre solde disponible vers l'objectif choisi, sans passer par un quelconque circuit bancaire réel.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Puis-je retirer l'argent d'un objectif à tout moment ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Oui, un retrait recrédite instantanément le montant sur votre solde disponible. Aucun délai ni pénalité ne s'applique dans cette simulation.</div></div>
+      </div>
+    </section>
+
+    <section id="cat-securite" class="mb-24">
+      <h3 class="mb-16">Sécurité</h3>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Mes documents d'identité sont-ils stockés en toute sécurité ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Dans cet environnement de démonstration, seules les métadonnées de vos documents (nom, type, taille de fichier) sont conservées dans votre navigateur — jamais leur contenu réel. Aucun document n'est envoyé sur un serveur.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment changer mon mot de passe ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Depuis la page Sécurité, renseignez votre mot de passe actuel puis le nouveau (8 caractères minimum). Il est immédiatement re-haché et stocké localement ; personne, pas même l'équipe du site, ne peut le consulter en clair.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment consulter l'historique de mes connexions ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">La page Sécurité affiche vos 20 dernières connexions enregistrées, avec la date et une estimation du navigateur et du système utilisés.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>NOVA BANK est-elle une vraie banque agréée ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Non. NOVA BANK est une plateforme de démonstration technique : elle ne détient aucune licence bancaire, n'est certifiée par aucun organisme de sécurité et ne doit jamais recevoir de véritables identifiants financiers. Plus de détails sont disponibles sur la page Sécurité.</div></div>
+      </div>
+    </section>
+
+    <section id="cat-facturation" class="mb-24">
+      <h3 class="mb-16">Facturation &amp; Frais</h3>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>NOVA BANK facture-t-elle des frais réels ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Non, aucun frais réel n'est jamais prélevé : il n'existe aucun moyen de paiement réel connecté à ce site. Les montants affichés servent uniquement à illustrer le fonctionnement d'une interface bancaire.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Comment consulter l'historique de mes opérations ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">La page « Transactions » liste l'ensemble de vos opérations, avec filtres par statut et par type, ainsi que leur date et leur montant.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question"><span>Puis-je exporter mes relevés ?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Cette fonctionnalité n'est pas proposée dans la version actuelle de la démonstration. Toutes vos données restent consultables à tout moment dans votre espace client, stockées localement dans votre navigateur.</div></div>
+      </div>
+    </section>
+
+    <div class="form-card wide" style="margin:0 0 40px;">
+      <h1 style="font-size:1.3rem;">Nous contacter</h1>
+      <p class="sub">Une question qui ne trouve pas de réponse ci-dessus ? Écrivez-nous.</p>
+      <div id="contactAlertWrap"></div>
+      <form id="contactForm" novalidate>
+        <div class="form-row">
+          <label for="contactName">Nom</label>
+          <input type="text" id="contactName" class="form-control" required>
+        </div>
+        <div class="form-row">
+          <label for="contactEmail">E-mail</label>
+          <input type="email" id="contactEmail" class="form-control" required>
+        </div>
+        <div class="form-row">
+          <label for="contactMessage">Message</label>
+          <textarea id="contactMessage" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Envoyer</button>
+      </form>
+    </div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    // ---- clic sur une catégorie : défilement vers la section FAQ correspondante
+    document.getElementById('helpCatsWrap').addEventListener('click', (e) => {
+      const cat = e.target.closest('.help-cat');
+      if (!cat) return;
+      const target = document.getElementById(cat.getAttribute('data-target'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // ---- recherche en direct dans les FAQ
+    const searchInput = document.getElementById('helpSearch');
+    const faqSections = [...document.querySelectorAll('section[id^="cat-"]')];
+    const emptyState = document.getElementById('faqEmptyState');
+
+    searchInput.addEventListener('input', () => {
+      const term = searchInput.value.trim().toLowerCase();
+      let totalVisible = 0;
+
+      faqSections.forEach(section => {
+        let sectionVisible = 0;
+        section.querySelectorAll('.faq-item').forEach(item => {
+          const q = item.querySelector('.faq-question span')?.textContent.toLowerCase() || '';
+          const a = item.querySelector('.faq-answer .inner')?.textContent.toLowerCase() || '';
+          const match = !term || q.includes(term) || a.includes(term);
+          item.classList.toggle('hidden', !match);
+          if (match) sectionVisible++;
+        });
+        section.classList.toggle('hidden', sectionVisible === 0);
+        totalVisible += sectionVisible;
+      });
+
+      emptyState.classList.toggle('hidden', totalVisible > 0);
+    });
+
+    // ---- formulaire de contact (démonstration uniquement, aucun envoi réel)
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const alertWrap = document.getElementById('contactAlertWrap');
+      alertWrap.innerHTML = `
+        <div class="alert alert-success">
+          <i class="fa-solid fa-circle-check"></i>
+          <div>Message envoyé (démonstration) — Ceci est un site de démonstration : aucun message n'est réellement transmis à une équipe support.</div>
+        </div>`;
+      e.target.reset();
+    });
+  }
+</script>
+</body>
+</html>

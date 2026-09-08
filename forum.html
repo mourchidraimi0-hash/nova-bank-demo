@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Analyses de marché, perspectives économiques et actualités financières signées NOVA BANK. Contenu fictif à des fins de démonstration technique.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Forum & Analyses — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .filter-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:44px;}
+  .filter-pill{border:1.5px solid var(--border);background:var(--white);color:var(--anthracite-soft);padding:9px 20px;border-radius:999px;font-weight:600;font-size:.86rem;transition:all .2s;}
+  .filter-pill:hover{border-color:var(--cyan);color:var(--cyan-dark);}
+  .filter-pill.active{background:var(--anthracite);border-color:var(--anthracite);color:var(--white);}
+  .article-tag{display:inline-block;background:var(--cyan-soft);color:var(--cyan-dark);font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:14px;}
+  .article-meta{color:var(--anthracite-light);font-size:.82rem;margin:14px 0;}
+  .article-locked{font-size:.8rem;color:var(--anthracite-light);margin-top:10px;}
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <div class="nav-links">
+      <a href="forum.html">Forum</a>
+      <a href="a-propos.html">À propos</a>
+      <a href="index.html#services">Nos services</a>
+      <a href="carriere.html">Carrière</a>
+    </div>
+    <div class="nav-actions">
+      <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+      <a href="inscription.html" class="btn btn-primary btn-sm">Ouvrir un compte</a>
+    </div>
+    <button class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="drawer-overlay"></div>
+<div class="mobile-drawer">
+  <a href="forum.html">Forum</a>
+  <a href="a-propos.html">À propos</a>
+  <a href="index.html#services">Nos services</a>
+  <a href="carriere.html">Carrière</a>
+  <div class="drawer-cta">
+    <a href="connexion.html" class="btn btn-outline btn-block">Connexion</a>
+    <a href="inscription.html" class="btn btn-primary btn-block">Ouvrir un compte</a>
+  </div>
+</div>
+
+<section class="hero" style="min-height:55vh;background-image:url('images/hero-hongkong-night.jpg')">
+  <div class="container hero-content">
+    <div class="hero-badge"><i class="fa-solid fa-newspaper"></i> Analyses & perspectives</div>
+    <h1>Forum & <span class="gradient-text">Analyses</span></h1>
+    <p class="lead">Décryptages, perspectives de marché et éclairages économiques préparés par les équipes de recherche de NOVA BANK.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="filter-row" id="filterRow">
+      <button class="filter-pill active" data-category="tous">Tous</button>
+      <button class="filter-pill" data-category="marches">Marchés</button>
+      <button class="filter-pill" data-category="analyse">Analyse</button>
+      <button class="filter-pill" data-category="economie">Économie</button>
+      <button class="filter-pill" data-category="investissement">Investissement</button>
+      <button class="filter-pill" data-category="entreprise">Entreprise</button>
+    </div>
+
+    <div class="grid grid-3" id="articleGrid">
+      <div class="card article-card" data-category="marches" data-aos="fade-up">
+        <div class="article-thumb"><img src="images/hongkong-day.jpg" alt=""></div>
+        <span class="article-tag">Marchés</span>
+        <h3>Volatilité sur les places asiatiques : ce qu'il faut surveiller</h3>
+        <p>Les marchés actions d'Asie-Pacifique enregistrent des mouvements contrastés ce trimestre. Notre équipe de recherche passe en revue les principaux facteurs à surveiller.</p>
+        <div class="article-meta">Par Chen Wei — 2 sept. 2026</div>
+        <a href="inscription.html">Lire l'article →</a>
+        <div class="article-locked">Contenu réservé à nos clients — ouvrez un compte pour lire l'analyse complète.</div>
+      </div>
+
+      <div class="card article-card" data-category="analyse" data-aos="fade-up" data-aos-delay="80">
+        <div class="article-thumb"><img src="images/nyse-trading-floor.jpg" alt=""></div>
+        <span class="article-tag">Analyse</span>
+        <h3>Taux d'intérêt : quelles perspectives pour les six prochains mois ?</h3>
+        <p>Après une période de stabilisation, plusieurs signaux macroéconomiques laissent entrevoir une inflexion des politiques monétaires. Décryptage de nos stratégistes.</p>
+        <div class="article-meta">Par Isabelle Moreau — 29 août 2026</div>
+        <a href="inscription.html">Lire l'article →</a>
+        <div class="article-locked">Contenu réservé à nos clients — ouvrez un compte pour lire l'analyse complète.</div>
+      </div>
+
+      <div class="card article-card" data-category="economie" data-aos="fade-up" data-aos-delay="160">
+        <div class="article-thumb"><img src="images/bangkok-twilight.jpg" alt=""></div>
+        <span class="article-tag">Économie</span>
+        <h3>Croissance en Asie du Sud-Est : les secteurs à suivre</h3>
+        <p>Le dynamisme économique de la région continue d'attirer les capitaux. Tour d'horizon des secteurs qui portent cette croissance selon nos économistes.</p>
+        <div class="article-meta">Par Marcus Tan — 24 août 2026</div>
+        <a href="inscription.html">Lire l'article →</a>
+        <div class="article-locked">Contenu réservé à nos clients — ouvrez un compte pour lire l'analyse complète.</div>
+      </div>
+
+      <div class="card article-card" data-category="investissement" data-aos="fade-up">
+        <div class="article-thumb"><img src="images/article-london.jpg" alt=""></div>
+        <span class="article-tag">Investissement</span>
+        <h3>Diversification de portefeuille : les principes intemporels</h3>
+        <p>Face à l'incertitude des marchés, une allocation d'actifs bien diversifiée reste un pilier essentiel. Retour sur les fondamentaux avec nos gérants.</p>
+        <div class="article-meta">Par Amélie Rousseau — 18 août 2026</div>
+        <a href="inscription.html">Lire l'article →</a>
+        <div class="article-locked">Contenu réservé à nos clients — ouvrez un compte pour lire l'analyse complète.</div>
+      </div>
+
+      <div class="card article-card" data-category="entreprise" data-aos="fade-up" data-aos-delay="80">
+        <div class="article-thumb"><img src="images/hero-hongkong-night.jpg" alt=""></div>
+        <span class="article-tag">Entreprise</span>
+        <h3>NOVA BANK renforce son équipe de recherche à Singapour</h3>
+        <p>Dans le cadre de son développement régional, notre institution annonce l'arrivée de nouveaux talents au sein de son pôle recherche et stratégie.</p>
+        <div class="article-meta">Par Rédaction Nova Bank — 12 août 2026</div>
+        <a href="inscription.html">Lire l'article →</a>
+        <div class="article-locked">Contenu réservé à nos clients — ouvrez un compte pour lire l'analyse complète.</div>
+      </div>
+
+      <div class="card article-card" data-category="marches" data-aos="fade-up" data-aos-delay="160">
+        <div class="article-thumb"><img src="images/article-containership.jpg" alt=""></div>
+        <span class="article-tag">Marchés</span>
+        <h3>Matières premières : que retenir du dernier trimestre ?</h3>
+        <p>Entre tensions géopolitiques et ajustements de l'offre, les marchés de matières premières restent sous tension. Notre synthèse trimestrielle.</p>
+        <div class="article-meta">Par Chen Wei — 5 août 2026</div>
+        <a href="inscription.html">Lire l'article →</a>
+        <div class="article-locked">Contenu réservé à nos clients — ouvrez un compte pour lire l'analyse complète.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="cta-band" data-aos="zoom-in">
+      <h2>Accédez à l'ensemble de nos analyses</h2>
+      <p>Ouvrez un compte NOVA BANK pour consulter l'intégralité de nos publications et suivre nos perspectives de marché.</p>
+      <a href="inscription.html" class="btn btn-primary">Ouvrir un compte</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+        <p>Institution financière fictive présentée à des fins de démonstration. Aucune opération bancaire réelle n'est effectuée sur ce site.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Produits</h5>
+        <a href="index.html#services">Banque d'investissement</a>
+        <a href="index.html#services">Gestion d'actifs</a>
+        <a href="index.html#services">Marchés de capitaux</a>
+      </div>
+      <div class="footer-col">
+        <h5>Entreprise</h5>
+        <a href="a-propos.html">À propos</a>
+        <a href="carriere.html">Carrière</a>
+        <a href="forum.html">Forum</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="#">Central, Hong Kong</a>
+        <a href="#">contact@novabank.demo</a>
+        <a href="connexion.html">Espace client</a>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <strong>NOVA BANK</strong> est une marque et une institution entièrement fictives, créées à des fins de démonstration technique uniquement. Ce site ne représente aucune banque réelle, n'effectue aucune opération bancaire réelle et ne doit pas être utilisé pour de véritables transactions financières. Toutes les données saisies restent stockées localement dans votre navigateur et ne sont transmises à aucun serveur.
+      <br><br>
+      Crédits photo : panorama nocturne de Hong Kong et vue diurne depuis le Star Ferry, par Diliff et Ben Herzberg, licence CC BY-SA 3.0 — crépuscule sur Bangkok, par Sergei Gussev, licence CC BY 4.0 — parquet de la Bourse de New York, par Carol M. Highsmith, domaine public — gratte-ciel de Londres, par Captain Galaxy, licence CC BY 4.0 — porte-conteneurs au port de Koper, par Petar Milošević, licence CC BY-SA 4.0. Toutes via Wikimedia Commons.
+    </div>
+  </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function(){
+  var pills = document.querySelectorAll('#filterRow .filter-pill');
+  var cards = document.querySelectorAll('#articleGrid .article-card');
+  pills.forEach(function(pill){
+    pill.addEventListener('click', function(){
+      pills.forEach(function(p){ p.classList.remove('active'); });
+      pill.classList.add('active');
+      var cat = pill.getAttribute('data-category');
+      cards.forEach(function(card){
+        var show = cat === 'tous' || card.getAttribute('data-category') === cat;
+        card.classList.toggle('hidden', !show);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

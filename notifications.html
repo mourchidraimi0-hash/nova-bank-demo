@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Consultez toutes les notifications et alertes liées à votre compte NOVA BANK.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Notifications — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html" class="active"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head flex-between">
+      <div>
+        <h1>Notifications</h1>
+        <p>Toutes les alertes et informations relatives à votre compte.</p>
+      </div>
+      <button class="btn btn-outline btn-sm hidden" id="markAllBtn"><i class="fa-solid fa-check-double"></i> Tout marquer comme lu</button>
+    </div>
+
+    <div class="segmented mb-24" id="notifFilters">
+      <button class="active" data-filter="all">Toutes</button>
+      <button data-filter="info">Info</button>
+      <button data-filter="success">Succès</button>
+      <button data-filter="warn">Avertissement</button>
+      <button data-filter="danger">Sécurité</button>
+    </div>
+
+    <div id="notifListWrap" data-animate-group></div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    const ICONS = { info: 'fa-circle-info', success: 'fa-circle-check', warn: 'fa-triangle-exclamation', danger: 'fa-shield-halved' };
+    let currentFilter = 'all';
+
+    function renderNotifications() {
+      const fresh = DB.getUserById(user.id);
+      const all = fresh.notifications || [];
+      const unreadCount = all.filter(n => !n.read).length;
+
+      document.getElementById('markAllBtn').classList.toggle('hidden', unreadCount === 0);
+
+      const list = currentFilter === 'all' ? all : all.filter(n => n.type === currentFilter);
+      const wrap = document.getElementById('notifListWrap');
+
+      if (!list.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>${all.length ? "Aucune notification ne correspond à ce filtre." : "Vous n'avez aucune notification pour le moment."}</p>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = list.map(n => `
+        <div class="notif-list-item ${n.read ? '' : 'unread'}" data-id="${escapeHtml(n.id)}"${n.read ? '' : ' style="cursor:pointer"'}>
+          <div class="n-icon"><i class="fa-solid ${ICONS[n.type] || 'fa-circle-info'}"></i></div>
+          <div class="n-body">
+            <p>${escapeHtml(n.message)}</p>
+            <div class="n-meta">${timeAgo(n.date)}</div>
+          </div>
+          ${n.read ? '' : '<div class="notif-dot"></div>'}
+        </div>`).join('');
+    }
+
+    document.getElementById('notifFilters').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-filter]');
+      if (!btn) return;
+      currentFilter = btn.getAttribute('data-filter');
+      document.querySelectorAll('#notifFilters button').forEach(b => b.classList.toggle('active', b === btn));
+      renderNotifications();
+    });
+
+    document.getElementById('notifListWrap').addEventListener('click', (e) => {
+      const item = e.target.closest('.notif-list-item');
+      if (!item) return;
+      DB.markNotificationRead(user.id, item.getAttribute('data-id'));
+      renderNotifications();
+      if (typeof initNotifBadge === 'function') initNotifBadge();
+    });
+
+    document.getElementById('markAllBtn').addEventListener('click', () => {
+      const fresh = DB.getUserById(user.id);
+      (fresh.notifications || []).filter(n => !n.read).forEach(n => DB.markNotificationRead(user.id, n.id));
+      renderNotifications();
+      if (typeof initNotifBadge === 'function') initNotifBadge();
+    });
+
+    renderNotifications();
+  }
+</script>
+</body>
+</html>

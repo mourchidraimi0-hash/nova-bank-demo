@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gérez vos informations personnelles et vos préférences de compte sur NOVA BANK.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Profil &amp; paramètres — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html" class="active"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1>Profil &amp; paramètres</h1>
+      <p>Vos informations personnelles et vos préférences de compte.</p>
+    </div>
+
+    <div data-animate-group>
+
+      <div class="card mb-24">
+        <h3>Informations personnelles</h3>
+        <div class="info-grid" id="infoGridWrap"></div>
+      </div>
+
+      <div class="card mb-24">
+        <h3 class="mb-16">Préférences de notifications</h3>
+        <div class="switch-row">
+          <div class="switch-label">
+            <b>Notifications par e-mail</b>
+            <span>Recevez un e-mail pour les opérations importantes de votre compte.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="prefEmail">
+            <span class="track"></span>
+          </label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-label">
+            <b>Notifications par SMS</b>
+            <span>Recevez un SMS pour les alertes urgentes (fraude, blocage de carte...).</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="prefSms">
+            <span class="track"></span>
+          </label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-label">
+            <b>Résumé mensuel par e-mail</b>
+            <span>Recevez un récapitulatif mensuel de votre activité bancaire.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="prefDigest">
+            <span class="track"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="card mb-24">
+        <h3 class="mb-16">Langue et devise</h3>
+        <div class="info-grid">
+          <div class="info-item"><span>Langue</span><b>Français</b></div>
+          <div class="info-item"><span>Devise du compte</span><b id="currencyValue"></b></div>
+        </div>
+        <p class="field-hint mt-16">La devise du compte est définie à l'ouverture et ne peut pas être modifiée depuis cette page de démonstration.</p>
+      </div>
+
+      <div class="card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div class="icon-box" style="margin-bottom:0;"><i class="fa-solid fa-shield-halved"></i></div>
+        <div style="flex:1;min-width:220px;">
+          <h3 style="margin-bottom:4px;">Mot de passe et sécurité</h3>
+          <p class="text-muted text-sm">Pour changer votre mot de passe ou consulter l'activité de sécurité de votre compte, rendez-vous dans l'onglet Sécurité.</p>
+        </div>
+        <a href="securite.html" class="btn btn-outline btn-sm">Aller à Sécurité <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    const fresh = DB.getUserById(user.id);
+
+    function formatDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return escapeHtml(d);
+      return dt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    function kycLabel(status) {
+      return {
+        none: 'Aucun document déposé',
+        submitted: 'Documents en cours de vérification',
+        verified: 'Identité vérifiée'
+      }[status] || (status || 'Aucun document déposé');
+    }
+
+    // ---- informations personnelles (lecture seule)
+    document.getElementById('infoGridWrap').innerHTML = `
+      <div class="info-item"><span>Prénom</span><b>${escapeHtml(fresh.firstName)}</b></div>
+      <div class="info-item"><span>Nom</span><b>${escapeHtml(fresh.lastName)}</b></div>
+      <div class="info-item"><span>E-mail</span><b>${escapeHtml(fresh.email)}</b></div>
+      <div class="info-item"><span>Téléphone</span><b>${escapeHtml(fresh.phone)}</b></div>
+      <div class="info-item"><span>Date de naissance</span><b>${formatDate(fresh.birthDate)}</b></div>
+      <div class="info-item"><span>Adresse</span><b>${escapeHtml(fresh.address)}</b></div>
+      <div class="info-item"><span>Numéro de compte</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
+      <div class="info-item"><span>Date d'adhésion</span><b>${timeAgo(fresh.createdAt)}</b></div>
+      <div class="info-item"><span>Statut KYC</span><b>${escapeHtml(kycLabel(fresh.kyc && fresh.kyc.status))}</b></div>`;
+
+    document.getElementById('currencyValue').textContent = fresh.currency || '—';
+
+    // ---- préférences de notifications (cosmétiques, stockées localement par utilisateur)
+    const PREFS_KEY = 'novabank_prefs_' + user.id;
+    const DEFAULT_PREFS = { emailNotif: true, smsNotif: false, monthlyDigest: true };
+
+    function loadPrefs() {
+      try {
+        const raw = localStorage.getItem(PREFS_KEY);
+        return raw ? Object.assign({}, DEFAULT_PREFS, JSON.parse(raw)) : Object.assign({}, DEFAULT_PREFS);
+      } catch (e) { return Object.assign({}, DEFAULT_PREFS); }
+    }
+    function savePrefs(prefs) {
+      try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
+    }
+
+    const prefs = loadPrefs();
+    document.getElementById('prefEmail').checked = !!prefs.emailNotif;
+    document.getElementById('prefSms').checked = !!prefs.smsNotif;
+    document.getElementById('prefDigest').checked = !!prefs.monthlyDigest;
+
+    document.getElementById('prefEmail').addEventListener('change', (e) => {
+      const p = loadPrefs(); p.emailNotif = e.target.checked; savePrefs(p);
+    });
+    document.getElementById('prefSms').addEventListener('change', (e) => {
+      const p = loadPrefs(); p.smsNotif = e.target.checked; savePrefs(p);
+    });
+    document.getElementById('prefDigest').addEventListener('change', (e) => {
+      const p = loadPrefs(); p.monthlyDigest = e.target.checked; savePrefs(p);
+    });
+  }
+</script>
+</body>
+</html>

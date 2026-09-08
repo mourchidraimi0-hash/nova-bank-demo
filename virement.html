@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Effectuez un virement depuis votre espace client NOVA BANK. Parcours de virement simulé à des fins de démonstration.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Nouveau virement — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html" class="active"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1>Nouveau virement</h1>
+      <p>Suivez les étapes ci-dessous pour effectuer un virement sortant.</p>
+    </div>
+
+    <div class="wizard-steps" id="wizardSteps">
+      <div id="wsBar1"></div>
+      <div id="wsBar2"></div>
+      <div id="wsBar3"></div>
+      <div id="wsBar4"></div>
+      <div id="wsBar5"></div>
+    </div>
+
+    <div class="panel">
+
+      <!-- STEP 1 : formulaire -->
+      <div class="wizard-step" id="step1">
+        <h3 class="mb-16">Détails du bénéficiaire</h3>
+        <form id="trxForm" novalidate>
+          <div class="form-row">
+            <label for="f-beneficiary">Bénéficiaire (nom complet)</label>
+            <input type="text" id="f-beneficiary" class="form-control" required>
+          </div>
+          <div class="form-row">
+            <label for="f-bankName">Banque du bénéficiaire</label>
+            <input type="text" id="f-bankName" class="form-control" required>
+          </div>
+          <div class="form-row two">
+            <div>
+              <label for="f-iban">IBAN / numéro de compte</label>
+              <input type="text" id="f-iban" class="form-control" required>
+            </div>
+            <div>
+              <label for="f-bic">BIC</label>
+              <input type="text" id="f-bic" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-row two">
+            <div>
+              <label for="f-amount">Montant</label>
+              <input type="number" id="f-amount" class="form-control" min="0.01" step="0.01" required>
+            </div>
+            <div>
+              <label for="f-currency">Devise</label>
+              <select id="f-currency" class="form-control">
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+                <option value="CHF">CHF</option>
+                <option value="HKD">HKD</option>
+                <option value="JPY">JPY</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-hint" id="currencyHint" style="display:none;"></div>
+          <div class="form-row">
+            <label for="f-reason">Motif</label>
+            <input type="text" id="f-reason" class="form-control" required>
+          </div>
+          <div class="form-row">
+            <label for="f-executionDate">Date d'exécution</label>
+            <input type="date" id="f-executionDate" class="form-control" required>
+          </div>
+          <div class="field-error" id="step1Error"></div>
+          <button type="submit" class="btn btn-primary btn-block">Continuer <i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+      </div>
+
+      <!-- STEP 2 : récapitulatif -->
+      <div class="wizard-step hidden" id="step2">
+        <h3 class="mb-16">Récapitulatif du virement</h3>
+        <div id="recapWrap"></div>
+        <div class="flex gap-12 mt-24">
+          <button type="button" class="btn btn-outline" id="btnStep2Back">Modifier</button>
+          <button type="button" class="btn btn-primary" id="btnStep2Confirm">Confirmer <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 3 : vérification par code -->
+      <div class="wizard-step hidden" id="step3">
+        <h3 class="mb-16">Vérification de sécurité</h3>
+        <div class="alert alert-warn">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div>Ce code est affiché uniquement à l'écran à des fins de démonstration. Aucun SMS ni e-mail n'est réellement envoyé.</div>
+        </div>
+        <div class="code-display" id="codeDisplay">000000</div>
+        <p class="text-center text-muted text-sm">Veuillez saisir le code affiché ci-dessus pour confirmer le virement.</p>
+        <div class="code-boxes" id="codeBoxes">
+          <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="0">
+          <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="1">
+          <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="2">
+          <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="3">
+          <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="4">
+          <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="5">
+        </div>
+        <div class="field-error text-center" id="step3Error"></div>
+        <button type="button" class="btn btn-primary btn-block" id="btnStep3Confirm">Confirmer le virement</button>
+      </div>
+
+      <!-- STEP 4 : progression animée -->
+      <div class="wizard-step hidden" id="step4">
+        <div class="progress-ring-wrap">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#ECFDF5" stroke-width="10"/>
+            <circle id="ringProgress" cx="70" cy="70" r="60" fill="none" stroke="#047857" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" transform="rotate(-90 70 70)"/>
+          </svg>
+          <div class="progress-ring-pct" id="ringPct">0%</div>
+          <div class="progress-ring-msg" id="ringMsg">Initialisation du virement…</div>
+        </div>
+      </div>
+
+      <!-- STEP 5 : en attente de validation -->
+      <div class="wizard-step hidden" id="step5">
+        <div class="result-icon pending"><i class="fa-solid fa-hourglass-half"></i></div>
+        <h3 class="text-center mb-16">Virement en file d'attente de validation</h3>
+        <div class="trx-ref-box">
+          Référence : <span class="ref" id="trxRefText"></span>
+          <button type="button" class="btn btn-sm btn-outline mt-8" id="copyRefBtn"><i class="fa-solid fa-copy"></i> Copier</button>
+        </div>
+        <p class="text-muted text-sm">
+          Le montant de ce virement n'a <b>pas</b> été débité de votre compte. Il ne le sera qu'une fois l'opération confirmée par notre processus de validation interne
+          — un processus simulé et local, mis en place uniquement à des fins de démonstration, sans intervention d'une véritable équipe de conformité.
+          Vous serez notifié directement dans votre espace client dès que l'opération sera confirmée ou rejetée, et vous pouvez en suivre le statut à tout moment depuis votre historique des transactions.
+        </p>
+        <div class="flex gap-12 mt-24">
+          <a href="espace-client.html" class="btn btn-outline">Retour au tableau de bord</a>
+          <button type="button" class="btn btn-primary" id="btnNewTransfer">Effectuer un autre virement</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    // ---------------------------------------------------------------- wizard state
+    let currentStep = 1;
+    const wizardData = {};
+    let ringTimers = [];
+
+    const stepEls = { 1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3'), 4: document.getElementById('step4'), 5: document.getElementById('step5') };
+    const barEls = { 1: document.getElementById('wsBar1'), 2: document.getElementById('wsBar2'), 3: document.getElementById('wsBar3'), 4: document.getElementById('wsBar4'), 5: document.getElementById('wsBar5') };
+
+    function goToStep(n) {
+      currentStep = n;
+      Object.keys(stepEls).forEach(k => stepEls[k].classList.toggle('hidden', Number(k) !== n));
+      Object.keys(barEls).forEach(k => {
+        const idx = Number(k);
+        barEls[k].classList.toggle('done', idx < n);
+        barEls[k].classList.toggle('active', idx === n);
+      });
+      if (n === 3) enterStep3();
+      if (n === 4) enterStep4();
+    }
+
+    // ---------------------------------------------------------------- step 1
+    const executionDateInput = document.getElementById('f-executionDate');
+    (function initDefaultDate() {
+      const today = new Date();
+      const iso = today.toISOString().slice(0, 10);
+      executionDateInput.min = iso;
+      executionDateInput.value = iso;
+    })();
+
+    const currencySelect = document.getElementById('f-currency');
+    const currencyHint = document.getElementById('currencyHint');
+
+    document.getElementById('trxForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('step1Error');
+      errorEl.classList.remove('show');
+      errorEl.textContent = '';
+
+      const beneficiary = document.getElementById('f-beneficiary').value.trim();
+      const bankName = document.getElementById('f-bankName').value.trim();
+      const iban = document.getElementById('f-iban').value.trim();
+      const bic = document.getElementById('f-bic').value.trim();
+      const amount = parseFloat(document.getElementById('f-amount').value);
+      const currency = currencySelect.value;
+      const reason = document.getElementById('f-reason').value.trim();
+      const executionDate = executionDateInput.value;
+
+      if (!beneficiary || !bankName || !iban || !bic || !reason || !executionDate || !amount || isNaN(amount) || amount <= 0) {
+        errorEl.textContent = 'Veuillez renseigner tous les champs avec un montant valide.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      const freshUser = DB.getUserById(user.id) || user;
+      if (currency === freshUser.currency) {
+        const available = DB.getAvailableBalance(freshUser);
+        if (amount > available) {
+          errorEl.textContent = `Solde disponible insuffisant. Solde disponible : ${DB.formatMoney(available, freshUser.currency)}.`;
+          errorEl.classList.add('show');
+          return;
+        }
+      }
+
+      Object.assign(wizardData, { beneficiary, bankName, iban, bic, amount, currency, reason, executionDate });
+      renderRecap();
+      goToStep(2);
+    });
+
+    currencySelect.addEventListener('change', () => {
+      const freshUser = DB.getUserById(user.id) || user;
+      if (currencySelect.value !== freshUser.currency) {
+        currencyHint.textContent = `Votre compte est en ${freshUser.currency}. Ce virement est libellé dans une devise différente (${currencySelect.value}) — la vérification de solde disponible ne s'applique pas dans cette démonstration.`;
+        currencyHint.style.display = 'block';
+      } else {
+        currencyHint.style.display = 'none';
+      }
+    });
+
+    function repopulateStep1() {
+      document.getElementById('f-beneficiary').value = wizardData.beneficiary || '';
+      document.getElementById('f-bankName').value = wizardData.bankName || '';
+      document.getElementById('f-iban').value = wizardData.iban || '';
+      document.getElementById('f-bic').value = wizardData.bic || '';
+      document.getElementById('f-amount').value = wizardData.amount || '';
+      currencySelect.value = wizardData.currency || 'EUR';
+      document.getElementById('f-reason').value = wizardData.reason || '';
+      executionDateInput.value = wizardData.executionDate || executionDateInput.value;
+    }
+
+    // ---------------------------------------------------------------- step 2
+    function renderRecap() {
+      const rows = [
+        ['Bénéficiaire', wizardData.beneficiary],
+        ['Banque du bénéficiaire', wizardData.bankName],
+        ['IBAN / numéro de compte', wizardData.iban],
+        ['BIC', wizardData.bic],
+        ['Montant', DB.formatMoney(wizardData.amount, wizardData.currency)],
+        ['Motif', wizardData.reason],
+        ["Date d'exécution", wizardData.executionDate]
+      ];
+      document.getElementById('recapWrap').innerHTML = rows.map(([label, val]) => `
+        <div class="recap-row"><span>${escapeHtml(label)}</span><b>${escapeHtml(String(val))}</b></div>
+      `).join('');
+    }
+
+    document.getElementById('btnStep2Back').addEventListener('click', () => {
+      repopulateStep1();
+      goToStep(1);
+    });
+    document.getElementById('btnStep2Confirm').addEventListener('click', () => {
+      goToStep(3);
+    });
+
+    // ---------------------------------------------------------------- step 3
+    let codeEntered = ['', '', '', '', '', ''];
+    const codeBoxes = Array.from(document.querySelectorAll('.code-box'));
+
+    function enterStep3() {
+      wizardData.code = DB.generate2FACode();
+      document.getElementById('codeDisplay').textContent = wizardData.code;
+      codeEntered = ['', '', '', '', '', ''];
+      codeBoxes.forEach(b => b.value = '');
+      document.getElementById('step3Error').classList.remove('show');
+      document.getElementById('step3Error').textContent = '';
+      codeBoxes[0].focus();
+    }
+
+    codeBoxes.forEach((box, i) => {
+      box.addEventListener('input', () => {
+        const v = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+        box.value = v;
+        codeEntered[i] = v;
+        if (v && i < codeBoxes.length - 1) codeBoxes[i + 1].focus();
+      });
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && i > 0) {
+          codeBoxes[i - 1].focus();
+        }
+      });
+    });
+
+    document.getElementById('btnStep3Confirm').addEventListener('click', () => {
+      const entered = codeEntered.join('');
+      const errorEl = document.getElementById('step3Error');
+      if (entered.length !== 6 || entered !== wizardData.code) {
+        errorEl.textContent = 'Le code saisi ne correspond pas. Veuillez réessayer.';
+        errorEl.classList.add('show');
+        return;
+      }
+      errorEl.classList.remove('show');
+      goToStep(4);
+    });
+
+    // ---------------------------------------------------------------- step 4
+    function enterStep4() {
+      ringTimers.forEach(t => clearTimeout(t));
+      ringTimers = [];
+      const ring = document.getElementById('ringProgress');
+      const pctEl = document.getElementById('ringPct');
+      const msgEl = document.getElementById('ringMsg');
+      const CIRC = 377;
+      const messages = [
+        'Initialisation du virement…',
+        'Vérification des informations bénéficiaire…',
+        'Chiffrement de la transaction…',
+        'Mise en file d\'attente pour validation…'
+      ];
+
+      ring.style.strokeDashoffset = CIRC;
+      pctEl.textContent = '0%';
+      msgEl.textContent = messages[0];
+
+      const totalDuration = 3400; // ms, animate 0 -> 99%
+      const steps = 60;
+      const stepDuration = totalDuration / steps;
+
+      for (let i = 1; i <= steps; i++) {
+        const t = setTimeout(() => {
+          const pct = Math.round((i / steps) * 99);
+          ring.style.strokeDashoffset = CIRC * (1 - pct / 100);
+          pctEl.textContent = pct + '%';
+          const msgIdx = Math.min(messages.length - 1, Math.floor((i / steps) * messages.length));
+          msgEl.textContent = messages[msgIdx];
+        }, i * stepDuration);
+        ringTimers.push(t);
+      }
+
+      const finalTimer = setTimeout(() => {
+        const trx = DB.createTransfer(user.id, {
+          beneficiary: wizardData.beneficiary,
+          bankName: wizardData.bankName,
+          iban: wizardData.iban,
+          bic: wizardData.bic,
+          amount: wizardData.amount,
+          currency: wizardData.currency,
+          reason: wizardData.reason,
+          executionDate: wizardData.executionDate
+        });
+        wizardData.ref = trx ? trx.ref : '';
+        document.getElementById('trxRefText').textContent = wizardData.ref;
+        goToStep(5);
+      }, totalDuration + 600);
+      ringTimers.push(finalTimer);
+    }
+
+    // ---------------------------------------------------------------- step 5
+    document.getElementById('copyRefBtn').addEventListener('click', () => {
+      const ref = wizardData.ref || '';
+      if (navigator.clipboard && ref) {
+        navigator.clipboard.writeText(ref).catch(() => {});
+      }
+    });
+
+    document.getElementById('btnNewTransfer').addEventListener('click', () => {
+      // reset wizard state without a page reload
+      document.getElementById('trxForm').reset();
+      const iso = new Date().toISOString().slice(0, 10);
+      executionDateInput.min = iso;
+      executionDateInput.value = iso;
+      currencyHint.style.display = 'none';
+      Object.keys(wizardData).forEach(k => delete wizardData[k]);
+      const errorEl = document.getElementById('step1Error');
+      errorEl.classList.remove('show');
+      errorEl.textContent = '';
+      goToStep(1);
+    });
+
+    // ---------------------------------------------------------------- init
+    goToStep(1);
+  }
+</script>
+</body>
+</html>

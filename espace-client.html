@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Espace client NOVA BANK : consultez votre solde, vos transactions et gérez votre compte. Site de démonstration technique.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Espace client — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html" class="active"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1 id="greeting">Bonjour</h1>
+      <p id="greetingSub"></p>
+    </div>
+
+    <div id="notifBannerWrap"></div>
+
+    <div id="balanceCardWrap" class="animate-in"></div>
+
+    <div class="tile-grid" id="tileGridWrap" data-animate-group></div>
+
+    <div class="quick-actions" id="quickActionsWrap" data-animate-group></div>
+
+    <div class="chart-panel" data-animate-group>
+      <div class="chart-head">
+        <h3>Évolution du solde</h3>
+        <div class="chart-legend"><span><i style="background:var(--cyan-dark)"></i> Solde (14 derniers jours)</span></div>
+      </div>
+      <canvas id="balanceChart" height="90"></canvas>
+    </div>
+
+    <div style="margin-bottom:32px;">
+      <div class="flex-between mb-16">
+        <h3>Dernières transactions</h3>
+        <a href="transactions.html" class="text-sm">Voir tout l'historique →</a>
+      </div>
+      <div class="table-wrap">
+        <div id="historyWrap"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    let balanceChart = null;
+
+    function buildBalanceSeries(fresh, days) {
+      const settled = (fresh.transactions || []).filter(t => t.settled).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      const labels = [], data = [];
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+        labels.push(d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+        let bal = 0;
+        settled.forEach(t => {
+          if (new Date(t.createdAt) <= dayEnd) {
+            const isOut = t.type === 'transfer_out' || t.type === 'debit';
+            bal += isOut ? -Number(t.amount) : Number(t.amount);
+          }
+        });
+        data.push(bal);
+      }
+      return { labels, data };
+    }
+
+    async function renderChart(fresh) {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js');
+      const { labels, data } = buildBalanceSeries(fresh, 14);
+      const ctx = document.getElementById('balanceChart').getContext('2d');
+      if (balanceChart) balanceChart.destroy();
+      balanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Solde',
+            data,
+            borderColor: '#047857',
+            backgroundColor: 'rgba(110,231,183,0.22)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#047857'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => DB.formatMoney(c.parsed.y, fresh.currency) } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#5B6167', font: { size: 11 } } },
+            y: { grid: { color: '#f0f1f2' }, ticks: { color: '#5B6167', font: { size: 11 }, callback: (v) => DB.formatMoney(v, fresh.currency) } }
+          }
+        }
+      });
+    }
+
+    function renderPage() {
+      const fresh = DB.getUserById(user.id) || user;
+
+      // ---- greeting
+      document.getElementById('greeting').textContent = `Bonjour, ${fresh.firstName}`;
+      const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('greetingSub').textContent = `Nous sommes le ${today}. Voici un aperçu de votre compte.`;
+
+      // ---- notification banner
+      const notifWrap = document.getElementById('notifBannerWrap');
+      const unread = (fresh.notifications || []).find(n => !n.read);
+      if (unread) {
+        let cls = '';
+        let icon = 'fa-circle-info';
+        if (unread.type === 'warn' || unread.type === 'info') { cls = 'warn'; icon = 'fa-triangle-exclamation'; }
+        if (unread.type === 'danger') { cls = 'danger'; icon = 'fa-circle-exclamation'; }
+        if (unread.type === 'success') { icon = 'fa-circle-check'; }
+        notifWrap.innerHTML = `
+          <div class="notif-banner ${cls}">
+            <i class="fa-solid ${icon}"></i>
+            <div class="msg">${escapeHtml(unread.message)}</div>
+            <button class="btn btn-sm btn-outline" id="markReadBtn">Marquer comme lu</button>
+          </div>`;
+        document.getElementById('markReadBtn').addEventListener('click', () => {
+          DB.markNotificationRead(fresh.id, unread.id);
+          renderPage();
+        });
+      } else {
+        notifWrap.innerHTML = '';
+      }
+
+      // ---- balance card
+      const pendingTotal = DB.getPendingOutTotal(fresh);
+      document.getElementById('balanceCardWrap').innerHTML = `
+        <div class="balance-card">
+          <div class="lbl">Solde disponible</div>
+          <div class="amount">${DB.formatMoney(fresh.balance, fresh.currency)}</div>
+          ${pendingTotal > 0 ? `<div class="pending-note">dont ${DB.formatMoney(pendingTotal, fresh.currency)} en attente de validation</div>` : ''}
+          <div class="meta">
+            <div><span>Numéro de compte</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
+            <div><span>Devise</span><b>${escapeHtml(fresh.currency)}</b></div>
+            <div><span>IBAN</span><b>${escapeHtml(fresh.iban)}</b></div>
+            <div><span>Statut</span><b>${statusBadge(fresh.status)}</b></div>
+          </div>
+        </div>`;
+
+      // ---- tuiles KPI
+      const txs0 = fresh.transactions || [];
+      const thirtyDaysAgo = Date.now() - 30 * 86400000;
+      const recent = txs0.filter(t => new Date(t.createdAt).getTime() >= thirtyDaysAgo);
+      const entrees = recent.filter(t => t.type === 'credit' && t.settled).reduce((s, t) => s + Number(t.amount), 0);
+      const sorties = recent.filter(t => (t.type === 'transfer_out' || t.type === 'debit') && t.settled).reduce((s, t) => s + Number(t.amount), 0);
+      const enAttente = txs0.filter(t => t.status === 'pending' || t.status === 'processing').length;
+      document.getElementById('tileGridWrap').innerHTML = `
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-arrow-down"></i></div><span class="trend up">30j</span></div><div class="value">${DB.formatMoney(entrees, fresh.currency)}</div><div class="label">Entrées récentes</div></div>
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-arrow-up"></i></div><span class="trend down">30j</span></div><div class="value">${DB.formatMoney(sorties, fresh.currency)}</div><div class="label">Sorties récentes</div></div>
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-hourglass-half"></i></div></div><div class="value">${enAttente}</div><div class="label">Opérations en attente</div></div>
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-receipt"></i></div></div><div class="value">${txs0.length}</div><div class="label">Opérations au total</div></div>`;
+
+      // ---- quick actions
+      document.getElementById('quickActionsWrap').innerHTML = `
+        <a href="virement.html" class="quick-action">
+          <i class="fa-solid fa-paper-plane"></i>
+          <h4>Virement</h4>
+        </a>
+        <a href="cartes.html" class="quick-action">
+          <i class="fa-solid fa-credit-card"></i>
+          <h4>Ma carte</h4>
+        </a>
+        <a href="epargne.html" class="quick-action">
+          <i class="fa-solid fa-piggy-bank"></i>
+          <h4>Épargne</h4>
+        </a>
+        <a href="aide.html" class="quick-action">
+          <i class="fa-solid fa-headset"></i>
+          <h4>Assistance</h4>
+        </a>`;
+
+      renderChart(fresh);
+
+      // ---- history (5 dernières — voir transactions.html pour l'historique complet)
+      const txs = (fresh.transactions || []).slice(0, 5);
+      if (!txs.length) {
+        document.getElementById('historyWrap').innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-inbox"></i>
+            <p>Aucune opération pour le moment.</p>
+          </div>`;
+      } else {
+        const rows = txs.map(t => {
+          const isOut = t.type === 'transfer_out' || t.type === 'debit';
+          const sign = isOut ? '-' : '+';
+          const cls = isOut ? 'amount-neg' : 'amount-pos';
+          return `
+            <tr>
+              <td>${escapeHtml(t.description)}</td>
+              <td>${timeAgo(t.createdAt)}</td>
+              <td>${statusBadge(t.status)}</td>
+              <td class="${cls}">${sign}${DB.formatMoney(t.amount, t.currency)}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('historyWrap').innerHTML = `
+          <table class="data-table">
+            <thead>
+              <tr><th>Description</th><th>Date</th><th>Statut</th><th>Montant</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+      }
+    }
+
+    renderPage();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Accès sécurisé au back-office administrateur de NOVA BANK, site de démonstration technique.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Connexion — Back-office NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<div class="form-page">
+  <div class="form-card">
+    <h1>Back-office</h1>
+    <div class="sub">Accès réservé au personnel de NOVA BANK</div>
+
+    <div class="alert alert-warn">
+      <i class="fa-solid fa-circle-info"></i>
+      <div>
+        <strong>Identifiants de démonstration</strong><br>
+        Super Admin — <code>superadmin</code> / <code>SuperAdmin123!</code><br>
+        Admin — <code>admin</code> / <code>Admin123!</code><br>
+        Support — <code>support</code> / <code>Support123!</code>
+      </div>
+    </div>
+
+    <div class="alert alert-error hidden" id="login-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="login-error-text"></span>
+    </div>
+
+    <!-- Étape 1 : identifiant + mot de passe -->
+    <section id="step1">
+      <form id="step1-form" novalidate>
+        <div class="form-row">
+          <label for="username">Identifiant</label>
+          <input type="text" id="username" class="form-control" autocomplete="username" required>
+          <div class="field-error" id="error-username"></div>
+        </div>
+        <div class="form-row">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" class="form-control" autocomplete="current-password" required>
+          <div class="field-error" id="error-password"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-step1">Continuer</button>
+      </form>
+    </section>
+
+    <!-- Étape 2 : vérification en deux étapes -->
+    <section id="step2" class="hidden">
+      <div class="alert alert-warn">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>Ce code est affiché à l'écran uniquement à des fins de démonstration : aucun SMS n'est réellement envoyé.</div>
+      </div>
+      <div class="code-display" id="code-display">000000</div>
+      <p class="text-center text-muted text-sm" style="text-align:center;">Veuillez saisir le code affiché ci-dessus pour confirmer votre connexion.</p>
+      <div class="code-boxes" id="code-boxes">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="0">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="1">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="2">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="3">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="4">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="5">
+      </div>
+      <div class="field-error" id="step2-error" style="text-align:center;"></div>
+      <button type="button" class="btn btn-primary btn-block" id="btn-step2">Vérifier et se connecter</button>
+      <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="#" id="btn-back">&larr; Retour</a></p>
+    </section>
+
+    <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="index.html">Retour au site public</a></p>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+(async function () {
+  await DB.ensureDefaultAdmins();
+
+  // Déjà connecté ? on saute directement le formulaire.
+  if (DB.getAdminSession()) { window.location.href = 'admin-dashboard.html'; return; }
+
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const step1Form = document.getElementById('step1-form');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const loginError = document.getElementById('login-error');
+  const loginErrorText = document.getElementById('login-error-text');
+  const codeDisplay = document.getElementById('code-display');
+  const codeBoxes = Array.from(document.querySelectorAll('.code-box'));
+  const step2Error = document.getElementById('step2-error');
+  const btnStep2 = document.getElementById('btn-step2');
+  const btnBack = document.getElementById('btn-back');
+
+  let pendingAdmin = null;
+  let pendingCode = null;
+  let codeEntered = ['', '', '', '', '', ''];
+
+  function clearErrors() {
+    loginError.classList.add('hidden');
+    document.querySelectorAll('#step1 .field-error').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    document.querySelectorAll('#step1 .form-control').forEach(el => el.classList.remove('error'));
+  }
+  function setFieldError(field, msg) {
+    const el = document.getElementById('error-' + field);
+    if (el) { el.textContent = msg; el.classList.add('show'); }
+    const input = document.getElementById(field);
+    if (input) input.classList.add('error');
+  }
+  function showLoginError(msg) {
+    loginErrorText.textContent = msg;
+    loginError.classList.remove('hidden');
+  }
+
+  step1Form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    let hasError = false;
+    if (!username) { setFieldError('username', 'Merci de renseigner votre identifiant.'); hasError = true; }
+    if (!password) { setFieldError('password', 'Merci de renseigner votre mot de passe.'); hasError = true; }
+    if (hasError) return;
+
+    const btn = document.getElementById('btn-step1');
+    btn.disabled = true;
+    btn.textContent = 'Vérification…';
+
+    const res = await DB.adminLogin(username, password);
+
+    btn.disabled = false;
+    btn.textContent = 'Continuer';
+
+    if (!res.ok) {
+      if (res.error === 'not_found') showLoginError('Identifiant inconnu.');
+      else if (res.error === 'wrong_password') showLoginError('Mot de passe incorrect.');
+      else showLoginError('Une erreur est survenue. Merci de réessayer.');
+      return;
+    }
+
+    pendingAdmin = res.admin;
+    pendingCode = DB.generate2FACode();
+    codeDisplay.textContent = pendingCode;
+    codeEntered = ['', '', '', '', '', ''];
+    codeBoxes.forEach(b => b.value = '');
+    step2Error.textContent = '';
+    step2Error.classList.remove('show');
+
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+    codeBoxes[0].focus();
+  });
+
+  codeBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      const v = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      box.value = v;
+      codeEntered[i] = v;
+      if (v && i < codeBoxes.length - 1) codeBoxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        codeBoxes[i - 1].focus();
+      }
+      if (e.key === 'Enter') { e.preventDefault(); btnStep2.click(); }
+    });
+  });
+
+  btnStep2.addEventListener('click', () => {
+    const entered = codeEntered.join('');
+    if (entered.length !== 6 || entered !== pendingCode) {
+      step2Error.textContent = 'Le code saisi ne correspond pas. Veuillez réessayer.';
+      step2Error.classList.add('show');
+      return;
+    }
+    if (!pendingAdmin) { window.location.href = 'admin-connexion.html'; return; }
+    DB.startAdminSession(pendingAdmin);
+    window.location.href = 'admin-dashboard.html';
+  });
+
+  btnBack.addEventListener('click', (e) => {
+    e.preventDefault();
+    pendingCode = null;
+    passwordInput.value = '';
+    step2.classList.add('hidden');
+    step1.classList.remove('hidden');
+    clearErrors();
+    passwordInput.focus();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gérez votre carte bancaire virtuelle NOVA BANK : gel de la carte, paramètres de paiement et sécurité.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Cartes — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-topbar">
+  <button id="sidebarToggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a href="index.html" class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></a>
+  <div style="width:26px"></div>
+</div>
+<div class="app-layout">
+  <aside class="app-sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <nav class="app-nav">
+      <div class="app-nav-section">Général</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
+      <a href="cartes.html" class="active"><i class="fa-solid fa-credit-card"></i> Cartes</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
+      <div class="app-nav-section">Compte</div>
+      <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <div class="app-nav-section">Support</div>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+    </nav>
+    <div class="bottom-links">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="app-main">
+
+    <div class="page-head">
+      <h1>Cartes</h1>
+      <p>Gérez votre/vos carte(s) bancaire(s) et leurs paramètres.</p>
+    </div>
+
+    <div class="alert alert-warn">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div>Ceci est une carte bancaire virtuelle de démonstration. Aucune carte physique n'est émise et aucun paiement réel n'est possible.</div>
+    </div>
+
+    <div id="cardsWrap" data-animate-group></div>
+
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = DB.requireClientAuth();
+  if (user) {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+
+    // ---- expiration calculée à la volée (createdAt + 4 ans), rien n'est stocké
+    function cardExpiry(createdAt) {
+      const d = new Date(createdAt);
+      d.setFullYear(d.getFullYear() + 4);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${mm}/${yy}`;
+    }
+
+    // ---- préférences cosmétiques de carte (localStorage, purement démo)
+    function getCardPrefs(cardId) {
+      try {
+        const raw = localStorage.getItem('novabank_card_prefs_' + cardId);
+        const defaults = { online: true, contactless: true, abroad: true };
+        return raw ? Object.assign(defaults, JSON.parse(raw)) : defaults;
+      } catch (e) {
+        return { online: true, contactless: true, abroad: true };
+      }
+    }
+    function setCardPref(cardId, key, value) {
+      const prefs = getCardPrefs(cardId);
+      prefs[key] = value;
+      localStorage.setItem('novabank_card_prefs_' + cardId, JSON.stringify(prefs));
+    }
+
+    function switchRow(cardId, prefKey, checked, title, desc) {
+      return `
+        <div class="switch-row">
+          <div class="switch-label"><b>${escapeHtml(title)}</b><span>${escapeHtml(desc)}</span></div>
+          <label class="switch">
+            <input type="checkbox" data-card-id="${escapeHtml(cardId)}" data-pref="${prefKey}" ${checked ? 'checked' : ''}>
+            <span class="track"></span>
+          </label>
+        </div>`;
+    }
+
+    function renderPage() {
+      const fresh = DB.getUserById(user.id) || user;
+      const cards = DB.getCards(fresh);
+      const wrap = document.getElementById('cardsWrap');
+
+      if (!cards.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-credit-card"></i>
+            <p>Aucune carte n'est associée à votre compte pour le moment.</p>
+          </div>`;
+        return;
+      }
+
+      const holder = `${fresh.firstName} ${fresh.lastName}`;
+
+      wrap.innerHTML = cards.map(card => {
+        const prefs = getCardPrefs(card.id);
+        return `
+        <div style="margin-bottom:36px;">
+          <div class="bank-card compact${card.frozen ? ' frozen' : ''}">
+            ${card.frozen ? '<div class="frozen-badge">Gelée</div>' : ''}
+            <div class="chip"></div>
+            <div class="num">•••• •••• •••• ${escapeHtml(card.last4)}</div>
+            <div class="row">
+              <div><span>Titulaire</span><b>${escapeHtml(holder)}</b></div>
+              <div><span>Expire</span><b>${cardExpiry(card.createdAt)}</b></div>
+            </div>
+          </div>
+          <div class="card-actions-row">
+            <button class="btn ${card.frozen ? 'btn-cyan' : 'btn-outline'} btn-sm" data-freeze-btn data-card-id="${escapeHtml(card.id)}">
+              <i class="fa-solid ${card.frozen ? 'fa-lock-open' : 'fa-lock'}"></i>
+              ${card.frozen ? 'Dégeler la carte' : 'Geler la carte'}
+            </button>
+          </div>
+
+          <div class="card" style="margin-top:20px;">
+            <h3 class="mb-16">Paramètres de la carte${cards.length > 1 ? ' — ' + escapeHtml(card.label) : ''}</h3>
+            ${switchRow(card.id, 'online', prefs.online, 'Paiements en ligne', 'Autoriser les achats sur internet avec cette carte.')}
+            ${switchRow(card.id, 'contactless', prefs.contactless, 'Paiements sans contact', 'Autoriser le paiement sans contact en magasin.')}
+            ${switchRow(card.id, 'abroad', prefs.abroad, "Retraits à l'étranger", 'Autoriser les retraits distributeur hors de votre pays de résidence.')}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    document.getElementById('cardsWrap').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-freeze-btn]');
+      if (!btn) return;
+      DB.toggleCardFreeze(user.id, btn.getAttribute('data-card-id'));
+      renderPage();
+    });
+
+    document.getElementById('cardsWrap').addEventListener('change', (e) => {
+      const input = e.target.closest('input[data-pref]');
+      if (!input) return;
+      setCardPref(input.getAttribute('data-card-id'), input.getAttribute('data-pref'), input.checked);
+    });
+
+    renderPage();
+  }
+</script>
+</body>
+</html>

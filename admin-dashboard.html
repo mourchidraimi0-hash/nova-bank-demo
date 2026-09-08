@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Tableau de bord administrateur NOVA BANK : statistiques clients, opérations et activité récente.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Tableau de bord — Back-office NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<div class="admin-mobile-topbar">
+  <button data-sidebar-toggle class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <span class="nav-logo" style="color:var(--anthracite)"><span class="logo-mark">NB</span></span>
+  <button data-theme-toggle class="theme-toggle"></button>
+</div>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="admin-dashboard.html" class="nav-logo"><span class="logo-mark">NB</span> Back-office</a>
+    <span class="admin-role-tag" data-admin-role></span>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="admin-clients.html"><i class="fa-solid fa-users"></i> Clients</a>
+      <a href="admin-operations.html"><i class="fa-solid fa-arrow-right-arrow-left"></i> Opérations</a>
+      <a href="admin-journal.html"><i class="fa-solid fa-scroll"></i> Journal d'activité</a>
+    </nav>
+    <div class="bottom-links">
+      <span class="text-sm" style="color:rgba(255,255,255,.6)">Connecté : <span data-admin-name></span></span>
+      <a href="#" data-admin-logout><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Tableau de bord</h1>
+      <button data-theme-toggle class="theme-toggle"></button>
+    </div>
+
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <div class="admin-card">
+      <h3>Solde total par devise</h3>
+      <div id="balances-box"></div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="admin-card">
+        <h3>Évolution des inscriptions (14 jours)</h3>
+        <canvas id="chart-signups" height="220"></canvas>
+      </div>
+      <div class="admin-card">
+        <h3>Volume d'opérations (14 jours)</h3>
+        <canvas id="chart-ops" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Dernières activités</h3>
+      <div id="activity-log"></div>
+    </div>
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+<script>
+(function () {
+  const session = ADMIN_UI.guard();
+  if (!session) return;
+
+  // ---------------------------------------------------------------- stats
+  const stats = DB.getStats();
+  const statGrid = document.getElementById('stat-grid');
+  const cards = [
+    { icon: 'fa-users', value: stats.totalClients, label: 'Total clients' },
+    { icon: 'fa-user-plus', value: stats.newClients30d, label: 'Nouveaux clients (30j)' },
+    { icon: 'fa-circle-check', value: stats.activeAccounts, label: 'Comptes actifs' },
+    { icon: 'fa-ban', value: stats.suspendedAccounts, label: 'Comptes suspendus' },
+    { icon: 'fa-id-card', value: stats.pendingKyc, label: 'Dossiers KYC en attente' },
+    { icon: 'fa-arrow-right-arrow-left', value: stats.pendingOps, label: 'Opérations en attente' }
+  ];
+  statGrid.innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="top">
+        <div class="icon"><i class="fa-solid ${c.icon}"></i></div>
+      </div>
+      <div class="value">${c.value.toLocaleString('fr-FR')}</div>
+      <div class="label">${c.label}</div>
+    </div>
+  `).join('');
+
+  // ---------------------------------------------------------------- balances by currency
+  const balancesBox = document.getElementById('balances-box');
+  const currencies = Object.entries(stats.balancesByCurrency);
+  if (!currencies.length) {
+    balancesBox.innerHTML = '<p class="text-sm text-muted">Aucune donnée.</p>';
+  } else {
+    balancesBox.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:14px;">' +
+      currencies.map(([cur, amount]) => `
+        <div class="info-item" style="min-width:160px;">
+          <span>${escapeHtml(cur)}</span>
+          <b>${escapeHtml(DB.formatMoney(amount, cur))}</b>
+        </div>
+      `).join('') + '</div>';
+  }
+
+  // ---------------------------------------------------------------- charts (theme-aware)
+  let signupsChart = null;
+  let opsChart = null;
+
+  function themeColors() {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    return {
+      grid: isDark ? '#31343c' : '#e6e6e6',
+      text: isDark ? '#9a9ea8' : '#767a83'
+    };
+  }
+
+  async function renderCharts() {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js');
+    const colors = themeColors();
+    const signupSeries = DB.getSignupSeries(14);
+    const opsSeries = DB.getOpsVolumeSeries(14);
+
+    if (signupsChart) { signupsChart.destroy(); signupsChart = null; }
+    if (opsChart) { opsChart.destroy(); opsChart = null; }
+
+    const commonScales = {
+      x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+      y: { beginAtZero: true, ticks: { color: colors.text, precision: 0 }, grid: { color: colors.grid } }
+    };
+
+    signupsChart = new Chart(document.getElementById('chart-signups').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: signupSeries.labels,
+        datasets: [{
+          label: 'Inscriptions',
+          data: signupSeries.counts,
+          borderColor: '#047857',
+          backgroundColor: 'rgba(110,231,183,0.25)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: '#047857'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: commonScales
+      }
+    });
+
+    opsChart = new Chart(document.getElementById('chart-ops').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: opsSeries.labels,
+        datasets: [{
+          label: 'Opérations',
+          data: opsSeries.counts,
+          borderColor: '#047857',
+          backgroundColor: 'rgba(110,231,183,0.55)',
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: commonScales
+      }
+    });
+  }
+
+  renderCharts();
+  document.addEventListener('cac-theme-changed', renderCharts);
+
+  // ---------------------------------------------------------------- activity log
+  const ACTION_LABELS = {
+    connexion_admin: 'Connexion admin',
+    deconnexion_admin: 'Déconnexion admin',
+    inscription_client: 'Inscription client',
+    virement_initie: 'Virement initié',
+    suspension_compte: 'Suspension de compte',
+    reactivation_compte: 'Réactivation de compte',
+    activation_compte: 'Activation de compte',
+    demande_informations: 'Demande d\'informations',
+    ajustement_solde: 'Ajustement de solde',
+    changement_statut_operation: 'Changement de statut d\'opération',
+    note_ajoutee: 'Note ajoutée'
+  };
+  function humanizeAction(action) {
+    if (ACTION_LABELS[action]) return ACTION_LABELS[action];
+    const s = String(action || '').replace(/_/g, ' ');
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  const activityLog = document.getElementById('activity-log');
+  const entries = DB.getActivityLog().slice(0, 6);
+  if (!entries.length) {
+    activityLog.innerHTML = `
+      <div class="empty-state">
+        <i class="fa-solid fa-scroll"></i>
+        <p>Aucune activité enregistrée pour le moment.</p>
+      </div>`;
+  } else {
+    activityLog.innerHTML = entries.map(e => `
+      <div class="log-item">
+        <div><strong>${escapeHtml(humanizeAction(e.action))}</strong> — ${escapeHtml(e.detail || '')}</div>
+        <div class="meta">${escapeHtml(e.adminName || 'Système')} · ${timeAgo(e.date)}</div>
+      </div>
+    `).join('');
+  }
+})();
+</script>
+</body>
+</html>

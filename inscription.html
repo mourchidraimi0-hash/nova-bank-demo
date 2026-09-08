@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ouvrez un compte NOVA BANK en quelques minutes. Formulaire de démonstration : aucune donnée n'est transmise à un serveur réel.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Ouvrir un compte — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar scrolled">
+  <div class="container">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+  </div>
+</nav>
+
+<div class="form-page">
+  <div class="form-card wide">
+    <h1>Ouvrir un compte</h1>
+    <p class="sub">Quelques minutes suffisent. Ce formulaire fait partie d'une démonstration entièrement locale : aucune donnée n'est transmise à un serveur, tout reste dans votre navigateur.</p>
+
+    <form id="signup-form" novalidate>
+      <div class="form-row two">
+        <div>
+          <label for="firstName">Prénom</label>
+          <input type="text" id="firstName" class="form-control" required>
+          <div class="field-error" id="error-firstName"></div>
+        </div>
+        <div>
+          <label for="lastName">Nom</label>
+          <input type="text" id="lastName" class="form-control" required>
+          <div class="field-error" id="error-lastName"></div>
+        </div>
+      </div>
+
+      <div class="form-row two">
+        <div>
+          <label for="email">E-mail</label>
+          <input type="email" id="email" class="form-control" required>
+          <div class="field-error" id="error-email"></div>
+        </div>
+        <div>
+          <label for="phone">Téléphone</label>
+          <input type="tel" id="phone" class="form-control" required>
+          <div class="field-error" id="error-phone"></div>
+        </div>
+      </div>
+
+      <div class="form-row two">
+        <div>
+          <label for="birthDate">Date de naissance</label>
+          <input type="date" id="birthDate" class="form-control" required>
+          <div class="field-error" id="error-birthDate"></div>
+        </div>
+        <div>
+          <label for="currency">Devise du compte</label>
+          <select id="currency" class="form-control" required>
+            <option value="EUR">Euro (€)</option>
+            <option value="USD">Dollar américain ($)</option>
+          </select>
+          <div class="field-error" id="error-currency"></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="address">Adresse postale</label>
+        <textarea id="address" class="form-control" required></textarea>
+        <div class="field-error" id="error-address"></div>
+      </div>
+
+      <div class="form-row two">
+        <div>
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" class="form-control" required>
+          <div class="pw-strength"><span></span><span></span><span></span><span></span></div>
+          <div class="pw-strength-label"></div>
+          <div class="field-error" id="error-password"></div>
+        </div>
+        <div>
+          <label for="confirmPassword">Confirmation du mot de passe</label>
+          <input type="password" id="confirmPassword" class="form-control" required>
+          <div class="field-error" id="error-confirmPassword"></div>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:32px;">
+        <span class="eyebrow">Optionnel</span>
+        <h3 style="margin-bottom:8px;">Vérification d'identité</h3>
+        <p class="text-muted text-sm" style="margin-bottom:20px;">Cette étape est facultative sur ce site de démonstration. Dans un établissement réel, ces documents seraient examinés par une équipe de conformité (KYC) avant l'activation complète du compte.</p>
+      </div>
+
+      <div class="form-row">
+        <label>Photo d'identité <span class="opt">(JPG/PNG, 5 Mo max)</span></label>
+        <div class="dropzone" data-dropzone="idPhoto" data-accept="image/jpeg,image/png" data-maxsize="5242880">
+          <input type="file" id="input-idPhoto" accept=".jpg,.jpeg,.png" hidden>
+          <i class="fa-solid fa-camera"></i>
+          <div class="dz-text"><b>Cliquez pour téléverser</b> ou glissez-déposez une photo</div>
+        </div>
+        <div class="dz-preview" id="preview-idPhoto">
+          <div class="dz-icon hidden"><i class="fa-solid fa-file-lines"></i></div>
+          <img>
+          <div class="dz-info"><div class="fname"></div><div class="fsize"></div></div>
+          <button type="button" class="dz-remove"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="field-error" id="error-idPhoto"></div>
+      </div>
+
+      <div class="form-row">
+        <label>Pièce d'identité <span class="opt">(JPG/PNG/PDF, 8 Mo max)</span></label>
+        <div class="dropzone" data-dropzone="idDocument" data-accept="image/jpeg,image/png,application/pdf" data-maxsize="8388608">
+          <input type="file" id="input-idDocument" accept=".jpg,.jpeg,.png,.pdf" hidden>
+          <i class="fa-solid fa-id-card"></i>
+          <div class="dz-text"><b>Cliquez pour téléverser</b> ou glissez-déposez un document</div>
+        </div>
+        <div class="dz-preview" id="preview-idDocument">
+          <div class="dz-icon hidden"><i class="fa-solid fa-file-lines"></i></div>
+          <img>
+          <div class="dz-info"><div class="fname"></div><div class="fsize"></div></div>
+          <button type="button" class="dz-remove"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="field-error" id="error-idDocument"></div>
+      </div>
+
+      <div class="field-hint" style="margin-bottom:24px;">Ces documents restent dans votre navigateur : seules leurs métadonnées (nom, type, taille) sont conservées, jamais leur contenu.</div>
+
+      <div class="checkbox-row" style="margin-bottom:28px;">
+        <input type="checkbox" id="terms" required>
+        <label for="terms" style="font-weight:400;">J'accepte les Conditions Générales d'Utilisation de ce site de démonstration.</label>
+      </div>
+      <div class="field-error" id="error-terms" style="margin-top:-20px;margin-bottom:20px;"></div>
+
+      <button type="submit" class="btn btn-primary btn-block">Créer mon compte</button>
+    </form>
+
+    <p class="text-sm text-muted mt-24" style="text-align:center;">Vous avez déjà un compte ? <a href="connexion.html">Se connecter</a></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="success-modal">
+  <div class="modal">
+    <div class="result-icon" style="background:#e8f8ee;color:#1e8449;"><i class="fa-solid fa-check"></i></div>
+    <h3 style="text-align:center;">Compte créé avec succès</h3>
+    <div class="copy-row">
+      <div><span class="text-muted text-sm" style="display:block;">Identifiant</span><span class="val" id="modal-id"></span></div>
+      <button type="button" onclick="copyVal('modal-id')"><i class="fa-solid fa-copy"></i></button>
+    </div>
+    <div class="copy-row">
+      <div><span class="text-muted text-sm" style="display:block;">Numéro de compte</span><span class="val" id="modal-account"></span></div>
+      <button type="button" onclick="copyVal('modal-account')"><i class="fa-solid fa-copy"></i></button>
+    </div>
+    <div class="copy-row">
+      <div><span class="text-muted text-sm" style="display:block;">IBAN</span><span class="val" id="modal-iban"></span></div>
+      <button type="button" onclick="copyVal('modal-iban')"><i class="fa-solid fa-copy"></i></button>
+    </div>
+    <p class="mt-16 mb-16"><b id="modal-balance"></b></p>
+    <div class="alert alert-warn">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>Ces informations sont stockées uniquement dans ce navigateur. Notez votre identifiant : en cas de perte, la récupération n'est pas automatisée sur ce site de démonstration.</span>
+    </div>
+    <button type="button" class="btn btn-primary btn-block" id="modal-continue">Accéder à mon espace client</button>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function () {
+  const existing = DB.getCurrentUser();
+  if (existing) { window.location.href = 'espace-client.html'; return; }
+
+  const form = document.getElementById('signup-form');
+
+  function setError(field, msg) {
+    const el = document.getElementById('error-' + field);
+    if (el) { el.textContent = msg; el.classList.add('show'); }
+    const input = document.getElementById(field);
+    if (input) input.classList.add('error');
+  }
+  function clearErrors() {
+    document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+  }
+  function isAdult(birthDateStr) {
+    const b = new Date(birthDateStr);
+    if (isNaN(b.getTime())) return false;
+    const today = new Date();
+    let age = today.getFullYear() - b.getFullYear();
+    const m = today.getMonth() - b.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < b.getDate())) age--;
+    return age >= 18;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const birthDate = document.getElementById('birthDate').value;
+    const currency = document.getElementById('currency').value;
+    const address = document.getElementById('address').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const termsChecked = document.getElementById('terms').checked;
+
+    let hasError = false;
+
+    if (!firstName) { setError('firstName', 'Merci de renseigner votre prénom.'); hasError = true; }
+    if (!lastName) { setError('lastName', 'Merci de renseigner votre nom.'); hasError = true; }
+
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) { setError('email', 'Merci de renseigner votre e-mail.'); hasError = true; }
+    else if (!emailRe.test(email)) { setError('email', 'Le format de l\'e-mail est invalide.'); hasError = true; }
+
+    if (!phone) { setError('phone', 'Merci de renseigner votre numéro de téléphone.'); hasError = true; }
+
+    if (!birthDate) { setError('birthDate', 'Merci de renseigner votre date de naissance.'); hasError = true; }
+    else if (!isAdult(birthDate)) { setError('birthDate', 'Vous devez avoir au moins 18 ans pour ouvrir un compte.'); hasError = true; }
+
+    if (!address) { setError('address', 'Merci de renseigner votre adresse postale.'); hasError = true; }
+
+    if (!password) { setError('password', 'Merci de choisir un mot de passe.'); hasError = true; }
+    else if (password.length < 8) { setError('password', 'Le mot de passe doit contenir au moins 8 caractères.'); hasError = true; }
+
+    if (!confirmPassword) { setError('confirmPassword', 'Merci de confirmer votre mot de passe.'); hasError = true; }
+    else if (password && confirmPassword !== password) { setError('confirmPassword', 'Les mots de passe ne correspondent pas.'); hasError = true; }
+
+    if (!termsChecked) { setError('terms', 'Vous devez accepter les Conditions Générales d\'Utilisation pour continuer.'); hasError = true; }
+
+    if (hasError) return;
+
+    if (email && DB.findUserByIdentifier(email)) {
+      setError('email', 'Un compte existe déjà avec cet e-mail.');
+      return;
+    }
+
+    const idPhotoMeta = getDzFileMeta('idPhoto');
+    const idDocumentMeta = getDzFileMeta('idDocument');
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Création en cours…';
+
+    try {
+      const user = await DB.createUser({
+        firstName, lastName, email, phone, birthDate, address, currency, password,
+        idPhotoMeta, idDocumentMeta
+      });
+
+      document.getElementById('modal-id').textContent = user.id;
+      document.getElementById('modal-account').textContent = user.accountNumber;
+      document.getElementById('modal-iban').textContent = user.iban;
+      document.getElementById('modal-balance').textContent = 'Solde initial : ' + DB.formatMoney(0, user.currency);
+
+      document.getElementById('modal-continue').onclick = async () => {
+        await DB.login(user.id, password);
+        window.location.href = 'espace-client.html';
+      };
+
+      document.getElementById('success-modal').classList.add('open');
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Créer mon compte';
+      setError('email', 'Une erreur est survenue lors de la création du compte. Merci de réessayer.');
+    }
+  });
+})();
+
+function copyVal(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text);
+}
+</script>
+</body>
+</html>
