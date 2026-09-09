@@ -1,0 +1,280 @@
+// Helper partagé par toutes les fonctions serverless — connexion Neon, hachage,
+// sessions, réponses JSON. Fichier préfixé par "_" : Vercel ne le publie pas
+// comme endpoint, seuls les modules le important y ont accès.
+
+const { neon } = require('@neondatabase/serverless');
+const crypto = require('crypto');
+
+const connectionString =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL_UNPOOLED ||
+  process.env.POSTGRES_URL_NON_POOLING;
+
+if (!connectionString) {
+  console.error('Aucune variable de connexion Neon trouvée (DATABASE_URL / POSTGRES_URL).');
+}
+
+const sql = connectionString ? neon(connectionString) : null;
+
+function uid(prefix) {
+  return prefix + crypto.randomBytes(9).toString('hex');
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+// ---------------------------------------------------------------- mots de passe (scrypt, natif Node — pas de dépendance)
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+function verifyPassword(password, stored) {
+  if (!stored || !stored.includes(':')) return false;
+  const [salt, hash] = stored.split(':');
+  const check = crypto.scryptSync(password, salt, 64).toString('hex');
+  try {
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(check, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------- références
+function generateAccountNumber() {
+  let n = '';
+  for (let i = 0; i < 10; i++) n += Math.floor(Math.random() * 10);
+  return 'NOVA-' + n.slice(0, 4) + '-' + n.slice(4, 8) + n.slice(8);
+}
+function generateIBAN() {
+  let n = '';
+  for (let i = 0; i < 16; i++) n += Math.floor(Math.random() * 10);
+  return 'HK' + Math.floor(10 + Math.random() * 89) + ' NOVA ' + n.match(/.{1,4}/g).join(' ');
+}
+function generateTrxRef() {
+  const letters = Array.from({ length: 4 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('');
+  let digits = '';
+  for (let i = 0; i < 6; i++) digits += Math.floor(Math.random() * 10);
+  return `TRX-${letters}-${digits}`;
+}
+function generate2FACode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+// ---------------------------------------------------------------- sessions (table sessions, token bearer)
+const SESSION_HOURS = 12;
+const ADMIN_SESSION_MINUTES = 30;
+
+async function createSession({ userId = null, isAdmin = false, adminId = null, role = null, name = null }) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const minutes = isAdmin ? ADMIN_SESSION_MINUTES : SESSION_HOURS * 60;
+  const expiresAt = new Date(Date.now() + minutes * 60000).toISOString();
+  await sql`
+    INSERT INTO sessions (token, user_id, is_admin, admin_id, role, name, expires_at)
+    VALUES (${token}, ${userId}, ${isAdmin}, ${adminId}, ${role}, ${name}, ${expiresAt})
+  `;
+  return { token, expiresAt };
+}
+
+async function getSession(token) {
+  if (!token) return null;
+  const rows = await sql`SELECT * FROM sessions WHERE token = ${token} LIMIT 1`;
+  const session = rows[0];
+  if (!session) return null;
+  if (new Date(session.expires_at).getTime() < Date.now()) {
+    await sql`DELETE FROM sessions WHERE token = ${token}`;
+    return null;
+  }
+  return session;
+}
+
+async function refreshSession(token, isAdmin) {
+  const minutes = isAdmin ? ADMIN_SESSION_MINUTES : SESSION_HOURS * 60;
+  const expiresAt = new Date(Date.now() + minutes * 60000).toISOString();
+  await sql`UPDATE sessions SET expires_at = ${expiresAt} WHERE token = ${token}`;
+}
+
+async function destroySession(token) {
+  if (!token) return;
+  await sql`DELETE FROM sessions WHERE token = ${token}`;
+}
+
+function getBearerToken(req) {
+  const header = req.headers['authorization'] || req.headers['Authorization'];
+  if (!header || !header.startsWith('Bearer ')) return null;
+  return header.slice(7).trim();
+}
+
+// ---------------------------------------------------------------- schéma (création idempotente, exécutée une fois par instance)
+let schemaReady = null;
+async function ensureSchema() {
+  if (schemaReady) return schemaReady;
+  schemaReady = (async () => {
+    await sql`CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      first_name TEXT NOT NULL,
+      last_name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      phone TEXT,
+      birth_date TEXT,
+      address TEXT,
+      currency TEXT NOT NULL DEFAULT 'EUR',
+      password_hash TEXT NOT NULL,
+      account_number TEXT UNIQUE NOT NULL,
+      iban TEXT NOT NULL,
+      balance NUMERIC NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'active',
+      suspend_reason TEXT,
+      kyc_id_photo JSONB,
+      kyc_id_document JSONB,
+      kyc_status TEXT DEFAULT 'none',
+      created_at TIMESTAMPTZ DEFAULT now(),
+      last_login TIMESTAMPTZ
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS login_history (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      date TIMESTAMPTZ DEFAULT now(),
+      user_agent TEXT
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS transactions (
+      ref TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      type TEXT NOT NULL,
+      description TEXT,
+      amount NUMERIC NOT NULL,
+      currency TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      settled BOOLEAN DEFAULT false,
+      admin_name TEXT,
+      beneficiary TEXT,
+      bank_name TEXT,
+      iban_dest TEXT,
+      bic TEXT,
+      reason TEXT,
+      execution_date TEXT,
+      created_at TIMESTAMPTZ DEFAULT now(),
+      updated_at TIMESTAMPTZ DEFAULT now()
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS notifications (
+      id TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      message TEXT,
+      type TEXT,
+      date TIMESTAMPTZ DEFAULT now(),
+      read BOOLEAN DEFAULT false
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS notes (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      author TEXT,
+      role TEXT,
+      text TEXT,
+      date TIMESTAMPTZ DEFAULT now()
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS savings_goals (
+      id TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT,
+      target_amount NUMERIC,
+      current_amount NUMERIC DEFAULT 0,
+      icon TEXT,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS cards (
+      id TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      label TEXT,
+      last4 TEXT,
+      frozen BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS admins (
+      id TEXT PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL,
+      name TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS activity_log (
+      id TEXT PRIMARY KEY,
+      date TIMESTAMPTZ DEFAULT now(),
+      admin_id TEXT,
+      admin_name TEXT,
+      role TEXT,
+      action TEXT,
+      detail TEXT
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS sessions (
+      token TEXT PRIMARY KEY,
+      user_id TEXT,
+      is_admin BOOLEAN DEFAULT false,
+      admin_id TEXT,
+      role TEXT,
+      name TEXT,
+      expires_at TIMESTAMPTZ NOT NULL
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS pending_2fa (
+      admin_id TEXT PRIMARY KEY,
+      code TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL
+    )`;
+
+    // Admins par défaut (créés une seule fois — mots de passe hachés avec scrypt)
+    const existing = await sql`SELECT COUNT(*)::int AS n FROM admins`;
+    if (existing[0].n === 0) {
+      const defaults = [
+        { username: 'superadmin', password: 'SuperAdmin123!', role: 'super_admin', name: 'Alexandra Wong' },
+        { username: 'admin', password: 'Admin123!', role: 'admin', name: 'Marc Chen' },
+        { username: 'support', password: 'Support123!', role: 'support', name: 'Julie Tan' }
+      ];
+      for (const a of defaults) {
+        await sql`
+          INSERT INTO admins (id, username, password_hash, role, name)
+          VALUES (${uid('ADM-')}, ${a.username}, ${hashPassword(a.password)}, ${a.role}, ${a.name})
+          ON CONFLICT (username) DO NOTHING
+        `;
+      }
+    }
+  })();
+  return schemaReady;
+}
+
+// ---------------------------------------------------------------- journal (append-only)
+async function logActivity({ adminId = null, adminName = 'Système', role = null, action, detail }) {
+  await sql`
+    INSERT INTO activity_log (id, admin_id, admin_name, role, action, detail)
+    VALUES (${uid('LOG-')}, ${adminId}, ${adminName}, ${role}, ${action}, ${detail || ''})
+  `;
+}
+
+// ---------------------------------------------------------------- utilitaires réponse
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    if (req.body && typeof req.body === 'object') { resolve(req.body); return; }
+    let data = '';
+    req.on('data', (chunk) => { data += chunk; });
+    req.on('end', () => {
+      if (!data) { resolve({}); return; }
+      try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+    });
+    req.on('error', reject);
+  });
+}
+
+function send(res, status, body) {
+  res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8').send(JSON.stringify(body));
+}
+function fail(res, status, error, extra) {
+  send(res, status, Object.assign({ ok: false, error }, extra || {}));
+}
+
+module.exports = {
+  sql, uid, nowIso, hashPassword, verifyPassword,
+  generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
+  createSession, getSession, refreshSession, destroySession, getBearerToken,
+  ensureSchema, logActivity, readJsonBody, send, fail
+};

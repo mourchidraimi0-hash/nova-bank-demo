@@ -51,7 +51,7 @@
       <i class="fa-solid fa-triangle-exclamation"></i>
       <div>
         <b>NOVA BANK est une plateforme de démonstration technique.</b><br>
-        Elle ne détient aucune licence bancaire réelle, n'est certifiée par aucun organisme de sécurité ou de conformité, et ne bénéficie d'aucun fonds de garantie des dépôts. Toutes les données (comptes, soldes, cartes, historiques) sont générées et stockées uniquement dans le navigateur de chaque visiteur, via <code>localStorage</code> — rien n'est envoyé à un serveur. Merci de ne jamais utiliser vos véritables identifiants bancaires, mots de passe habituels ou informations personnelles sensibles sur ce site.
+        Elle ne détient aucune licence bancaire réelle, n'est certifiée par aucun organisme de sécurité ou de conformité, et ne bénéficie d'aucun fonds de garantie des dépôts. Contrairement à une ancienne version de ce site, vos données (comptes, soldes, cartes, historiques) ne restent plus seulement dans votre navigateur : chaque action passe par notre API et est enregistrée dans une base de données Postgres centralisée et partagée, comme dans une vraie banque. Votre mot de passe est haché (algorithme scrypt) avant d'être stocké — il n'est jamais conservé en clair et n'est jamais visible, même par l'équipe du back-office. Chaque opération administrative est consignée dans un journal d'activité append-only côté serveur, que personne ne peut modifier ou effacer après coup. Cela reste malgré tout un site de démonstration : merci de ne jamais utiliser vos véritables identifiants bancaires, mots de passe habituels ou informations personnelles sensibles ici.
       </div>
     </div>
 
@@ -129,7 +129,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
@@ -155,8 +156,8 @@
       return os ? `${browser} sur ${os}` : browser;
     }
 
-    function renderLoginHistory() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function renderLoginHistory() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const history = fresh.loginHistory || [];
       const wrap = document.getElementById('loginHistoryWrap');
       if (!history.length) {
@@ -178,7 +179,7 @@
           <tbody>${rows}</tbody>
         </table>`;
     }
-    renderLoginHistory();
+    await renderLoginHistory();
 
     // ---------------------------------------------------------------- changement de mot de passe
     function clearPwdErrors() {
@@ -244,6 +245,7 @@
     alertNewLogin.addEventListener('change', () => savePrefs({ ...loadPrefs(), newLogin: alertNewLogin.checked }));
     alertWeeklySummary.addEventListener('change', () => savePrefs({ ...loadPrefs(), weeklySummary: alertWeeklySummary.checked }));
   }
+})();
 </script>
 </body>
 </html>

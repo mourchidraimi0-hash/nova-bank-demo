@@ -57,9 +57,10 @@
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
 <script>
-  const session = ADMIN_UI.guard();
+(async function () {
+  const session = await ADMIN_UI.guard();
   if (session) {
-    let allUsers = DB.getUsers();
+    let allUsers = await DB.getAllClients();
 
     function render() {
       const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
@@ -109,6 +110,7 @@
     document.getElementById('statusFilter').addEventListener('change', render);
     render();
   }
+})();
 </script>
 </body>
 </html>

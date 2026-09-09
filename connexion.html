@@ -61,8 +61,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-(function () {
-  const existing = DB.getCurrentUser();
+(async function () {
+  const existing = await DB.getCurrentUser();
   if (existing) { window.location.href = 'espace-client.html'; return; }
 
   const form = document.getElementById('login-form');

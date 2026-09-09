@@ -60,7 +60,8 @@
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
 <script>
-  const session = ADMIN_UI.guard();
+(async function () {
+  const session = await ADMIN_UI.guard();
   if (session) {
     const TYPE_LABELS = { transfer_out: 'Virement sortant', credit: 'Crédit manuel', debit: 'Débit manuel' };
     const STATUS_OPTIONS = [
@@ -76,10 +77,10 @@
       return op.type === 'credit' ? '+' : '-';
     }
 
-    function render() {
+    async function render() {
       const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
       const status = document.getElementById('statusFilter').value;
-      const ops = DB.getAllOperations().filter(op => {
+      const ops = (await DB.getAllOperations()).filter(op => {
         if (status !== 'all' && op.status !== status) return false;
         if (!q) return true;
         const haystack = `${op.ref} ${op.clientName} ${op.beneficiary || ''}`.toLowerCase();
@@ -129,12 +130,12 @@
       `;
 
       wrap.querySelectorAll('.op-status-select').forEach(sel => {
-        sel.addEventListener('change', () => {
+        sel.addEventListener('change', async () => {
           if (!DB.canManageAccounts(session.role)) return;
           const userId = sel.getAttribute('data-user-id');
           const ref = sel.getAttribute('data-ref');
-          DB.updateTransactionStatus(userId, ref, sel.value);
-          render();
+          await DB.updateTransactionStatus(userId, ref, sel.value);
+          await render();
         });
       });
 
@@ -150,6 +151,7 @@
     document.getElementById('statusFilter').addEventListener('change', render);
     render();
   }
+})();
 </script>
 <style>
   .op-client-link{color:var(--cyan-dark);font-weight:600;}

@@ -61,12 +61,13 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
-    function renderPage() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function renderPage() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const goals = DB.getSavingsGoals(fresh);
 
       // ---- account grid : compte courant + objectifs d'épargne (sous-comptes) + ajout
@@ -111,8 +112,9 @@
         <div class="info-item"><span>Date d'ouverture</span><b>${timeAgo(fresh.createdAt)}</b></div>`;
     }
 
-    renderPage();
+    await renderPage();
   }
+})();
 </script>
 </body>
 </html>

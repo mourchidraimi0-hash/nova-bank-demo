@@ -1,0 +1,9 @@
+{
+  "name": "nova-bank-demo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NOVA BANK — site de démonstration avec backend centralisé (Vercel Functions + Neon Postgres).",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}

@@ -65,15 +65,16 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
     const ICONS = { info: 'fa-circle-info', success: 'fa-circle-check', warn: 'fa-triangle-exclamation', danger: 'fa-shield-halved' };
     let currentFilter = 'all';
 
-    function renderNotifications() {
-      const fresh = DB.getUserById(user.id);
+    async function renderNotifications() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const all = fresh.notifications || [];
       const unreadCount = all.filter(n => !n.read).length;
 
@@ -110,23 +111,23 @@
       renderNotifications();
     });
 
-    document.getElementById('notifListWrap').addEventListener('click', (e) => {
+    document.getElementById('notifListWrap').addEventListener('click', async (e) => {
       const item = e.target.closest('.notif-list-item');
       if (!item) return;
-      DB.markNotificationRead(user.id, item.getAttribute('data-id'));
-      renderNotifications();
+      await DB.markNotificationRead(user.id, item.getAttribute('data-id'));
+      await renderNotifications();
       if (typeof initNotifBadge === 'function') initNotifBadge();
     });
 
-    document.getElementById('markAllBtn').addEventListener('click', () => {
-      const fresh = DB.getUserById(user.id);
-      (fresh.notifications || []).filter(n => !n.read).forEach(n => DB.markNotificationRead(user.id, n.id));
-      renderNotifications();
+    document.getElementById('markAllBtn').addEventListener('click', async () => {
+      await DB.markAllNotificationsRead();
+      await renderNotifications();
       if (typeof initNotifBadge === 'function') initNotifBadge();
     });
 
-    renderNotifications();
+    await renderNotifications();
   }
+})();
 </script>
 </body>
 </html>

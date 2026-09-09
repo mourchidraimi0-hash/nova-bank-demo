@@ -59,7 +59,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
@@ -99,8 +100,8 @@
         </div>`;
     }
 
-    function renderPage() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function renderPage() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const cards = DB.getCards(fresh);
       const wrap = document.getElementById('cardsWrap');
 
@@ -145,11 +146,15 @@
       }).join('');
     }
 
-    document.getElementById('cardsWrap').addEventListener('click', (e) => {
+    document.getElementById('cardsWrap').addEventListener('click', async (e) => {
       const btn = e.target.closest('[data-freeze-btn]');
       if (!btn) return;
-      DB.toggleCardFreeze(user.id, btn.getAttribute('data-card-id'));
-      renderPage();
+      try {
+        await DB.toggleCardFreeze(user.id, btn.getAttribute('data-card-id'));
+        await renderPage();
+      } catch (err) {
+        alert(err.message);
+      }
     });
 
     document.getElementById('cardsWrap').addEventListener('change', (e) => {
@@ -158,8 +163,9 @@
       setCardPref(input.getAttribute('data-card-id'), input.getAttribute('data-pref'), input.checked);
     });
 
-    renderPage();
+    await renderPage();
   }
+})();
 </script>
 </body>
 </html>

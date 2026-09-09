@@ -89,7 +89,7 @@
 
       <div class="faq-item">
         <div class="faq-question"><span>Comment créer un compte NOVA BANK ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Cliquez sur « Ouvrir un compte » depuis la page d'accueil et suivez les étapes du formulaire d'inscription (identité, coordonnées, choix de devise). Un compte de démonstration est créé instantanément dans votre navigateur, sans vérification bancaire réelle.</div></div>
+        <div class="faq-answer"><div class="inner">Cliquez sur « Ouvrir un compte » depuis la page d'accueil et suivez les étapes du formulaire d'inscription (identité, coordonnées, choix de devise). Un compte de démonstration est créé instantanément sur notre serveur partagé, sans vérification bancaire réelle.</div></div>
       </div>
 
       <div class="faq-item">
@@ -99,7 +99,7 @@
 
       <div class="faq-item">
         <div class="faq-question"><span>Comment mettre à jour mes informations personnelles ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Rendez-vous dans « Profil &amp; paramètres » pour modifier vos coordonnées. Ces informations restent stockées localement dans votre navigateur et ne sont partagées avec aucun tiers.</div></div>
+        <div class="faq-answer"><div class="inner">Rendez-vous dans « Profil &amp; paramètres » pour modifier vos coordonnées. Ces informations sont enregistrées dans notre base de données partagée et ne sont partagées avec aucun tiers extérieur au site.</div></div>
       </div>
 
       <div class="faq-item">
@@ -137,7 +137,7 @@
 
       <div class="faq-item">
         <div class="faq-question"><span>Comment geler ou dégeler ma carte ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Rendez-vous dans « Cartes » et utilisez le bouton dédié sur votre carte. Le gel est immédiat et purement local à votre navigateur ; il ne bloque aucune transaction réelle puisque la carte n'existe pas physiquement.</div></div>
+        <div class="faq-answer"><div class="inner">Rendez-vous dans « Cartes » et utilisez le bouton dédié sur votre carte. Le gel est immédiat et enregistré sur notre serveur ; il ne bloque aucune transaction réelle puisque la carte n'existe pas physiquement.</div></div>
       </div>
 
       <div class="faq-item">
@@ -175,12 +175,12 @@
 
       <div class="faq-item">
         <div class="faq-question"><span>Mes documents d'identité sont-ils stockés en toute sécurité ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Dans cet environnement de démonstration, seules les métadonnées de vos documents (nom, type, taille de fichier) sont conservées dans votre navigateur — jamais leur contenu réel. Aucun document n'est envoyé sur un serveur.</div></div>
+        <div class="faq-answer"><div class="inner">Dans cet environnement de démonstration, seules les métadonnées de vos documents (nom, type, taille de fichier) sont envoyées à notre serveur et conservées dans la base de données — jamais leur contenu réel, qui n'est ni transmis ni stocké.</div></div>
       </div>
 
       <div class="faq-item">
         <div class="faq-question"><span>Comment changer mon mot de passe ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Depuis la page Sécurité, renseignez votre mot de passe actuel puis le nouveau (8 caractères minimum). Il est immédiatement re-haché et stocké localement ; personne, pas même l'équipe du site, ne peut le consulter en clair.</div></div>
+        <div class="faq-answer"><div class="inner">Depuis la page Sécurité, renseignez votre mot de passe actuel puis le nouveau (8 caractères minimum). Il est immédiatement re-haché (scrypt) et stocké ainsi sur notre serveur ; personne, pas même l'équipe du back-office, ne peut le consulter en clair.</div></div>
       </div>
 
       <div class="faq-item">
@@ -209,7 +209,7 @@
 
       <div class="faq-item">
         <div class="faq-question"><span>Puis-je exporter mes relevés ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Cette fonctionnalité n'est pas proposée dans la version actuelle de la démonstration. Toutes vos données restent consultables à tout moment dans votre espace client, stockées localement dans votre navigateur.</div></div>
+        <div class="faq-answer"><div class="inner">Cette fonctionnalité n'est pas proposée dans la version actuelle de la démonstration. Toutes vos données restent consultables à tout moment dans votre espace client, centralisées dans notre base de données partagée.</div></div>
       </div>
     </section>
 
@@ -239,7 +239,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
@@ -288,6 +289,7 @@
       e.target.reset();
     });
   }
+})();
 </script>
 </body>
 </html>

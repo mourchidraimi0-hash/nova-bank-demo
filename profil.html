@@ -113,11 +113,12 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
-    const fresh = DB.getUserById(user.id);
+    const fresh = (await DB.getUserById(user.id)) || user;
 
     function formatDate(d) {
       if (!d) return '—';
@@ -177,6 +178,7 @@
       const p = loadPrefs(); p.monthlyDigest = e.target.checked; savePrefs(p);
     });
   }
+})();
 </script>
 </body>
 </html>

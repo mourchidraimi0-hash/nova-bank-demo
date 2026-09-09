@@ -4,10 +4,9 @@
 
 const ADMIN_UI = (() => {
 
-  function guard() {
-    const session = DB.requireAdminAuth();
+  async function guard() {
+    const session = await DB.requireAdminAuth();
     if (!session) return null;
-    DB.refreshAdminSession();
     startInactivityWatch();
     renderIdentity(session);
     applyRolePermissions(session.role);
@@ -18,8 +17,8 @@ const ADMIN_UI = (() => {
     ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(evt => {
       document.addEventListener(evt, throttleRefresh, { passive: true });
     });
-    setInterval(() => {
-      const s = DB.getAdminSession();
+    setInterval(async () => {
+      const s = await DB.getAdminSession();
       if (!s) { window.location.href = 'admin-connexion.html'; }
     }, 15000);
   }

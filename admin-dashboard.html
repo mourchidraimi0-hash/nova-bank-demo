@@ -67,12 +67,12 @@
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
 <script>
-(function () {
-  const session = ADMIN_UI.guard();
+(async function () {
+  const session = await ADMIN_UI.guard();
   if (!session) return;
 
   // ---------------------------------------------------------------- stats
-  const stats = DB.getStats();
+  const stats = await DB.getStats();
   const statGrid = document.getElementById('stat-grid');
   const cards = [
     { icon: 'fa-users', value: stats.totalClients, label: 'Total clients' },
@@ -122,8 +122,8 @@
   async function renderCharts() {
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js');
     const colors = themeColors();
-    const signupSeries = DB.getSignupSeries(14);
-    const opsSeries = DB.getOpsVolumeSeries(14);
+    const signupSeries = await DB.getSignupSeries(14);
+    const opsSeries = await DB.getOpsVolumeSeries(14);
 
     if (signupsChart) { signupsChart.destroy(); signupsChart = null; }
     if (opsChart) { opsChart.destroy(); opsChart = null; }
@@ -176,7 +176,7 @@
     });
   }
 
-  renderCharts();
+  await renderCharts();
   document.addEventListener('cac-theme-changed', renderCharts);
 
   // ---------------------------------------------------------------- activity log
@@ -200,7 +200,7 @@
   }
 
   const activityLog = document.getElementById('activity-log');
-  const entries = DB.getActivityLog().slice(0, 6);
+  const entries = (await DB.getActivityLog()).slice(0, 6);
   if (!entries.length) {
     activityLog.innerHTML = `
       <div class="empty-state">

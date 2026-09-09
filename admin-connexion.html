@@ -79,10 +79,8 @@
 <script src="js/main.js"></script>
 <script>
 (async function () {
-  await DB.ensureDefaultAdmins();
-
   // Déjà connecté ? on saute directement le formulaire.
-  if (DB.getAdminSession()) { window.location.href = 'admin-dashboard.html'; return; }
+  if (await DB.getAdminSession()) { window.location.href = 'admin-dashboard.html'; return; }
 
   const step1 = document.getElementById('step1');
   const step2 = document.getElementById('step2');
@@ -97,8 +95,7 @@
   const btnStep2 = document.getElementById('btn-step2');
   const btnBack = document.getElementById('btn-back');
 
-  let pendingAdmin = null;
-  let pendingCode = null;
+  let pendingAdminId = null;
   let codeEntered = ['', '', '', '', '', ''];
 
   function clearErrors() {
@@ -133,21 +130,21 @@
     btn.disabled = true;
     btn.textContent = 'Vérification…';
 
-    const res = await DB.adminLogin(username, password);
+    const res = await DB.adminLoginStep1(username, password);
 
     btn.disabled = false;
     btn.textContent = 'Continuer';
 
     if (!res.ok) {
-      if (res.error === 'not_found') showLoginError('Identifiant inconnu.');
-      else if (res.error === 'wrong_password') showLoginError('Mot de passe incorrect.');
+      if (res.error === 'invalid_credentials') showLoginError('Identifiant ou mot de passe incorrect.');
       else showLoginError('Une erreur est survenue. Merci de réessayer.');
       return;
     }
 
-    pendingAdmin = res.admin;
-    pendingCode = DB.generate2FACode();
-    codeDisplay.textContent = pendingCode;
+    pendingAdminId = res.adminId;
+    // Démo : le code est généré et validé côté serveur ; il est simplement renvoyé ici pour
+    // être affiché à l'écran, conformément à l'exigence de transparence totale (aucun SMS réel).
+    codeDisplay.textContent = res.demoCode;
     codeEntered = ['', '', '', '', '', ''];
     codeBoxes.forEach(b => b.value = '');
     step2Error.textContent = '';
@@ -173,21 +170,34 @@
     });
   });
 
-  btnStep2.addEventListener('click', () => {
+  btnStep2.addEventListener('click', async () => {
     const entered = codeEntered.join('');
-    if (entered.length !== 6 || entered !== pendingCode) {
-      step2Error.textContent = 'Le code saisi ne correspond pas. Veuillez réessayer.';
+    if (entered.length !== 6) {
+      step2Error.textContent = 'Merci de saisir les 6 chiffres du code.';
       step2Error.classList.add('show');
       return;
     }
-    if (!pendingAdmin) { window.location.href = 'admin-connexion.html'; return; }
-    DB.startAdminSession(pendingAdmin);
+    if (!pendingAdminId) { window.location.href = 'admin-connexion.html'; return; }
+
+    btnStep2.disabled = true;
+    btnStep2.textContent = 'Vérification…';
+    const res = await DB.adminLoginStep2(pendingAdminId, entered);
+    btnStep2.disabled = false;
+    btnStep2.textContent = 'Vérifier et se connecter';
+
+    if (!res.ok) {
+      step2Error.textContent = res.error === 'code_expired'
+        ? 'Le code a expiré. Veuillez recommencer la connexion.'
+        : 'Le code saisi ne correspond pas. Veuillez réessayer.';
+      step2Error.classList.add('show');
+      return;
+    }
     window.location.href = 'admin-dashboard.html';
   });
 
   btnBack.addEventListener('click', (e) => {
     e.preventDefault();
-    pendingCode = null;
+    pendingAdminId = null;
     passwordInput.value = '';
     step2.classList.add('hidden');
     step1.classList.remove('hidden');

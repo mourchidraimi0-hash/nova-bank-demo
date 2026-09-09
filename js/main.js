@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ---------------------------------------------------------------- badge de notifications non lues (sidebar client)
-function initNotifBadge() {
+async function initNotifBadge() {
   if (typeof DB === 'undefined' || !DB.getCurrentUser) return;
-  const user = DB.getCurrentUser();
+  const user = await DB.getCurrentUser();
   if (!user) return;
   const count = (user.notifications || []).filter(n => !n.read).length;
   document.querySelectorAll('[data-notif-badge]').forEach(el => {

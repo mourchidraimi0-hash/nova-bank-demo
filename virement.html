@@ -179,7 +179,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
@@ -215,7 +216,7 @@
     const currencySelect = document.getElementById('f-currency');
     const currencyHint = document.getElementById('currencyHint');
 
-    document.getElementById('trxForm').addEventListener('submit', (e) => {
+    document.getElementById('trxForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const errorEl = document.getElementById('step1Error');
       errorEl.classList.remove('show');
@@ -236,7 +237,7 @@
         return;
       }
 
-      const freshUser = DB.getUserById(user.id) || user;
+      const freshUser = (await DB.getUserById(user.id)) || user;
       if (currency === freshUser.currency) {
         const available = DB.getAvailableBalance(freshUser);
         if (amount > available) {
@@ -251,8 +252,8 @@
       goToStep(2);
     });
 
-    currencySelect.addEventListener('change', () => {
-      const freshUser = DB.getUserById(user.id) || user;
+    currencySelect.addEventListener('change', async () => {
+      const freshUser = (await DB.getUserById(user.id)) || user;
       if (currencySelect.value !== freshUser.currency) {
         currencyHint.textContent = `Votre compte est en ${freshUser.currency}. Ce virement est libellé dans une devise différente (${currencySelect.value}) — la vérification de solde disponible ne s'applique pas dans cette démonstration.`;
         currencyHint.style.display = 'block';
@@ -370,20 +371,28 @@
         ringTimers.push(t);
       }
 
-      const finalTimer = setTimeout(() => {
-        const trx = DB.createTransfer(user.id, {
-          beneficiary: wizardData.beneficiary,
-          bankName: wizardData.bankName,
-          iban: wizardData.iban,
-          bic: wizardData.bic,
-          amount: wizardData.amount,
-          currency: wizardData.currency,
-          reason: wizardData.reason,
-          executionDate: wizardData.executionDate
-        });
-        wizardData.ref = trx ? trx.ref : '';
-        document.getElementById('trxRefText').textContent = wizardData.ref;
-        goToStep(5);
+      const finalTimer = setTimeout(async () => {
+        try {
+          const trx = await DB.createTransfer(user.id, {
+            beneficiary: wizardData.beneficiary,
+            bankName: wizardData.bankName,
+            iban: wizardData.iban,
+            bic: wizardData.bic,
+            amount: wizardData.amount,
+            currency: wizardData.currency,
+            reason: wizardData.reason,
+            executionDate: wizardData.executionDate
+          });
+          wizardData.ref = trx ? trx.ref : '';
+          document.getElementById('trxRefText').textContent = wizardData.ref;
+          goToStep(5);
+        } catch (err) {
+          goToStep(1);
+          repopulateStep1();
+          const errorEl = document.getElementById('step1Error');
+          errorEl.textContent = err.message;
+          errorEl.classList.add('show');
+        }
       }, totalDuration + 600);
       ringTimers.push(finalTimer);
     }
@@ -413,6 +422,7 @@
     // ---------------------------------------------------------------- init
     goToStep(1);
   }
+})();
 </script>
 </body>
 </html>

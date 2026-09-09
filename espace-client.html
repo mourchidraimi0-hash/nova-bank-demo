@@ -78,7 +78,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
@@ -136,8 +137,8 @@
       });
     }
 
-    function renderPage() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function renderPage() {
+      const fresh = (await DB.getUserById(user.id)) || user;
 
       // ---- greeting
       document.getElementById('greeting').textContent = `Bonjour, ${fresh.firstName}`;
@@ -159,9 +160,9 @@
             <div class="msg">${escapeHtml(unread.message)}</div>
             <button class="btn btn-sm btn-outline" id="markReadBtn">Marquer comme lu</button>
           </div>`;
-        document.getElementById('markReadBtn').addEventListener('click', () => {
-          DB.markNotificationRead(fresh.id, unread.id);
-          renderPage();
+        document.getElementById('markReadBtn').addEventListener('click', async () => {
+          await DB.markNotificationRead(fresh.id, unread.id);
+          await renderPage();
         });
       } else {
         notifWrap.innerHTML = '';
@@ -214,7 +215,7 @@
           <h4>Assistance</h4>
         </a>`;
 
-      renderChart(fresh);
+      await renderChart(fresh);
 
       // ---- history (5 dernières — voir transactions.html pour l'historique complet)
       const txs = (fresh.transactions || []).slice(0, 5);
@@ -247,8 +248,9 @@
       }
     }
 
-    renderPage();
+    await renderPage();
   }
+})();
 </script>
 </body>
 </html>

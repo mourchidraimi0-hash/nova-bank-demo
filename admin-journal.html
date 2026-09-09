@@ -52,7 +52,8 @@
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
 <script>
-  const session = ADMIN_UI.guard();
+(async function () {
+  const session = await ADMIN_UI.guard();
   if (session) {
     const ACTION_LABELS = {
       inscription_client: "Inscription d'un client",
@@ -68,9 +69,9 @@
       note_ajoutee: 'Note ajoutée'
     };
 
-    function render() {
+    async function render() {
       const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-      const entries = DB.getActivityLog().filter(e => {
+      const entries = (await DB.getActivityLog()).filter(e => {
         if (!q) return true;
         const haystack = `${e.action} ${e.detail} ${e.adminName}`.toLowerCase();
         return haystack.includes(q);
@@ -94,6 +95,7 @@
     document.getElementById('searchInput').addEventListener('input', render);
     render();
   }
+})();
 </script>
 </body>
 </html>

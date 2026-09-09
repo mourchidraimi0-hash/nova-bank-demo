@@ -183,11 +183,12 @@
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
 <script>
-  const session = ADMIN_UI.guard();
+(async function () {
+  const session = await ADMIN_UI.guard();
   if (session) {
     const params = new URLSearchParams(location.search);
     const clientId = params.get('id');
-    let clientUser = DB.getUserById(clientId);
+    let clientUser = await DB.getUserById(clientId);
 
     const KYC_LABELS = { none: 'Aucun document', submitted: 'Documents soumis', verified: 'Vérifié' };
     const SUSPEND_REASONS = [
@@ -200,7 +201,7 @@
     let currentActionType = null; // 'suspend' | 'reactivate' | 'activate' | 'requestInfo'
     let pendingBalanceOp = null;
 
-    function refresh() { clientUser = DB.getUserById(clientId); }
+    async function refresh() { clientUser = await DB.getUserById(clientId); }
 
     function fmtDoc(meta) {
       if (!meta) return 'Aucun document déposé';
@@ -328,8 +329,8 @@
       `).join('');
     }
 
-    function renderAll() {
-      refresh();
+    async function renderAll() {
+      await refresh();
       if (!clientUser) {
         document.getElementById('notFoundState').classList.remove('hidden');
         document.getElementById('clientContent').classList.add('hidden');
@@ -423,30 +424,35 @@
     });
     document.getElementById('actionModalCancel').addEventListener('click', closeActionModal);
 
-    document.getElementById('actionModalConfirm').addEventListener('click', () => {
+    document.getElementById('actionModalConfirm').addEventListener('click', async () => {
       if (!DB.canManageAccounts(session.role)) { closeActionModal(); return; }
-      if (currentActionType === 'suspend') {
-        const sel = document.getElementById('suspendReasonSelect');
-        let reason = sel.value;
-        if (reason === 'Autre') {
-          const custom = (document.getElementById('suspendCustomReason').value || '').trim();
-          if (!custom) { showActionError('Veuillez préciser le motif.'); return; }
-          reason = custom;
+      try {
+        if (currentActionType === 'suspend') {
+          const sel = document.getElementById('suspendReasonSelect');
+          let reason = sel.value;
+          if (reason === 'Autre') {
+            const custom = (document.getElementById('suspendCustomReason').value || '').trim();
+            if (!custom) { showActionError('Veuillez préciser le motif.'); return; }
+            reason = custom;
+          }
+          const note = (document.getElementById('suspendNote').value || '').trim();
+          await DB.suspendUser(clientId, reason);
+          if (note) await DB.addAdminNote(clientId, note);
+        } else if (currentActionType === 'reactivate') {
+          await DB.reactivateUser(clientId);
+        } else if (currentActionType === 'activate') {
+          await DB.activateUser(clientId);
+        } else if (currentActionType === 'requestInfo') {
+          const message = (document.getElementById('requestInfoMessage').value || '').trim();
+          if (!message) { showActionError('Veuillez saisir un message.'); return; }
+          await DB.requestMoreInfo(clientId, message);
         }
-        const note = (document.getElementById('suspendNote').value || '').trim();
-        DB.suspendUser(clientId, reason);
-        if (note) DB.addAdminNote(clientId, note);
-      } else if (currentActionType === 'reactivate') {
-        DB.reactivateUser(clientId);
-      } else if (currentActionType === 'activate') {
-        DB.activateUser(clientId);
-      } else if (currentActionType === 'requestInfo') {
-        const message = (document.getElementById('requestInfoMessage').value || '').trim();
-        if (!message) { showActionError('Veuillez saisir un message.'); return; }
-        DB.requestMoreInfo(clientId, message);
+      } catch (err) {
+        showActionError(err.message);
+        return;
       }
       closeActionModal();
-      renderAll();
+      await renderAll();
     });
 
     // ---------------------------------------------------------- balance adjustment
@@ -481,11 +487,11 @@
       pendingBalanceOp = null;
     });
 
-    document.getElementById('balanceModalConfirm').addEventListener('click', () => {
+    document.getElementById('balanceModalConfirm').addEventListener('click', async () => {
       if (!DB.canManageAccounts(session.role)) { balanceModal.classList.remove('open'); return; }
       if (!pendingBalanceOp) return;
       try {
-        DB.adjustBalance(clientId, pendingBalanceOp.type, pendingBalanceOp.amount, pendingBalanceOp.reason);
+        await DB.adjustBalance(clientId, pendingBalanceOp.type, pendingBalanceOp.amount, pendingBalanceOp.reason);
       } catch (err) {
         balanceModalError.textContent = err.message;
         balanceModalError.style.display = '';
@@ -494,21 +500,22 @@
       pendingBalanceOp = null;
       balanceModal.classList.remove('open');
       document.getElementById('balanceForm').reset();
-      renderAll();
+      await renderAll();
     });
 
     // ---------------------------------------------------------- internal notes (all roles)
-    document.getElementById('btnAddNote').addEventListener('click', () => {
+    document.getElementById('btnAddNote').addEventListener('click', async () => {
       const textarea = document.getElementById('newNoteText');
       const text = (textarea.value || '').trim();
       if (!text) return;
-      DB.addAdminNote(clientId, text);
+      await DB.addAdminNote(clientId, text);
       textarea.value = '';
-      renderAll();
+      await renderAll();
     });
 
-    renderAll();
+    await renderAll();
   }
+})();
 </script>
 </body>
 </html>

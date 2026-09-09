@@ -75,7 +75,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
@@ -97,8 +98,8 @@
       });
     }
 
-    function renderTable() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function renderTable() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const all = fresh.transactions || [];
       const filtered = getFiltered(all);
       const wrap = document.getElementById('tableWrap');
@@ -145,8 +146,8 @@
         </table>`;
     }
 
-    function exportCsv() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function exportCsv() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const filtered = getFiltered(fresh.transactions || []);
       const header = ['Référence', 'Description', 'Date', 'Type', 'Statut', 'Montant', 'Devise'];
       const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -172,8 +173,9 @@
     document.getElementById('typeFilter').addEventListener('change', renderTable);
     document.getElementById('exportBtn').addEventListener('click', exportCsv);
 
-    renderTable();
+    await renderTable();
   }
+})();
 </script>
 </body>
 </html>

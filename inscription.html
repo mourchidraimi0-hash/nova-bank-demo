@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Ouvrez un compte NOVA BANK en quelques minutes. Formulaire de démonstration : aucune donnée n'est transmise à un serveur réel.">
+<meta name="description" content="Ouvrez un compte NOVA BANK en quelques minutes. Formulaire de démonstration technique : les données sont envoyées à un serveur partagé de démonstration, sans licence bancaire réelle.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <title>Ouvrir un compte — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
 <div class="form-page">
   <div class="form-card wide">
     <h1>Ouvrir un compte</h1>
-    <p class="sub">Quelques minutes suffisent. Ce formulaire fait partie d'une démonstration entièrement locale : aucune donnée n'est transmise à un serveur, tout reste dans votre navigateur.</p>
+    <p class="sub">Quelques minutes suffisent. Ce formulaire fait partie d'une démonstration technique : vos informations sont envoyées à notre serveur et enregistrées dans une base de données partagée, comme dans une vraie banque — mais NOVA BANK reste un site fictif, sans licence bancaire réelle.</p>
 
     <form id="signup-form" novalidate>
       <div class="form-row two">
@@ -126,7 +126,7 @@
         <div class="field-error" id="error-idDocument"></div>
       </div>
 
-      <div class="field-hint" style="margin-bottom:24px;">Ces documents restent dans votre navigateur : seules leurs métadonnées (nom, type, taille) sont conservées, jamais leur contenu.</div>
+      <div class="field-hint" style="margin-bottom:24px;">Seules les métadonnées de ces fichiers (nom, type, taille) sont envoyées à notre serveur et enregistrées — jamais leur contenu réel, qui n'est ni transmis ni conservé.</div>
 
       <div class="checkbox-row" style="margin-bottom:28px;">
         <input type="checkbox" id="terms" required>
@@ -160,7 +160,7 @@
     <p class="mt-16 mb-16"><b id="modal-balance"></b></p>
     <div class="alert alert-warn">
       <i class="fa-solid fa-triangle-exclamation"></i>
-      <span>Ces informations sont stockées uniquement dans ce navigateur. Notez votre identifiant : en cas de perte, la récupération n'est pas automatisée sur ce site de démonstration.</span>
+      <span>Ces informations sont enregistrées sur notre serveur de démonstration. Notez votre identifiant : en cas de perte, la récupération n'est pas automatisée sur ce site de démonstration.</span>
     </div>
     <button type="button" class="btn btn-primary btn-block" id="modal-continue">Accéder à mon espace client</button>
   </div>
@@ -169,8 +169,8 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-(function () {
-  const existing = DB.getCurrentUser();
+(async function () {
+  const existing = await DB.getCurrentUser();
   if (existing) { window.location.href = 'espace-client.html'; return; }
 
   const form = document.getElementById('signup-form');
@@ -236,11 +236,6 @@
 
     if (hasError) return;
 
-    if (email && DB.findUserByIdentifier(email)) {
-      setError('email', 'Un compte existe déjà avec cet e-mail.');
-      return;
-    }
-
     const idPhotoMeta = getDzFileMeta('idPhoto');
     const idDocumentMeta = getDzFileMeta('idDocument');
 
@@ -268,7 +263,7 @@
     } catch (err) {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Créer mon compte';
-      setError('email', 'Une erreur est survenue lors de la création du compte. Merci de réessayer.');
+      setError('email', err && err.message ? err.message : 'Une erreur est survenue lors de la création du compte. Merci de réessayer.');
     }
   });
 })();

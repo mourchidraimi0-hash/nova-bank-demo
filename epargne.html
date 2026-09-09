@@ -117,14 +117,15 @@
 <script src="js/db.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const user = DB.requireClientAuth();
+(async function () {
+  const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
     let currentAmountAction = null; // { goalId, mode: 'contribute' | 'withdraw' }
 
-    function renderPage() {
-      const fresh = DB.getUserById(user.id) || user;
+    async function renderPage() {
+      const fresh = (await DB.getUserById(user.id)) || user;
       const goals = DB.getSavingsGoals(fresh);
 
       // ---- tuiles récapitulatives
@@ -183,7 +184,7 @@
       }).join('');
 
       wrap.querySelectorAll('[data-delete]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const goalId = btn.getAttribute('data-delete');
           const goal = goals.find(x => x.id === goalId);
           if (!goal) return;
@@ -191,8 +192,12 @@
             ? ` Le montant déjà mis de côté (${DB.formatMoney(goal.currentAmount, fresh.currency)}) sera automatiquement recrédité sur votre solde disponible.`
             : '';
           if (confirm(`Supprimer l'objectif « ${goal.name} » ?${extra}`)) {
-            DB.deleteSavingsGoal(fresh.id, goalId);
-            renderPage();
+            try {
+              await DB.deleteSavingsGoal(fresh.id, goalId);
+              await renderPage();
+            } catch (err) {
+              alert(err.message);
+            }
           }
         });
       });
@@ -220,7 +225,7 @@
       if (e.target.id === 'goalModalOverlay') closeGoalModal();
     });
 
-    document.getElementById('goalForm').addEventListener('submit', (e) => {
+    document.getElementById('goalForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('goalName').value.trim();
       const target = Number(document.getElementById('goalTarget').value);
@@ -231,9 +236,14 @@
         err.classList.add('show');
         return;
       }
-      DB.createSavingsGoal(user.id, { name, targetAmount: target, icon });
-      closeGoalModal();
-      renderPage();
+      try {
+        await DB.createSavingsGoal(user.id, { name, targetAmount: target, icon });
+        closeGoalModal();
+        await renderPage();
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.classList.add('show');
+      }
     });
 
     // ---- modale générique : mettre de côté / retirer
@@ -258,27 +268,28 @@
       if (e.target.id === 'amountModalOverlay') closeAmountModal();
     });
 
-    document.getElementById('amountForm').addEventListener('submit', (e) => {
+    document.getElementById('amountForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentAmountAction) return;
       const amt = Number(document.getElementById('amountInput').value);
       const err = document.getElementById('amountFormError');
       try {
         if (currentAmountAction.mode === 'contribute') {
-          DB.contributeToSavingsGoal(user.id, currentAmountAction.goalId, amt);
+          await DB.contributeToSavingsGoal(user.id, currentAmountAction.goalId, amt);
         } else {
-          DB.withdrawFromSavingsGoal(user.id, currentAmountAction.goalId, amt);
+          await DB.withdrawFromSavingsGoal(user.id, currentAmountAction.goalId, amt);
         }
         closeAmountModal();
-        renderPage();
+        await renderPage();
       } catch (ex) {
         err.textContent = ex.message;
         err.classList.add('show');
       }
     });
 
-    renderPage();
+    await renderPage();
   }
+})();
 </script>
 </body>
 </html>
