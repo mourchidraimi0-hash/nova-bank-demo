@@ -137,6 +137,37 @@ function getBearerToken(req) {
   return header.slice(7).trim();
 }
 
+async function destroyAllUserSessions(userId) {
+  await sql`DELETE FROM sessions WHERE user_id = ${userId} AND is_admin = false`;
+}
+
+// ---------------------------------------------------------------- réinitialisation du mot de passe
+// Démo : ce site n'a pas de serveur d'e-mail réel. Le jeton (aléatoire, à usage unique,
+// expirant après 30 minutes) est généré et vérifié exactement comme dans un vrai système —
+// seule la remise se fait à l'écran plutôt que par e-mail, comme pour le code 2FA admin.
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+async function createPasswordResetToken(userId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 30 * 60000).toISOString();
+  await sql`
+    INSERT INTO password_resets (token_hash, user_id, expires_at, used)
+    VALUES (${hashToken(token)}, ${userId}, ${expiresAt}, false)
+  `;
+  return token;
+}
+
+async function consumePasswordResetToken(token) {
+  const tokenHash = hashToken(token);
+  const rows = await sql`SELECT * FROM password_resets WHERE token_hash = ${tokenHash} LIMIT 1`;
+  const row = rows[0];
+  if (!row || row.used || new Date(row.expires_at).getTime() < Date.now()) return null;
+  await sql`UPDATE password_resets SET used = true WHERE token_hash = ${tokenHash}`;
+  return row.user_id;
+}
+
 // ---------------------------------------------------------------- schéma (création idempotente, exécutée une fois par instance)
 let schemaReady = null;
 async function ensureSchema() {
@@ -257,6 +288,12 @@ async function ensureSchema() {
       count INT NOT NULL DEFAULT 0,
       window_start TIMESTAMPTZ NOT NULL DEFAULT now()
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS password_resets (
+      token_hash TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used BOOLEAN DEFAULT false
+    )`;
 
     // Index — les clés primaires sont déjà indexées automatiquement ; ceux-ci accélèrent
     // les filtres/tris utilisés par le back-office (fiche client, listes paginées, stats).
@@ -273,6 +310,7 @@ async function ensureSchema() {
     await sql`CREATE INDEX IF NOT EXISTS idx_cards_user_id ON cards(user_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_activity_log_date ON activity_log(date DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_password_resets_user_id ON password_resets(user_id)`;
 
     // Admins par défaut (créés une seule fois — mots de passe hachés avec scrypt)
     const existing = await sql`SELECT COUNT(*)::int AS n FROM admins`;
@@ -327,6 +365,7 @@ module.exports = {
   sql, uid, nowIso, hashPassword, verifyPassword, isStrongPassword,
   getClientIp, checkRateLimit,
   generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
-  createSession, getSession, refreshSession, destroySession, getBearerToken,
+  createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
+  createPasswordResetToken, consumePasswordResetToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 };

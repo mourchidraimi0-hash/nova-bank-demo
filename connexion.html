@@ -30,9 +30,17 @@
       <span id="login-error-text"></span>
     </div>
 
-    <div class="alert alert-warn hidden" id="reset-notice">
-      <i class="fa-solid fa-circle-info"></i>
-      <span>Pour réinitialiser votre mot de passe, veuillez contacter notre support. Aucune réinitialisation automatique n'est disponible sur ce site de démonstration.</span>
+    <div class="alert alert-warn hidden" id="reset-panel">
+      <i class="fa-solid fa-key"></i>
+      <div style="width:100%;">
+        <p class="text-sm mb-8"><strong>Réinitialiser votre mot de passe</strong></p>
+        <p class="text-sm text-muted mb-8">Saisissez votre identifiant ou e-mail. Ce site de démonstration n'a pas de serveur d'e-mail réel : le lien de réinitialisation sera affiché directement ci-dessous.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" id="reset-identifier" class="form-control" placeholder="Identifiant ou e-mail" style="flex:1;min-width:180px;">
+          <button type="button" id="reset-submit" class="btn btn-primary btn-sm">Générer le lien</button>
+        </div>
+        <div id="reset-result" class="mt-16"></div>
+      </div>
     </div>
 
     <form id="login-form" novalidate>
@@ -70,11 +78,48 @@
   const errorBox = document.getElementById('login-error');
   const errorText = document.getElementById('login-error-text');
   const forgotLink = document.getElementById('forgot-link');
-  const resetNotice = document.getElementById('reset-notice');
+  const resetPanel = document.getElementById('reset-panel');
+  const resetResult = document.getElementById('reset-result');
+  const resetSubmit = document.getElementById('reset-submit');
 
   forgotLink.addEventListener('click', (e) => {
     e.preventDefault();
-    resetNotice.classList.remove('hidden');
+    resetPanel.classList.toggle('hidden');
+  });
+
+  resetSubmit.addEventListener('click', async () => {
+    const identifier = document.getElementById('reset-identifier').value.trim();
+    if (!identifier) return;
+
+    resetSubmit.disabled = true;
+    resetSubmit.textContent = 'Génération…';
+
+    try {
+      const { resetToken } = await DB.requestPasswordReset(identifier);
+      const link = window.location.origin + '/reinitialisation.html?token=' + encodeURIComponent(resetToken);
+      resetResult.innerHTML = `
+        <div class="alert alert-success" style="margin-top:12px;margin-bottom:0;">
+          <i class="fa-solid fa-circle-check"></i>
+          <div style="width:100%;">
+            Lien de réinitialisation (affiché ici uniquement car ce site n'a pas de serveur d'e-mail réel) :<br>
+            <a href="${link}" id="reset-link-anchor" style="word-break:break-all;">${escapeHtml(link)}</a><br>
+            <button type="button" class="btn btn-sm btn-outline mt-8" id="reset-copy-btn"><i class="fa-solid fa-copy"></i> Copier le lien</button>
+            <p class="text-sm text-muted mt-8" style="margin-bottom:0;">Ce lien expire dans 30 minutes et ne peut être utilisé qu'une seule fois.</p>
+          </div>
+        </div>`;
+      document.getElementById('reset-copy-btn').addEventListener('click', () => {
+        if (navigator.clipboard) navigator.clipboard.writeText(link).catch(() => {});
+      });
+    } catch (err) {
+      resetResult.innerHTML = `
+        <div class="alert alert-error" style="margin-top:12px;margin-bottom:0;">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>${escapeHtml(err.message)}</span>
+        </div>`;
+    }
+
+    resetSubmit.disabled = false;
+    resetSubmit.textContent = 'Générer le lien';
   });
 
   function showLoginError(msg) {

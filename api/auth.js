@@ -1,7 +1,8 @@
 const {
   sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit,
   generateAccountNumber, generateIBAN,
-  createSession, getSession, refreshSession, destroySession, getBearerToken,
+  createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
+  createPasswordResetToken, consumePasswordResetToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
 
@@ -145,6 +146,53 @@ module.exports = async (req, res) => {
       await sql`UPDATE users SET password_hash = ${hashPassword(newPassword)} WHERE id = ${user.id}`;
       await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${user.id}, 'Votre mot de passe a été modifié avec succès.', 'success')`;
       await logActivity({ adminName: 'Client', action: 'changement_mot_de_passe', detail: `${user.first_name} ${user.last_name} a changé son mot de passe` });
+      return send(res, 200, { ok: true });
+    }
+
+    // ---------------------------------------------------------------- réinitialisation du mot de passe (sans email réel)
+    // Démo : aucun serveur d'e-mail n'est connecté à ce site. Le jeton de réinitialisation est
+    // réel (aléatoire, à usage unique, expire après 30 minutes) mais renvoyé directement au
+    // client pour être affiché à l'écran, exactement comme le code 2FA de l'espace admin.
+    if (action === 'requestPasswordReset') {
+      const allowed = await checkRateLimit({ key: `pwreset:${getClientIp(req)}`, max: 5, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
+      const { identifier } = body;
+      if (!identifier) return fail(res, 400, 'missing_fields');
+      const id = String(identifier).trim().toLowerCase();
+      const rows = await sql`
+        SELECT * FROM users
+        WHERE lower(id) = ${id} OR lower(email) = ${id} OR lower(account_number) = ${id}
+        LIMIT 1
+      `;
+      const user = rows[0];
+      if (!user) return fail(res, 404, 'not_found');
+      if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
+
+      const resetToken = await createPasswordResetToken(user.id);
+      await logActivity({ adminName: 'Client', action: 'demande_reinitialisation_mdp', detail: `Demande de réinitialisation pour ${user.account_number}` });
+      return send(res, 200, { ok: true, resetToken });
+    }
+
+    if (action === 'resetPassword') {
+      const allowed = await checkRateLimit({ key: `pwresetconfirm:${getClientIp(req)}`, max: 10, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
+      const { token, newPassword } = body;
+      if (!token || !newPassword) return fail(res, 400, 'missing_fields');
+      if (!isStrongPassword(newPassword)) return fail(res, 400, 'weak_password');
+
+      const userId = await consumePasswordResetToken(token);
+      if (!userId) return fail(res, 400, 'invalid_token');
+
+      const rows = await sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1`;
+      const user = rows[0];
+      if (!user) return fail(res, 404, 'not_found');
+
+      await sql`UPDATE users SET password_hash = ${hashPassword(newPassword)} WHERE id = ${userId}`;
+      await destroyAllUserSessions(userId);
+      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, 'Votre mot de passe a été réinitialisé. Si vous n\'êtes pas à l\'origine de cette action, contactez le support immédiatement.', 'warning')`;
+      await logActivity({ adminName: `${user.first_name} ${user.last_name}`, action: 'reinitialisation_mdp', detail: `Mot de passe réinitialisé pour ${user.account_number} — toutes les sessions actives ont été révoquées` });
       return send(res, 200, { ok: true });
     }
 

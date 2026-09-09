@@ -97,6 +97,20 @@ const DB = (() => {
     return true;
   }
 
+  // Démo : aucun serveur d'e-mail réel — le lien de réinitialisation est renvoyé directement
+  // pour être affiché à l'écran, sur le même principe que le code 2FA de l'espace admin.
+  async function requestPasswordReset(identifier) {
+    const r = await api('auth', { body: { action: 'requestPasswordReset', identifier } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return { resetToken: r.resetToken };
+  }
+
+  async function resetPassword(token, newPassword) {
+    const r = await api('auth', { body: { action: 'resetPassword', token, newPassword } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return true;
+  }
+
   async function updateProfile(fields) {
     const r = await api('client', { body: { action: 'updateProfile', ...fields } });
     if (!r.ok) throw new Error(errorMessage(r.error));
@@ -312,6 +326,7 @@ const DB = (() => {
       invalid_amount: 'Montant invalide.',
       weak_password: 'Le mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.',
       rate_limited: 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.',
+      invalid_token: 'Ce lien de réinitialisation est invalide ou a déjà été utilisé. Merci de recommencer la procédure.',
       reason_required: 'Un motif est obligatoire pour cette action.',
       invalid_credentials: 'Identifiants incorrects.',
       code_expired: 'Le code a expiré. Veuillez recommencer la connexion.',
@@ -325,6 +340,7 @@ const DB = (() => {
   return {
     KEYS, uid, nowIso, generate2FACode, formatMoney,
     createUser, login, getCurrentUser, logout, requireClientAuth, changePassword, updateProfile,
+    requestPasswordReset, resetPassword,
     getAvailableBalance, getPendingOutTotal, markNotificationRead, markAllNotificationsRead, createTransfer,
     getSavingsGoals, createSavingsGoal, contributeToSavingsGoal, withdrawFromSavingsGoal, deleteSavingsGoal,
     getCards, toggleCardFreeze,
