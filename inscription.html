@@ -163,6 +163,14 @@
       <i class="fa-solid fa-triangle-exclamation"></i>
       <span>Ces informations sont enregistrées sur notre serveur de démonstration. Notez votre identifiant : en cas de perte, la récupération n'est pas automatisée sur ce site de démonstration.</span>
     </div>
+    <div class="alert alert-success" style="text-align:left;">
+      <i class="fa-solid fa-envelope-circle-check"></i>
+      <div style="width:100%;">
+        Confirmez votre adresse e-mail (affiché ici car ce site n'a pas de serveur d'e-mail réel) :<br>
+        <a href="#" id="modal-verify-link" style="word-break:break-all;"></a><br>
+        <p class="text-sm text-muted mt-8" style="margin-bottom:0;">Tant que l'e-mail n'est pas confirmé, les virements sortants sont bloqués. Vous pourrez aussi renvoyer ce lien depuis votre tableau de bord.</p>
+      </div>
+    </div>
     <button type="button" class="btn btn-primary btn-block" id="modal-continue">Accéder à mon espace client</button>
   </div>
 </div>
@@ -245,7 +253,7 @@
     submitBtn.textContent = 'Création en cours…';
 
     try {
-      const user = await DB.createUser({
+      const { user, verificationToken } = await DB.createUser({
         firstName, lastName, email, phone, birthDate, address, currency, password,
         idPhotoMeta, idDocumentMeta
       });
@@ -254,6 +262,11 @@
       document.getElementById('modal-account').textContent = user.accountNumber;
       document.getElementById('modal-iban').textContent = user.iban;
       document.getElementById('modal-balance').textContent = 'Solde initial : ' + DB.formatMoney(0, user.currency);
+
+      const verifyLink = window.location.origin + '/verification-email.html?token=' + encodeURIComponent(verificationToken);
+      const verifyAnchor = document.getElementById('modal-verify-link');
+      verifyAnchor.textContent = verifyLink;
+      verifyAnchor.href = verifyLink;
 
       document.getElementById('modal-continue').onclick = async () => {
         await DB.login(user.id, password);

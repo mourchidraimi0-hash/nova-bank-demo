@@ -32,6 +32,8 @@ module.exports = async (req, res) => {
     // action updateTransactionStatus). Avant cela, le montant est simplement retenu dans le
     // "solde disponible" calculé côté client (solde - virements sortants en attente).
     if (action === 'createTransfer') {
+      if (!user.email_verified) return fail(res, 403, 'email_not_verified');
+
       const { amount, beneficiary, bankName, ibanDest, bic, reason, executionDate } = body;
       const amt = Number(amount);
       if (!amt || amt <= 0) return fail(res, 400, 'invalid_amount');

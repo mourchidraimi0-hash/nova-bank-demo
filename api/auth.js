@@ -3,6 +3,7 @@ const {
   generateAccountNumber, generateIBAN,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,
+  createEmailVerificationToken, consumeEmailVerificationToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
 
@@ -30,6 +31,7 @@ async function serializeUser(row) {
     balance: Number(row.balance),
     status: row.status,
     suspendReason: row.suspend_reason,
+    emailVerified: row.email_verified,
     kyc: { idPhoto: row.kyc_id_photo, idDocument: row.kyc_id_document, status: row.kyc_status },
     createdAt: row.created_at,
     lastLogin: row.last_login,
@@ -88,16 +90,18 @@ module.exports = async (req, res) => {
       const kycStatus = (idPhotoMeta || idDocumentMeta) ? 'submitted' : 'none';
 
       await sql`
-        INSERT INTO users (id, first_name, last_name, email, phone, birth_date, address, currency, password_hash, account_number, iban, balance, status, kyc_id_photo, kyc_id_document, kyc_status)
-        VALUES (${id}, ${firstName}, ${lastName}, ${email}, ${phone || null}, ${birthDate || null}, ${address || null}, ${currency || 'EUR'}, ${hashPassword(password)}, ${accountNumber}, ${iban}, 0, 'active', ${idPhotoMeta ? JSON.stringify(idPhotoMeta) : null}, ${idDocumentMeta ? JSON.stringify(idDocumentMeta) : null}, ${kycStatus})
+        INSERT INTO users (id, first_name, last_name, email, phone, birth_date, address, currency, password_hash, account_number, iban, balance, status, kyc_id_photo, kyc_id_document, kyc_status, email_verified)
+        VALUES (${id}, ${firstName}, ${lastName}, ${email}, ${phone || null}, ${birthDate || null}, ${address || null}, ${currency || 'EUR'}, ${hashPassword(password)}, ${accountNumber}, ${iban}, 0, 'active', ${idPhotoMeta ? JSON.stringify(idPhotoMeta) : null}, ${idDocumentMeta ? JSON.stringify(idDocumentMeta) : null}, ${kycStatus}, false)
       `;
       let last4 = ''; for (let i = 0; i < 4; i++) last4 += Math.floor(Math.random() * 10);
       const cardLabel = 'Carte principale';
       await sql`INSERT INTO cards (id, user_id, label, last4, frozen) VALUES (${uid('CARD-')}, ${id}, ${cardLabel}, ${last4}, false)`;
       await logActivity({ adminName: 'Client', action: 'inscription_client', detail: `Nouveau compte ${accountNumber} (${firstName} ${lastName})` });
 
+      const verificationToken = await createEmailVerificationToken(id);
+
       const rows = await sql`SELECT * FROM users WHERE id = ${id} LIMIT 1`;
-      return send(res, 200, { ok: true, user: await serializeUser(rows[0]) });
+      return send(res, 200, { ok: true, user: await serializeUser(rows[0]), verificationToken });
     }
 
     if (action === 'login') {
@@ -197,6 +201,49 @@ module.exports = async (req, res) => {
       await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, ${notifMsg}, 'warning')`;
       await logActivity({ adminName: `${user.first_name} ${user.last_name}`, action: 'reinitialisation_mdp', detail: `Mot de passe réinitialisé pour ${user.account_number} — toutes les sessions actives ont été révoquées` });
       return send(res, 200, { ok: true });
+    }
+
+    // ---------------------------------------------------------------- vérification de l'e-mail (sans email réel)
+    // Démo : le jeton est réel (à usage unique, expire après 24h) mais affiché à l'écran au
+    // lieu d'être envoyé par e-mail. Tant qu'il n'est pas confirmé, les virements sortants
+    // sont bloqués (voir api/client.js) — les comptes déjà existants avant cette fonctionnalité
+    // restent, eux, marqués vérifiés pour ne pas être bloqués rétroactivement.
+    if (action === 'verifyEmail') {
+      const allowed = await checkRateLimit({ key: `verifyemail:${getClientIp(req)}`, max: 10, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
+      const { token } = body;
+      if (!token) return fail(res, 400, 'missing_fields');
+
+      const userId = await consumeEmailVerificationToken(token);
+      if (!userId) return fail(res, 400, 'invalid_token');
+
+      const rows = await sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1`;
+      const user = rows[0];
+      if (!user) return fail(res, 404, 'not_found');
+
+      await sql`UPDATE users SET email_verified = true WHERE id = ${userId}`;
+      const notifMsg = 'Votre adresse e-mail a été confirmée avec succès.';
+      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, ${notifMsg}, 'success')`;
+      await logActivity({ adminName: `${user.first_name} ${user.last_name}`, action: 'verification_email', detail: `E-mail confirmé pour ${user.account_number}` });
+      return send(res, 200, { ok: true });
+    }
+
+    if (action === 'resendVerification') {
+      const authToken = getBearerToken(req);
+      const session = await getSession(authToken);
+      if (!session || session.is_admin || !session.user_id) return fail(res, 401, 'not_authenticated');
+
+      const allowed = await checkRateLimit({ key: `resendverif:${getClientIp(req)}`, max: 5, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
+      const rows = await sql`SELECT * FROM users WHERE id = ${session.user_id} LIMIT 1`;
+      const user = rows[0];
+      if (!user) return fail(res, 404, 'not_found');
+      if (user.email_verified) return fail(res, 400, 'already_verified');
+
+      const verificationToken = await createEmailVerificationToken(user.id);
+      return send(res, 200, { ok: true, verificationToken });
     }
 
     return fail(res, 400, 'unknown_action');

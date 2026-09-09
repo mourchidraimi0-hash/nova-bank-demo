@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://nova-bank-demo-ten.vercel.app"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Confirmez votre adresse e-mail NOVA BANK.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow">
+<title>Confirmation d'e-mail — NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar scrolled">
+  <div class="container">
+    <a href="index.html" class="nav-logo"><span class="logo-mark">NB</span> NOVA BANK</a>
+    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+  </div>
+</nav>
+
+<div class="form-page">
+  <div class="form-card">
+    <h1>Confirmation de votre e-mail</h1>
+    <p class="sub">Une dernière étape pour activer tous les services de votre compte NOVA BANK.</p>
+
+    <div class="alert alert-error hidden" id="error-box">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="error-text"></span>
+    </div>
+
+    <section id="confirm-section">
+      <p class="text-sm text-muted mb-16">Cliquez sur le bouton ci-dessous pour confirmer que cette adresse e-mail vous appartient. Tant qu'elle n'est pas confirmée, les virements sortants restent bloqués.</p>
+      <button type="button" class="btn btn-primary btn-block" id="confirm-btn">Confirmer mon adresse e-mail</button>
+    </section>
+
+    <section id="success-section" class="hidden">
+      <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>Votre adresse e-mail a été confirmée avec succès. Vous pouvez désormais effectuer des virements.</div>
+      </div>
+      <a href="espace-client.html" class="btn btn-primary btn-block mt-16">Accéder à mon espace client</a>
+    </section>
+
+    <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="espace-client.html">Retour à l'espace client</a></p>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  const errorBox = document.getElementById('error-box');
+  const errorText = document.getElementById('error-text');
+  const confirmSection = document.getElementById('confirm-section');
+  const successSection = document.getElementById('success-section');
+  const confirmBtn = document.getElementById('confirm-btn');
+
+  function showError(msg) {
+    errorText.textContent = msg;
+    errorBox.classList.remove('hidden');
+  }
+
+  if (!token) {
+    confirmSection.classList.add('hidden');
+    showError("Ce lien de confirmation est invalide. Depuis votre tableau de bord, vous pouvez en générer un nouveau.");
+    return;
+  }
+
+  confirmBtn.addEventListener('click', async () => {
+    errorBox.classList.add('hidden');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Confirmation en cours…';
+
+    try {
+      await DB.verifyEmail(token);
+      confirmSection.classList.add('hidden');
+      successSection.classList.remove('hidden');
+    } catch (err) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmer mon adresse e-mail';
+      showError(err.message);
+    }
+  });
+})();
+</script>
+</body>
+</html>

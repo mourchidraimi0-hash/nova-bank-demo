@@ -48,6 +48,8 @@
       <p id="greetingSub"></p>
     </div>
 
+    <div id="verifyBannerWrap"></div>
+
     <div id="notifBannerWrap"></div>
 
     <div id="balanceCardWrap" class="animate-in"></div>
@@ -145,6 +147,43 @@
       document.getElementById('greeting').textContent = `Bonjour, ${fresh.firstName}`;
       const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       document.getElementById('greetingSub').textContent = `Nous sommes le ${today}. Voici un aperçu de votre compte.`;
+
+      // ---- bandeau de confirmation d'e-mail (bloque les virements sortants tant qu'il est actif)
+      const verifyWrap = document.getElementById('verifyBannerWrap');
+      if (fresh.emailVerified === false) {
+        verifyWrap.innerHTML = `
+          <div class="notif-banner warn">
+            <i class="fa-solid fa-envelope-circle-exclamation"></i>
+            <div class="msg">Votre adresse e-mail n'est pas confirmée. Les virements sortants sont bloqués tant qu'elle ne l'est pas.</div>
+            <button class="btn btn-sm btn-outline" id="resendVerifyBtn">Renvoyer le lien</button>
+          </div>
+          <div id="verifyLinkResult"></div>`;
+        document.getElementById('resendVerifyBtn').addEventListener('click', async () => {
+          const btn = document.getElementById('resendVerifyBtn');
+          btn.disabled = true;
+          try {
+            const { verificationToken } = await DB.resendVerification();
+            const link = window.location.origin + '/verification-email.html?token=' + encodeURIComponent(verificationToken);
+            document.getElementById('verifyLinkResult').innerHTML = `
+              <div class="alert alert-success" style="margin-top:12px;">
+                <i class="fa-solid fa-circle-check"></i>
+                <div style="width:100%;">
+                  Lien de confirmation (affiché ici, aucun e-mail réel n'est envoyé) :<br>
+                  <a href="${link}" style="word-break:break-all;">${escapeHtml(link)}</a>
+                </div>
+              </div>`;
+          } catch (err) {
+            document.getElementById('verifyLinkResult').innerHTML = `
+              <div class="alert alert-error" style="margin-top:12px;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${escapeHtml(err.message)}</span>
+              </div>`;
+          }
+          btn.disabled = false;
+        });
+      } else {
+        verifyWrap.innerHTML = '';
+      }
 
       // ---- notification banner
       const notifWrap = document.getElementById('notifBannerWrap');

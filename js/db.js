@@ -62,7 +62,7 @@ const DB = (() => {
   async function createUser(data) {
     const r = await api('auth', { body: { action: 'signup', ...data } });
     if (!r.ok) throw new Error(errorMessage(r.error));
-    return r.user;
+    return { user: r.user, verificationToken: r.verificationToken };
   }
 
   async function login(identifier, password) {
@@ -109,6 +109,19 @@ const DB = (() => {
     const r = await api('auth', { body: { action: 'resetPassword', token, newPassword } });
     if (!r.ok) throw new Error(errorMessage(r.error));
     return true;
+  }
+
+  // Même principe : jeton réel affiché à l'écran, faute de serveur d'e-mail.
+  async function verifyEmail(token) {
+    const r = await api('auth', { body: { action: 'verifyEmail', token } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return true;
+  }
+
+  async function resendVerification() {
+    const r = await api('auth', { body: { action: 'resendVerification' } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return { verificationToken: r.verificationToken };
   }
 
   async function updateProfile(fields) {
@@ -326,7 +339,9 @@ const DB = (() => {
       invalid_amount: 'Montant invalide.',
       weak_password: 'Le mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.',
       rate_limited: 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.',
-      invalid_token: 'Ce lien de réinitialisation est invalide ou a déjà été utilisé. Merci de recommencer la procédure.',
+      invalid_token: 'Ce lien est invalide ou a déjà été utilisé. Merci de recommencer la procédure.',
+      email_not_verified: "Votre adresse e-mail n'est pas encore confirmée. Confirmez-la depuis votre tableau de bord pour effectuer un virement.",
+      already_verified: 'Votre adresse e-mail est déjà confirmée.',
       reason_required: 'Un motif est obligatoire pour cette action.',
       invalid_credentials: 'Identifiants incorrects.',
       code_expired: 'Le code a expiré. Veuillez recommencer la connexion.',
@@ -340,7 +355,7 @@ const DB = (() => {
   return {
     KEYS, uid, nowIso, generate2FACode, formatMoney,
     createUser, login, getCurrentUser, logout, requireClientAuth, changePassword, updateProfile,
-    requestPasswordReset, resetPassword,
+    requestPasswordReset, resetPassword, verifyEmail, resendVerification,
     getAvailableBalance, getPendingOutTotal, markNotificationRead, markAllNotificationsRead, createTransfer,
     getSavingsGoals, createSavingsGoal, contributeToSavingsGoal, withdrawFromSavingsGoal, deleteSavingsGoal,
     getCards, toggleCardFreeze,

@@ -168,6 +168,29 @@ async function consumePasswordResetToken(token) {
   return row.user_id;
 }
 
+// ---------------------------------------------------------------- vérification d'e-mail
+// Même principe que la réinitialisation de mot de passe : jeton réel à usage unique,
+// affiché à l'écran faute de serveur d'e-mail. Expire après 24h (plus long que le
+// reset : l'utilisateur n'est pas forcément pressé de confirmer juste après l'inscription).
+async function createEmailVerificationToken(userId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60000).toISOString();
+  await sql`
+    INSERT INTO email_verifications (token_hash, user_id, expires_at, used)
+    VALUES (${hashToken(token)}, ${userId}, ${expiresAt}, false)
+  `;
+  return token;
+}
+
+async function consumeEmailVerificationToken(token) {
+  const tokenHash = hashToken(token);
+  const rows = await sql`SELECT * FROM email_verifications WHERE token_hash = ${tokenHash} LIMIT 1`;
+  const row = rows[0];
+  if (!row || row.used || new Date(row.expires_at).getTime() < Date.now()) return null;
+  await sql`UPDATE email_verifications SET used = true WHERE token_hash = ${tokenHash}`;
+  return row.user_id;
+}
+
 // ---------------------------------------------------------------- schéma (création idempotente, exécutée une fois par instance)
 let schemaReady = null;
 async function ensureSchema() {
@@ -191,9 +214,14 @@ async function ensureSchema() {
       kyc_id_photo JSONB,
       kyc_id_document JSONB,
       kyc_status TEXT DEFAULT 'none',
+      email_verified BOOLEAN NOT NULL DEFAULT true,
       created_at TIMESTAMPTZ DEFAULT now(),
       last_login TIMESTAMPTZ
     )`;
+    // Migration : la colonne n'existe pas encore sur les bases déjà en production.
+    // DEFAULT true préserve les comptes déjà créés (jamais bloqués rétroactivement) ;
+    // seule l'inscription force explicitement false pour les nouveaux comptes.
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT true`;
     await sql`CREATE TABLE IF NOT EXISTS login_history (
       id SERIAL PRIMARY KEY,
       user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
@@ -294,6 +322,12 @@ async function ensureSchema() {
       expires_at TIMESTAMPTZ NOT NULL,
       used BOOLEAN DEFAULT false
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS email_verifications (
+      token_hash TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used BOOLEAN DEFAULT false
+    )`;
 
     // Index — les clés primaires sont déjà indexées automatiquement ; ceux-ci accélèrent
     // les filtres/tris utilisés par le back-office (fiche client, listes paginées, stats).
@@ -311,6 +345,8 @@ async function ensureSchema() {
     await sql`CREATE INDEX IF NOT EXISTS idx_activity_log_date ON activity_log(date DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_password_resets_user_id ON password_resets(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_verifications_user_id ON email_verifications(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_email_verified ON users(email_verified)`;
 
     // Admins par défaut (créés une seule fois — mots de passe hachés avec scrypt)
     const existing = await sql`SELECT COUNT(*)::int AS n FROM admins`;
@@ -367,5 +403,6 @@ module.exports = {
   generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,
+  createEmailVerificationToken, consumeEmailVerificationToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 };

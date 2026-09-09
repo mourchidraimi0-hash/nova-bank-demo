@@ -28,6 +28,7 @@ async function serializeClient(row) {
     id: row.id, firstName: row.first_name, lastName: row.last_name, email: row.email, phone: row.phone,
     birthDate: row.birth_date, address: row.address, currency: row.currency, accountNumber: row.account_number,
     iban: row.iban, balance: Number(row.balance), status: row.status, suspendReason: row.suspend_reason,
+    emailVerified: row.email_verified,
     kyc: { idPhoto: row.kyc_id_photo, idDocument: row.kyc_id_document, status: row.kyc_status },
     createdAt: row.created_at, lastLogin: row.last_login,
     transactions: transactions.map(serializeTransaction),
