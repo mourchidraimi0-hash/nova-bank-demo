@@ -92,7 +92,8 @@ module.exports = async (req, res) => {
         VALUES (${id}, ${firstName}, ${lastName}, ${email}, ${phone || null}, ${birthDate || null}, ${address || null}, ${currency || 'EUR'}, ${hashPassword(password)}, ${accountNumber}, ${iban}, 0, 'active', ${idPhotoMeta ? JSON.stringify(idPhotoMeta) : null}, ${idDocumentMeta ? JSON.stringify(idDocumentMeta) : null}, ${kycStatus})
       `;
       let last4 = ''; for (let i = 0; i < 4; i++) last4 += Math.floor(Math.random() * 10);
-      await sql`INSERT INTO cards (id, user_id, label, last4, frozen) VALUES (${uid('CARD-')}, ${id}, 'Carte principale', ${last4}, false)`;
+      const cardLabel = 'Carte principale';
+      await sql`INSERT INTO cards (id, user_id, label, last4, frozen) VALUES (${uid('CARD-')}, ${id}, ${cardLabel}, ${last4}, false)`;
       await logActivity({ adminName: 'Client', action: 'inscription_client', detail: `Nouveau compte ${accountNumber} (${firstName} ${lastName})` });
 
       const rows = await sql`SELECT * FROM users WHERE id = ${id} LIMIT 1`;
@@ -144,7 +145,8 @@ module.exports = async (req, res) => {
       const user = rows[0];
       if (!user || !verifyPassword(currentPassword, user.password_hash)) return fail(res, 401, 'wrong_password');
       await sql`UPDATE users SET password_hash = ${hashPassword(newPassword)} WHERE id = ${user.id}`;
-      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${user.id}, 'Votre mot de passe a été modifié avec succès.', 'success')`;
+      const changePwMsg = 'Votre mot de passe a été modifié avec succès.';
+      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${user.id}, ${changePwMsg}, 'success')`;
       await logActivity({ adminName: 'Client', action: 'changement_mot_de_passe', detail: `${user.first_name} ${user.last_name} a changé son mot de passe` });
       return send(res, 200, { ok: true });
     }
@@ -191,7 +193,8 @@ module.exports = async (req, res) => {
 
       await sql`UPDATE users SET password_hash = ${hashPassword(newPassword)} WHERE id = ${userId}`;
       await destroyAllUserSessions(userId);
-      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, 'Votre mot de passe a été réinitialisé. Si vous n\'êtes pas à l\'origine de cette action, contactez le support immédiatement.', 'warning')`;
+      const notifMsg = "Votre mot de passe a été réinitialisé. Si vous n'êtes pas à l'origine de cette action, contactez le support immédiatement.";
+      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, ${notifMsg}, 'warning')`;
       await logActivity({ adminName: `${user.first_name} ${user.last_name}`, action: 'reinitialisation_mdp', detail: `Mot de passe réinitialisé pour ${user.account_number} — toutes les sessions actives ont été révoquées` });
       return send(res, 200, { ok: true });
     }
