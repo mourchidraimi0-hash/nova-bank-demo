@@ -476,6 +476,8 @@ body.admin .copy-row{background:var(--admin-bg);border-color:var(--admin-border)
 
 .filters-row{display:flex;gap:14px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
 .filters-row .form-control{max-width:280px;}
+.pagination-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px;flex-wrap:wrap;}
+.pagination-row .btn:disabled{opacity:.4;cursor:not-allowed;}
 .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
 @media (max-width:900px){.charts-grid{grid-template-columns:1fr;}}
 .log-item{padding:14px 0;border-bottom:1px solid var(--admin-border);font-size:.88rem;}

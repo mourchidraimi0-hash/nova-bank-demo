@@ -201,7 +201,7 @@
   }
 
   const activityLog = document.getElementById('activity-log');
-  const entries = (await DB.getActivityLog()).slice(0, 6);
+  const entries = (await DB.getActivityLog({ pageSize: 6 })).entries;
   if (!entries.length) {
     activityLog.innerHTML = `
       <div class="empty-state">

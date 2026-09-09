@@ -258,6 +258,22 @@ async function ensureSchema() {
       window_start TIMESTAMPTZ NOT NULL DEFAULT now()
     )`;
 
+    // Index — les clés primaires sont déjà indexées automatiquement ; ceux-ci accélèrent
+    // les filtres/tris utilisés par le back-office (fiche client, listes paginées, stats).
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_kyc_status ON users(kyc_status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_login_history_user_id ON login_history(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_notes_user_id ON notes(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_savings_goals_user_id ON savings_goals(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_cards_user_id ON cards(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_activity_log_date ON activity_log(date DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)`;
+
     // Admins par défaut (créés une seule fois — mots de passe hachés avec scrypt)
     const existing = await sql`SELECT COUNT(*)::int AS n FROM admins`;
     if (existing[0].n === 0) {

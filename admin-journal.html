@@ -46,6 +46,7 @@
       </div>
       <p class="field-hint">Ce journal est permanent et non modifiable : aucune entrée ne peut être supprimée ou éditée, y compris par un Super Admin.</p>
       <div id="logWrap"></div>
+      <div class="pagination-row" id="paginationRow"></div>
     </div>
   </main>
 </div>
@@ -69,18 +70,18 @@
       changement_statut_operation: "Changement de statut d'opération",
       note_ajoutee: 'Note ajoutée'
     };
+    const PAGE_SIZE = 25;
+    let currentPage = 1;
+    let debounceTimer = null;
 
     async function render() {
-      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-      const entries = (await DB.getActivityLog()).filter(e => {
-        if (!q) return true;
-        const haystack = `${e.action} ${e.detail} ${e.adminName}`.toLowerCase();
-        return haystack.includes(q);
-      });
+      const q = (document.getElementById('searchInput').value || '').trim();
+      const { entries, total } = await DB.getActivityLog({ page: currentPage, pageSize: PAGE_SIZE, q });
 
       const wrap = document.getElementById('logWrap');
       if (!entries.length) {
         wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-scroll"></i><p>Aucune entrée ne correspond à ces critères.</p></div>';
+        document.getElementById('paginationRow').innerHTML = '';
         return;
       }
 
@@ -91,9 +92,23 @@
           <div class="meta">${escapeHtml(e.adminName || 'Système')} (${escapeHtml(e.role ? DB.roleLabel(e.role) : 'Système')}) — ${timeAgo(e.date)}</div>
         </div>
       `).join('');
+
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      document.getElementById('paginationRow').innerHTML = `
+        <span class="text-sm text-muted">${total} entrée${total > 1 ? 's' : ''} — page ${currentPage} sur ${totalPages}</span>
+        <div class="flex gap-8">
+          <button type="button" class="btn btn-outline btn-sm" id="btnPrevPage" ${currentPage <= 1 ? 'disabled' : ''}>&larr; Précédent</button>
+          <button type="button" class="btn btn-outline btn-sm" id="btnNextPage" ${currentPage >= totalPages ? 'disabled' : ''}>Suivant &rarr;</button>
+        </div>
+      `;
+      document.getElementById('btnPrevPage')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; render(); } });
+      document.getElementById('btnNextPage')?.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; render(); } });
     }
 
-    document.getElementById('searchInput').addEventListener('input', render);
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => { currentPage = 1; render(); }, 350);
+    });
     render();
   }
 })();

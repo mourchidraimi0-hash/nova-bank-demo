@@ -54,6 +54,7 @@
       </div>
       <p class="field-hint">La colonne « Code d'activation » reprend la référence de l'opération à titre de repère interne ; elle ne constitue pas une preuve bancaire indépendante.</p>
       <div id="tableWrap"></div>
+      <div class="pagination-row" id="paginationRow"></div>
     </div>
   </main>
 </div>
@@ -73,24 +74,23 @@
       ['cancelled', 'Annulée']
     ];
     const canManage = DB.canManageAccounts(session.role);
+    const PAGE_SIZE = 25;
+    let currentPage = 1;
+    let debounceTimer = null;
 
     function amountSign(op) {
       return op.type === 'credit' ? '+' : '-';
     }
 
     async function render() {
-      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const q = (document.getElementById('searchInput').value || '').trim();
       const status = document.getElementById('statusFilter').value;
-      const ops = (await DB.getAllOperations()).filter(op => {
-        if (status !== 'all' && op.status !== status) return false;
-        if (!q) return true;
-        const haystack = `${op.ref} ${op.clientName} ${op.beneficiary || ''}`.toLowerCase();
-        return haystack.includes(q);
-      });
+      const { operations: ops, total } = await DB.getAllOperations({ page: currentPage, pageSize: PAGE_SIZE, q, status });
 
       const wrap = document.getElementById('tableWrap');
       if (!ops.length) {
         wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-receipt"></i><p>Aucune opération ne correspond à ces critères.</p></div>';
+        document.getElementById('paginationRow').innerHTML = '';
         return;
       }
 
@@ -146,10 +146,24 @@
           sel.disabled = true;
         });
       }
+
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      document.getElementById('paginationRow').innerHTML = `
+        <span class="text-sm text-muted">${total} opération${total > 1 ? 's' : ''} — page ${currentPage} sur ${totalPages}</span>
+        <div class="flex gap-8">
+          <button type="button" class="btn btn-outline btn-sm" id="btnPrevPage" ${currentPage <= 1 ? 'disabled' : ''}>&larr; Précédent</button>
+          <button type="button" class="btn btn-outline btn-sm" id="btnNextPage" ${currentPage >= totalPages ? 'disabled' : ''}>Suivant &rarr;</button>
+        </div>
+      `;
+      document.getElementById('btnPrevPage')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; render(); } });
+      document.getElementById('btnNextPage')?.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; render(); } });
     }
 
-    document.getElementById('searchInput').addEventListener('input', render);
-    document.getElementById('statusFilter').addEventListener('change', render);
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => { currentPage = 1; render(); }, 350);
+    });
+    document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; render(); });
     render();
   }
 })();

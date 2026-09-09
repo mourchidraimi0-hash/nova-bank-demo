@@ -229,9 +229,9 @@ const DB = (() => {
     return (me && me.id === id) ? me : null;
   }
 
-  async function getAllClients() {
-    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'clients' } });
-    return r.ok ? r.clients : [];
+  async function getAllClients({ page = 1, pageSize = 20, q = '', status = 'all' } = {}) {
+    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'clients', page, pageSize, q, status } });
+    return r.ok ? { clients: r.clients, total: r.total, page: r.page, pageSize: r.pageSize } : { clients: [], total: 0, page: 1, pageSize };
   }
 
   async function suspendUser(userId, reason, note) {
@@ -278,9 +278,9 @@ const DB = (() => {
   }
 
   // ---------------------------------------------------------------- admin — statistiques et journal
-  async function getAllOperations() {
-    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'operations' } });
-    return r.ok ? r.operations : [];
+  async function getAllOperations({ page = 1, pageSize = 25, q = '', status = 'all' } = {}) {
+    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'operations', page, pageSize, q, status } });
+    return r.ok ? { operations: r.operations, total: r.total, page: r.page, pageSize: r.pageSize } : { operations: [], total: 0, page: 1, pageSize };
   }
   async function getStats() {
     const r = await api('admin', { method: 'GET', admin: true, query: { action: 'stats' } });
@@ -294,9 +294,9 @@ const DB = (() => {
     const r = await api('admin', { method: 'GET', admin: true, query: { action: 'opsSeries', days } });
     return r.ok ? { labels: r.labels, counts: r.counts } : { labels: [], counts: [] };
   }
-  async function getActivityLog() {
-    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'journal' } });
-    return r.ok ? r.entries : [];
+  async function getActivityLog({ page = 1, pageSize = 25, q = '' } = {}) {
+    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'journal', page, pageSize, q } });
+    return r.ok ? { entries: r.entries, total: r.total, page: r.page, pageSize: r.pageSize } : { entries: [], total: 0, page: 1, pageSize };
   }
 
   // ---------------------------------------------------------------- messages d'erreur (fr)

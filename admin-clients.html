@@ -51,6 +51,7 @@
         </select>
       </div>
       <div id="tableWrap"></div>
+      <div class="pagination-row" id="paginationRow"></div>
     </div>
   </main>
 </div>
@@ -61,25 +62,23 @@
 (async function () {
   const session = await ADMIN_UI.guard();
   if (session) {
-    let allUsers = await DB.getAllClients();
+    const PAGE_SIZE = 20;
+    let currentPage = 1;
+    let debounceTimer = null;
 
-    function render() {
-      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    async function render() {
+      const q = (document.getElementById('searchInput').value || '').trim();
       const status = document.getElementById('statusFilter').value;
-      let list = allUsers.filter(u => {
-        if (status !== 'all' && u.status !== status) return false;
-        if (!q) return true;
-        const haystack = `${u.firstName} ${u.lastName} ${u.id} ${u.accountNumber} ${u.email}`.toLowerCase();
-        return haystack.includes(q);
-      });
+      const { clients, total } = await DB.getAllClients({ page: currentPage, pageSize: PAGE_SIZE, q, status });
 
       const wrap = document.getElementById('tableWrap');
-      if (!list.length) {
+      if (!clients.length) {
         wrap.innerHTML = '<div class="empty-state"><i class="fa-solid fa-user-slash"></i><p>Aucun client ne correspond à ces critères.</p></div>';
+        document.getElementById('paginationRow').innerHTML = '';
         return;
       }
 
-      const rows = list.map(u => `
+      const rows = clients.map(u => `
         <tr>
           <td><b>${escapeHtml(u.firstName)} ${escapeHtml(u.lastName)}</b></td>
           <td>${escapeHtml(u.id)}</td>
@@ -105,10 +104,24 @@
           </table>
         </div>
       `;
+
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      document.getElementById('paginationRow').innerHTML = `
+        <span class="text-sm text-muted">${total} client${total > 1 ? 's' : ''} — page ${currentPage} sur ${totalPages}</span>
+        <div class="flex gap-8">
+          <button type="button" class="btn btn-outline btn-sm" id="btnPrevPage" ${currentPage <= 1 ? 'disabled' : ''}>&larr; Précédent</button>
+          <button type="button" class="btn btn-outline btn-sm" id="btnNextPage" ${currentPage >= totalPages ? 'disabled' : ''}>Suivant &rarr;</button>
+        </div>
+      `;
+      document.getElementById('btnPrevPage')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; render(); } });
+      document.getElementById('btnNextPage')?.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; render(); } });
     }
 
-    document.getElementById('searchInput').addEventListener('input', render);
-    document.getElementById('statusFilter').addEventListener('change', render);
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => { currentPage = 1; render(); }, 350);
+    });
+    document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; render(); });
     render();
   }
 })();

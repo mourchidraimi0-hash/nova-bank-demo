@@ -36,6 +36,12 @@ async function serializeClient(row) {
   };
 }
 
+function parsePaging(req, defaultPageSize = 20) {
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize, 10) || defaultPageSize));
+  return { page, pageSize, offset: (page - 1) * pageSize };
+}
+
 async function requireAdmin(req) {
   const token = getBearerToken(req);
   const session = await getSession(token);
@@ -95,8 +101,24 @@ module.exports = async (req, res) => {
         return send(res, 200, { ok: true, labels: rows.map(r => r.label), counts: rows.map(r => r.count) });
       }
       if (action === 'clients') {
-        const rows = await sql`SELECT * FROM users ORDER BY created_at DESC`;
-        return send(res, 200, { ok: true, clients: await Promise.all(rows.map(serializeClient)) });
+        const { page, pageSize, offset } = parsePaging(req);
+        const q = (req.query.q || '').trim();
+        const qLike = `%${q}%`;
+        const status = req.query.status || 'all';
+        const [countRows, rows] = await Promise.all([
+          sql`
+            SELECT COUNT(*)::int AS n FROM users
+            WHERE (${q} = '' OR first_name ILIKE ${qLike} OR last_name ILIKE ${qLike} OR email ILIKE ${qLike} OR account_number ILIKE ${qLike} OR id ILIKE ${qLike})
+              AND (${status} = 'all' OR status = ${status})
+          `,
+          sql`
+            SELECT * FROM users
+            WHERE (${q} = '' OR first_name ILIKE ${qLike} OR last_name ILIKE ${qLike} OR email ILIKE ${qLike} OR account_number ILIKE ${qLike} OR id ILIKE ${qLike})
+              AND (${status} = 'all' OR status = ${status})
+            ORDER BY created_at DESC LIMIT ${pageSize} OFFSET ${offset}
+          `
+        ]);
+        return send(res, 200, { ok: true, clients: await Promise.all(rows.map(serializeClient)), total: countRows[0].n, page, pageSize });
       }
       if (action === 'client') {
         const rows = await sql`SELECT * FROM users WHERE id = ${req.query.id} LIMIT 1`;
@@ -104,20 +126,46 @@ module.exports = async (req, res) => {
         return send(res, 200, { ok: true, client: await serializeClient(rows[0]) });
       }
       if (action === 'operations') {
-        const rows = await sql`
-          SELECT t.*, u.first_name, u.last_name, u.account_number FROM transactions t
-          JOIN users u ON u.id = t.user_id ORDER BY t.created_at DESC LIMIT 500
-        `;
+        const { page, pageSize, offset } = parsePaging(req, 25);
+        const q = (req.query.q || '').trim();
+        const qLike = `%${q}%`;
+        const status = req.query.status || 'all';
+        const [countRows, rows] = await Promise.all([
+          sql`
+            SELECT COUNT(*)::int AS n FROM transactions t JOIN users u ON u.id = t.user_id
+            WHERE (${status} = 'all' OR t.status = ${status})
+              AND (${q} = '' OR t.ref ILIKE ${qLike} OR t.beneficiary ILIKE ${qLike} OR u.first_name ILIKE ${qLike} OR u.last_name ILIKE ${qLike})
+          `,
+          sql`
+            SELECT t.*, u.first_name, u.last_name, u.account_number FROM transactions t
+            JOIN users u ON u.id = t.user_id
+            WHERE (${status} = 'all' OR t.status = ${status})
+              AND (${q} = '' OR t.ref ILIKE ${qLike} OR t.beneficiary ILIKE ${qLike} OR u.first_name ILIKE ${qLike} OR u.last_name ILIKE ${qLike})
+            ORDER BY t.created_at DESC LIMIT ${pageSize} OFFSET ${offset}
+          `
+        ]);
         return send(res, 200, {
           ok: true,
-          operations: rows.map(r => ({ ...serializeTransaction(r), clientName: `${r.first_name} ${r.last_name}`, accountNumber: r.account_number }))
+          operations: rows.map(r => ({ ...serializeTransaction(r), clientName: `${r.first_name} ${r.last_name}`, accountNumber: r.account_number })),
+          total: countRows[0].n, page, pageSize
         });
       }
       if (action === 'journal') {
-        const rows = await sql`SELECT * FROM activity_log ORDER BY date DESC LIMIT 500`;
+        const { page, pageSize, offset } = parsePaging(req, 25);
+        const q = (req.query.q || '').trim();
+        const qLike = `%${q}%`;
+        const [countRows, rows] = await Promise.all([
+          sql`SELECT COUNT(*)::int AS n FROM activity_log WHERE (${q} = '' OR action ILIKE ${qLike} OR detail ILIKE ${qLike} OR admin_name ILIKE ${qLike})`,
+          sql`
+            SELECT * FROM activity_log
+            WHERE (${q} = '' OR action ILIKE ${qLike} OR detail ILIKE ${qLike} OR admin_name ILIKE ${qLike})
+            ORDER BY date DESC LIMIT ${pageSize} OFFSET ${offset}
+          `
+        ]);
         return send(res, 200, {
           ok: true,
-          entries: rows.map(r => ({ id: r.id, date: r.date, adminId: r.admin_id, adminName: r.admin_name, role: r.role, action: r.action, detail: r.detail }))
+          entries: rows.map(r => ({ id: r.id, date: r.date, adminId: r.admin_id, adminName: r.admin_name, role: r.role, action: r.action, detail: r.detail })),
+          total: countRows[0].n, page, pageSize
         });
       }
       return fail(res, 400, 'unknown_action');
