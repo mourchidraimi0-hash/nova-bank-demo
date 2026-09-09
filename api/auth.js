@@ -1,5 +1,6 @@
 const {
-  sql, uid, hashPassword, verifyPassword, generateAccountNumber, generateIBAN,
+  sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit,
+  generateAccountNumber, generateIBAN,
   createSession, getSession, refreshSession, destroySession, getBearerToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
@@ -71,8 +72,12 @@ module.exports = async (req, res) => {
     const action = body.action;
 
     if (action === 'signup') {
+      const allowed = await checkRateLimit({ key: `signup:${getClientIp(req)}`, max: 5, windowMinutes: 60 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
       const { firstName, lastName, email, phone, birthDate, address, currency, password, idPhotoMeta, idDocumentMeta } = body;
       if (!firstName || !lastName || !email || !password) return fail(res, 400, 'missing_fields');
+      if (!isStrongPassword(password)) return fail(res, 400, 'weak_password');
       const existing = await sql`SELECT id FROM users WHERE lower(email) = lower(${email}) LIMIT 1`;
       if (existing[0]) return fail(res, 409, 'email_taken');
 
@@ -94,6 +99,9 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'login') {
+      const allowed = await checkRateLimit({ key: `login:${getClientIp(req)}`, max: 10, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
       const { identifier, password } = body;
       if (!identifier || !password) return fail(res, 400, 'missing_fields');
       const id = String(identifier).trim().toLowerCase();
@@ -125,7 +133,12 @@ module.exports = async (req, res) => {
       const token = getBearerToken(req);
       const session = await getSession(token);
       if (!session || session.is_admin || !session.user_id) return fail(res, 401, 'not_authenticated');
+
+      const allowed = await checkRateLimit({ key: `changepw:${getClientIp(req)}`, max: 8, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
       const { currentPassword, newPassword } = body;
+      if (!isStrongPassword(newPassword)) return fail(res, 400, 'weak_password');
       const rows = await sql`SELECT * FROM users WHERE id = ${session.user_id} LIMIT 1`;
       const user = rows[0];
       if (!user || !verifyPassword(currentPassword, user.password_hash)) return fail(res, 401, 'wrong_password');

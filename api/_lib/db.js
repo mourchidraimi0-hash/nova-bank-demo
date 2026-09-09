@@ -25,6 +25,36 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+// ---------------------------------------------------------------- validation des mots de passe
+// Exigée côté serveur : le contrôle JS dans le navigateur peut toujours être contourné
+// par un appel direct à l'API. 8 caractères minimum, au moins une lettre et un chiffre.
+function isStrongPassword(password) {
+  return typeof password === 'string' && password.length >= 8 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
+}
+
+// ---------------------------------------------------------------- limitation de débit (brute force / spam)
+// Compteur à fenêtre fixe stocké en base : les instances serverless ne partagent pas de
+// mémoire entre elles, donc un compteur en mémoire process serait contournable en boucle.
+function getClientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  if (fwd) return String(fwd).split(',')[0].trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+async function checkRateLimit({ key, max, windowMinutes }) {
+  const rows = await sql`
+    INSERT INTO rate_limits (key, count, window_start)
+    VALUES (${key}, 1, now())
+    ON CONFLICT (key) DO UPDATE SET
+      count = CASE WHEN rate_limits.window_start < now() - make_interval(mins => ${windowMinutes})
+                   THEN 1 ELSE rate_limits.count + 1 END,
+      window_start = CASE WHEN rate_limits.window_start < now() - make_interval(mins => ${windowMinutes})
+                   THEN now() ELSE rate_limits.window_start END
+    RETURNING count
+  `;
+  return rows[0].count <= max;
+}
+
 // ---------------------------------------------------------------- mots de passe (scrypt, natif Node — pas de dépendance)
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -222,6 +252,11 @@ async function ensureSchema() {
       code TEXT NOT NULL,
       expires_at TIMESTAMPTZ NOT NULL
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS rate_limits (
+      key TEXT PRIMARY KEY,
+      count INT NOT NULL DEFAULT 0,
+      window_start TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
 
     // Admins par défaut (créés une seule fois — mots de passe hachés avec scrypt)
     const existing = await sql`SELECT COUNT(*)::int AS n FROM admins`;
@@ -273,7 +308,8 @@ function fail(res, status, error, extra) {
 }
 
 module.exports = {
-  sql, uid, nowIso, hashPassword, verifyPassword,
+  sql, uid, nowIso, hashPassword, verifyPassword, isStrongPassword,
+  getClientIp, checkRateLimit,
   generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
   createSession, getSession, refreshSession, destroySession, getBearerToken,
   ensureSchema, logActivity, readJsonBody, send, fail

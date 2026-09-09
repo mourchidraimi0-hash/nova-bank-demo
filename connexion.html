@@ -125,6 +125,8 @@
       showLoginError('Mot de passe incorrect.');
     } else if (res.error === 'suspended') {
       showLoginError('Votre compte a été suspendu. Motif : ' + escapeHtml(res.reason || 'non précisé') + '. Contactez notre support pour plus d\'informations.');
+    } else if (res.error === 'rate_limited') {
+      showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
     } else {
       showLoginError('Une erreur est survenue. Merci de réessayer.');
     }

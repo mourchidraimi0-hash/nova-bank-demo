@@ -310,6 +310,8 @@ const DB = (() => {
       not_authenticated: 'Votre session a expiré. Veuillez vous reconnecter.',
       insufficient_funds: 'Solde disponible insuffisant.',
       invalid_amount: 'Montant invalide.',
+      weak_password: 'Le mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.',
+      rate_limited: 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.',
       reason_required: 'Un motif est obligatoire pour cette action.',
       invalid_credentials: 'Identifiants incorrects.',
       code_expired: 'Le code a expiré. Veuillez recommencer la connexion.',

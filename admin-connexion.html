@@ -138,6 +138,7 @@
 
     if (!res.ok) {
       if (res.error === 'invalid_credentials') showLoginError('Identifiant ou mot de passe incorrect.');
+      else if (res.error === 'rate_limited') showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
       else showLoginError('Une erreur est survenue. Merci de réessayer.');
       return;
     }
@@ -189,6 +190,8 @@
     if (!res.ok) {
       step2Error.textContent = res.error === 'code_expired'
         ? 'Le code a expiré. Veuillez recommencer la connexion.'
+        : res.error === 'rate_limited'
+        ? 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.'
         : 'Le code saisi ne correspond pas. Veuillez réessayer.';
       step2Error.classList.add('show');
       return;

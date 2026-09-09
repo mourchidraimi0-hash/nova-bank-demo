@@ -1,5 +1,6 @@
 const {
   sql, uid, hashPassword, verifyPassword, generate2FACode, generateTrxRef,
+  getClientIp, checkRateLimit,
   createSession, getSession, refreshSession, destroySession, getBearerToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
@@ -128,6 +129,9 @@ module.exports = async (req, res) => {
 
     // ---------------------------------------------------------------- connexion (étape 1 : identifiants -> code 2FA affiché à l'écran)
     if (action === 'loginStep1') {
+      const allowed = await checkRateLimit({ key: `admin_login:${getClientIp(req)}`, max: 5, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
       const { username, password } = body;
       if (!username || !password) return fail(res, 400, 'missing_fields');
       const rows = await sql`SELECT * FROM admins WHERE lower(username) = lower(${username}) LIMIT 1`;
@@ -145,6 +149,9 @@ module.exports = async (req, res) => {
 
     // ---------------------------------------------------------------- connexion (étape 2 : validation du code)
     if (action === 'loginStep2') {
+      const allowed = await checkRateLimit({ key: `admin_2fa:${getClientIp(req)}`, max: 8, windowMinutes: 5 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
       const { adminId, code } = body;
       const pendingRows = await sql`SELECT * FROM pending_2fa WHERE admin_id = ${adminId} LIMIT 1`;
       const pending = pendingRows[0];
