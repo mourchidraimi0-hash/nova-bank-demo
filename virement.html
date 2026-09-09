@@ -167,9 +167,10 @@
           — un processus simulé et local, mis en place uniquement à des fins de démonstration, sans intervention d'une véritable équipe de conformité.
           Vous serez notifié directement dans votre espace client dès que l'opération sera confirmée ou rejetée, et vous pouvez en suivre le statut à tout moment depuis votre historique des transactions.
         </p>
-        <div class="flex gap-12 mt-24">
+        <div class="flex gap-12 mt-24" style="flex-wrap:wrap;">
           <a href="espace-client.html" class="btn btn-outline">Retour au tableau de bord</a>
           <button type="button" class="btn btn-primary" id="btnNewTransfer">Effectuer un autre virement</button>
+          <button type="button" class="btn btn-outline" id="btnLogoutAfterTransfer"><i class="fa-solid fa-right-from-bracket"></i> Terminer et me déconnecter</button>
         </div>
       </div>
 
@@ -184,6 +185,7 @@
   const user = await DB.requireClientAuth();
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
+    document.getElementById('btnLogoutAfterTransfer')?.addEventListener('click', () => { DB.logout(); window.location.href = 'connexion.html'; });
 
     // ---------------------------------------------------------------- wizard state
     let currentStep = 1;
