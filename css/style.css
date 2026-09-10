@@ -109,10 +109,7 @@ body:not(.admin)::after{
 .navbar.scrolled .nav-logo{color:var(--anthracite);}
 .nav-logo:hover{text-decoration:none;}
 .logo-mark{
-  width:42px;height:42px;border-radius:10px;background:var(--anthracite);
-  color:var(--white);display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:1.05rem;letter-spacing:-1px;flex-shrink:0;
-  box-shadow:0 4px 14px rgba(51,51,51,.25);
+  height:34px;width:auto;flex-shrink:0;display:block;object-fit:contain;
 }
 .nav-links{display:flex;align-items:center;gap:32px;}
 .nav-links a{color:var(--white);font-weight:500;font-size:.94rem;transition:color .3s;}
