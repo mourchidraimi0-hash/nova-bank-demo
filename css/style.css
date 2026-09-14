@@ -197,6 +197,13 @@ body.menu-open .nav-burger span{background:var(--anthracite);}
 .card:hover .icon-box{transform:scale(1.08) rotate(-4deg);background:var(--cyan);}
 .card h3{font-size:1.15rem;margin-bottom:10px;}
 .card p{color:var(--anthracite-light);font-size:.94rem;}
+.card-photo{position:relative;background-size:cover;background-position:center;overflow:hidden;}
+.card-photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(15,20,25,.55) 0%, rgba(15,20,25,.88) 100%);}
+.card-photo>*{position:relative;z-index:1;}
+.card-photo h3{color:var(--white);}
+.card-photo p{color:rgba(255,255,255,.85);}
+.card-photo .icon-box{background:rgba(255,255,255,.15);color:var(--white);backdrop-filter:blur(4px);}
+.card-photo:hover .icon-box{background:rgba(255,255,255,.28);}
 
 /* ---------- Pourquoi nous choisir ---------- */
 .why-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
