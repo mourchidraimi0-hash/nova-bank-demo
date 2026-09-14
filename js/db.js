@@ -304,6 +304,23 @@ const DB = (() => {
     return true;
   }
 
+  // ---------------------------------------------------------------- admin — gestion des comptes admin (super_admin)
+  async function getAdmins() {
+    const r = await api('admin', { method: 'GET', admin: true, query: { action: 'admins' } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return r.admins;
+  }
+  async function createAdmin({ username, password, name, role }) {
+    const r = await api('admin', { admin: true, body: { action: 'createAdmin', username, password, name, role } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return { id: r.id };
+  }
+  async function setAdminActive(adminId, active) {
+    const r = await api('admin', { admin: true, body: { action: 'setAdminActive', adminId, active } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return true;
+  }
+
   // ---------------------------------------------------------------- admin — statistiques et journal
   async function getAllOperations({ page = 1, pageSize = 25, q = '', status = 'all' } = {}) {
     const r = await api('admin', { method: 'GET', admin: true, query: { action: 'operations', page, pageSize, q, status } });
@@ -340,6 +357,12 @@ const DB = (() => {
       weak_password: 'Le mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.',
       rate_limited: 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.',
       invalid_token: 'Ce lien est invalide ou a déjà été utilisé. Merci de recommencer la procédure.',
+      account_disabled: 'Ce compte administrateur a été désactivé.',
+      forbidden: "Vous n'avez pas les droits pour effectuer cette action.",
+      username_taken: 'Cet identifiant est déjà utilisé par un autre compte admin.',
+      invalid_role: 'Rôle invalide.',
+      cannot_modify_self: 'Vous ne pouvez pas modifier votre propre compte de cette façon.',
+      last_super_admin: 'Impossible de désactiver le dernier compte Super Admin actif.',
       email_not_verified: "Votre adresse e-mail n'est pas encore confirmée. Confirmez-la depuis votre tableau de bord pour effectuer un virement.",
       already_verified: 'Votre adresse e-mail est déjà confirmée.',
       reason_required: 'Un motif est obligatoire pour cette action.',
@@ -363,6 +386,7 @@ const DB = (() => {
     roleLabel, canManageAccounts, canManageAdmins,
     getUserById, getAllClients, suspendUser, reactivateUser, activateUser, requestMoreInfo,
     adjustBalance, updateTransactionStatus, addAdminNote,
+    getAdmins, createAdmin, setAdminActive,
     getAllOperations, getStats, getSignupSeries, getOpsVolumeSeries, getActivityLog,
     errorMessage
   };

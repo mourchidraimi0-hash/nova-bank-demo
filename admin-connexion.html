@@ -140,6 +140,7 @@
     if (!res.ok) {
       if (res.error === 'invalid_credentials') showLoginError('Identifiant ou mot de passe incorrect.');
       else if (res.error === 'rate_limited') showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
+      else if (res.error === 'account_disabled') showLoginError('Ce compte administrateur a été désactivé. Contactez un Super Admin.');
       else showLoginError('Une erreur est survenue. Merci de réessayer.');
       return;
     }

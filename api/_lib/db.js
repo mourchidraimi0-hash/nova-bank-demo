@@ -141,6 +141,10 @@ async function destroyAllUserSessions(userId) {
   await sql`DELETE FROM sessions WHERE user_id = ${userId} AND is_admin = false`;
 }
 
+async function destroyAllAdminSessions(adminId) {
+  await sql`DELETE FROM sessions WHERE admin_id = ${adminId} AND is_admin = true`;
+}
+
 // ---------------------------------------------------------------- réinitialisation du mot de passe
 // Démo : ce site n'a pas de serveur d'e-mail réel. Le jeton (aléatoire, à usage unique,
 // expirant après 30 minutes) est généré et vérifié exactement comme dans un vrai système —
@@ -286,8 +290,11 @@ async function ensureSchema() {
       password_hash TEXT NOT NULL,
       role TEXT NOT NULL,
       name TEXT NOT NULL,
+      active BOOLEAN NOT NULL DEFAULT true,
       created_at TIMESTAMPTZ DEFAULT now()
     )`;
+    // Migration : la colonne n'existe pas encore sur les bases déjà en production.
+    await sql`ALTER TABLE admins ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true`;
     await sql`CREATE TABLE IF NOT EXISTS activity_log (
       id TEXT PRIMARY KEY,
       date TIMESTAMPTZ DEFAULT now(),
@@ -401,7 +408,7 @@ module.exports = {
   sql, uid, nowIso, hashPassword, verifyPassword, isStrongPassword,
   getClientIp, checkRateLimit,
   generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
-  createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
+  createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, destroyAllAdminSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,
   createEmailVerificationToken, consumeEmailVerificationToken,
   ensureSchema, logActivity, readJsonBody, send, fail

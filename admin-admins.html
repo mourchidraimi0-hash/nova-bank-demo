@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://nova-bank-demo-ten.vercel.app"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gestion des comptes administrateurs NOVA BANK (réservé aux Super Admin).">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta name="robots" content="noindex, nofollow">
+<title>Comptes admin — Back-office NOVA BANK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin">
+<div class="admin-mobile-topbar">
+  <button data-sidebar-toggle class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <span class="nav-logo" style="color:var(--anthracite)"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"></span>
+  <button data-theme-toggle class="theme-toggle"></button>
+</div>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="admin-dashboard.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> Back-office</a>
+    <span class="admin-role-tag" data-admin-role></span>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+      <a href="admin-clients.html"><i class="fa-solid fa-users"></i> Clients</a>
+      <a href="admin-operations.html"><i class="fa-solid fa-arrow-right-arrow-left"></i> Opérations</a>
+      <a href="admin-journal.html"><i class="fa-solid fa-scroll"></i> Journal d'activité</a>
+      <a href="admin-admins.html" class="active" data-requires="super_admin"><i class="fa-solid fa-user-shield"></i> Comptes admin</a>
+    </nav>
+    <div class="bottom-links">
+      <span class="text-sm" style="color:rgba(255,255,255,.6)">Connecté : <span data-admin-name></span></span>
+      <a href="#" data-admin-logout><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Comptes admin</h1>
+      <button data-theme-toggle class="theme-toggle"></button>
+    </div>
+
+    <div id="accessDeniedWrap"></div>
+
+    <div id="pageContent" class="hidden">
+      <div class="admin-card mb-24">
+        <h3 class="mb-16">Créer un compte admin</h3>
+        <div id="createAdminError"></div>
+        <form id="createAdminForm" novalidate>
+          <div class="grid grid-2" style="gap:16px;">
+            <div class="form-row">
+              <label for="newUsername">Identifiant</label>
+              <input type="text" id="newUsername" class="form-control" autocomplete="off" required>
+            </div>
+            <div class="form-row">
+              <label for="newName">Nom complet</label>
+              <input type="text" id="newName" class="form-control" required>
+            </div>
+            <div class="form-row">
+              <label for="newPassword">Mot de passe</label>
+              <input type="password" id="newPassword" class="form-control" autocomplete="new-password" required>
+              <div class="field-hint">8 caractères minimum, avec au moins une lettre et un chiffre.</div>
+            </div>
+            <div class="form-row">
+              <label for="newRole">Rôle</label>
+              <select id="newRole" class="form-control" required>
+                <option value="support">Support</option>
+                <option value="admin">Admin</option>
+                <option value="super_admin">Super Admin</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-8">Créer le compte</button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h3 class="mb-16">Comptes existants</h3>
+        <div id="adminsWrap"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+<script>
+(async function () {
+  const session = await ADMIN_UI.guard();
+  if (!session) return;
+
+  if (session.role !== 'super_admin') {
+    document.getElementById('accessDeniedWrap').innerHTML = `
+      <div class="alert alert-error">
+        <i class="fa-solid fa-lock"></i>
+        <span>Cette page est réservée aux comptes Super Admin.</span>
+      </div>`;
+    return;
+  }
+  document.getElementById('pageContent').classList.remove('hidden');
+
+  const ROLE_LABELS = { super_admin: 'Super Admin', admin: 'Admin', support: 'Support' };
+
+  async function render() {
+    let admins;
+    try {
+      admins = await DB.getAdmins();
+    } catch (err) {
+      document.getElementById('adminsWrap').innerHTML = `<div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i><span>${escapeHtml(err.message)}</span></div>`;
+      return;
+    }
+
+    const rows = admins.map(a => {
+      const isSelf = a.id === session.adminId;
+      return `
+        <tr>
+          <td><b>${escapeHtml(a.name)}</b></td>
+          <td>${escapeHtml(a.username)}</td>
+          <td>${escapeHtml(ROLE_LABELS[a.role] || a.role)}</td>
+          <td>${a.active ? '<span class="badge badge-active">Actif</span>' : '<span class="badge badge-suspended">Désactivé</span>'}</td>
+          <td>${timeAgo(a.createdAt)}</td>
+          <td>
+            ${isSelf
+              ? '<span class="text-sm text-muted">Votre compte</span>'
+              : `<button type="button" class="btn btn-sm ${a.active ? 'btn-outline' : 'btn-cyan'}" data-toggle-active data-admin-id="${escapeHtml(a.id)}" data-active="${a.active}">${a.active ? 'Désactiver' : 'Réactiver'}</button>`
+            }
+          </td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('adminsWrap').innerHTML = `
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Nom</th><th>Identifiant</th><th>Rôle</th><th>Statut</th><th>Créé le</th><th>Action</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+
+    document.querySelectorAll('[data-toggle-active]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const adminId = btn.getAttribute('data-admin-id');
+        const currentlyActive = btn.getAttribute('data-active') === 'true';
+        btn.disabled = true;
+        try {
+          await DB.setAdminActive(adminId, !currentlyActive);
+          await render();
+        } catch (err) {
+          alert(err.message);
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  document.getElementById('createAdminForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorWrap = document.getElementById('createAdminError');
+    errorWrap.innerHTML = '';
+
+    const username = document.getElementById('newUsername').value.trim();
+    const name = document.getElementById('newName').value.trim();
+    const password = document.getElementById('newPassword').value;
+    const role = document.getElementById('newRole').value;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Création en cours…';
+
+    try {
+      await DB.createAdmin({ username, password, name, role });
+      e.target.reset();
+      await render();
+    } catch (err) {
+      errorWrap.innerHTML = `<div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i><span>${escapeHtml(err.message)}</span></div>`;
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Créer le compte';
+  });
+
+  await render();
+})();
+</script>
+</body>
+</html>

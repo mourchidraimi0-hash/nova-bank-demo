@@ -1,9 +1,11 @@
 const {
-  sql, uid, hashPassword, verifyPassword, generate2FACode, generateTrxRef,
+  sql, uid, hashPassword, verifyPassword, isStrongPassword, generate2FACode, generateTrxRef,
   getClientIp, checkRateLimit,
-  createSession, getSession, refreshSession, destroySession, getBearerToken,
+  createSession, getSession, refreshSession, destroySession, destroyAllAdminSessions, getBearerToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
+
+const ADMIN_ROLES = ['support', 'admin', 'super_admin'];
 
 // Codes 2FA stockés en base (table pending_2fa) — les instances serverless ne sont pas garanties
 // stables entre deux requêtes. Le code est aussi renvoyé au client pour affichage à l'écran :
@@ -151,6 +153,14 @@ module.exports = async (req, res) => {
           total: countRows[0].n, page, pageSize
         });
       }
+      if (action === 'admins') {
+        if (session.role !== 'super_admin') return fail(res, 403, 'forbidden');
+        const rows = await sql`SELECT * FROM admins ORDER BY created_at ASC`;
+        return send(res, 200, {
+          ok: true,
+          admins: rows.map(a => ({ id: a.id, username: a.username, name: a.name, role: a.role, active: a.active, createdAt: a.created_at }))
+        });
+      }
       if (action === 'journal') {
         const { page, pageSize, offset } = parsePaging(req, 25);
         const q = (req.query.q || '').trim();
@@ -186,6 +196,7 @@ module.exports = async (req, res) => {
       const rows = await sql`SELECT * FROM admins WHERE lower(username) = lower(${username}) LIMIT 1`;
       const admin = rows[0];
       if (!admin || !verifyPassword(password, admin.password_hash)) return fail(res, 401, 'invalid_credentials');
+      if (!admin.active) return fail(res, 403, 'account_disabled');
       const code = generate2FACode();
       const expiresAt = new Date(Date.now() + 5 * 60000).toISOString();
       await sql`
@@ -314,6 +325,50 @@ module.exports = async (req, res) => {
 
       await sql`UPDATE transactions SET status = ${newStatus}, settled = ${settled}, updated_at = now() WHERE ref = ${ref}`;
       await logActivity({ adminId: actorId, adminName: actorName, role: actorRole, action: 'changement_statut_operation', detail: `Opération ${ref} (${user.first_name} ${user.last_name}) : ${oldStatus} → ${newStatus}` });
+      return send(res, 200, { ok: true });
+    }
+
+    // ---------------------------------------------------------------- gestion des comptes admin (super_admin uniquement)
+    if (action === 'createAdmin') {
+      if (actorRole !== 'super_admin') return fail(res, 403, 'forbidden');
+      const allowed = await checkRateLimit({ key: `create_admin:${getClientIp(req)}`, max: 10, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
+      const { username, password, name, role } = body;
+      if (!username || !password || !name || !role) return fail(res, 400, 'missing_fields');
+      if (!ADMIN_ROLES.includes(role)) return fail(res, 400, 'invalid_role');
+      if (!isStrongPassword(password)) return fail(res, 400, 'weak_password');
+
+      const existing = await sql`SELECT id FROM admins WHERE lower(username) = lower(${username}) LIMIT 1`;
+      if (existing[0]) return fail(res, 409, 'username_taken');
+
+      const newId = uid('ADM-');
+      await sql`
+        INSERT INTO admins (id, username, password_hash, role, name, active)
+        VALUES (${newId}, ${username}, ${hashPassword(password)}, ${role}, ${name}, true)
+      `;
+      await logActivity({ adminId: actorId, adminName: actorName, role: actorRole, action: 'creation_admin', detail: `Compte admin créé : ${username} (${name}) — rôle ${role}` });
+      return send(res, 200, { ok: true, id: newId });
+    }
+
+    if (action === 'setAdminActive') {
+      if (actorRole !== 'super_admin') return fail(res, 403, 'forbidden');
+      const { adminId, active } = body;
+      if (!adminId || typeof active !== 'boolean') return fail(res, 400, 'missing_fields');
+      if (adminId === actorId) return fail(res, 400, 'cannot_modify_self');
+
+      const rows = await sql`SELECT * FROM admins WHERE id = ${adminId} LIMIT 1`;
+      const target = rows[0];
+      if (!target) return fail(res, 404, 'not_found');
+
+      if (!active && target.role === 'super_admin') {
+        const activeSuperAdmins = await sql`SELECT COUNT(*)::int AS n FROM admins WHERE role = 'super_admin' AND active = true`;
+        if (activeSuperAdmins[0].n <= 1) return fail(res, 400, 'last_super_admin');
+      }
+
+      await sql`UPDATE admins SET active = ${active} WHERE id = ${adminId}`;
+      if (!active) await destroyAllAdminSessions(adminId);
+      await logActivity({ adminId: actorId, adminName: actorName, role: actorRole, action: active ? 'reactivation_admin' : 'desactivation_admin', detail: `Compte admin ${target.username} (${target.name}) ${active ? 'réactivé' : 'désactivé'}` });
       return send(res, 200, { ok: true });
     }
 
