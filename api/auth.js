@@ -1,6 +1,6 @@
 const {
   sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit, verifyTurnstile, sendEmail,
-  generateAccountNumber, generateIBAN,
+  generateAccountNumber, generateIBAN, generate2FACode,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,
   createEmailVerificationToken, consumeEmailVerificationToken,
@@ -32,6 +32,20 @@ function passwordResetEmailHtml(firstName, link) {
       </p>
       <p style="color:#5B6167;font-size:.85rem;">Ce lien expire dans 30 minutes et ne peut être utilisé qu'une seule fois. Si le bouton ne fonctionne pas, copiez ce lien : ${link}</p>
       <p style="color:#5B6167;font-size:.85rem;">Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail — votre mot de passe actuel reste inchangé.</p>
+      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
+    </div>`;
+}
+
+function loginCodeEmailHtml(firstName, code) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
+      <h2 style="color:#15181B;">Bonjour ${firstName},</h2>
+      <p>Voici votre code de connexion à usage unique pour accéder à votre espace client NOVA BANK :</p>
+      <p style="text-align:center;margin:28px 0;">
+        <span style="display:inline-block;background:#ECFDF5;color:#047857;font-size:2rem;font-weight:bold;letter-spacing:.3em;padding:14px 24px;border-radius:8px;">${code}</span>
+      </p>
+      <p style="color:#5B6167;font-size:.85rem;">Ce code expire dans 5 minutes et ne peut être utilisé qu'une seule fois.</p>
+      <p style="color:#5B6167;font-size:.85rem;">Si vous n'êtes pas à l'origine de cette tentative de connexion, changez votre mot de passe immédiatement depuis la page Sécurité.</p>
       <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
     </div>`;
 }
@@ -167,6 +181,56 @@ module.exports = async (req, res) => {
 
       if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
       if (!verifyPassword(password, user.password_hash)) return fail(res, 401, 'wrong_password');
+
+      // ---------------------------------------------------------------- 2FA (code à usage unique par e-mail)
+      // Mot de passe validé, mais aucune session n'est encore créée : elle ne le sera qu'après
+      // vérification du code (action loginVerify). Le code est envoyé par e-mail réel (Resend) ;
+      // en secours (compte non vérifié chez Resend), il est aussi renvoyé pour affichage à
+      // l'écran, comme partout ailleurs sur ce site de démonstration.
+      const code = generate2FACode();
+      const expiresAt = new Date(Date.now() + 5 * 60000).toISOString();
+      await sql`
+        INSERT INTO pending_client_2fa (user_id, code, expires_at) VALUES (${user.id}, ${code}, ${expiresAt})
+        ON CONFLICT (user_id) DO UPDATE SET code = ${code}, expires_at = ${expiresAt}
+      `;
+      const emailResult = await sendEmail({
+        to: user.email,
+        subject: 'Votre code de connexion — NOVA BANK',
+        html: loginCodeEmailHtml(user.first_name, code)
+      });
+      if (!emailResult.ok) {
+        console.error(`Code de connexion non envoyé pour ${user.email} : ${emailResult.error}`);
+      }
+
+      return send(res, 200, {
+        ok: true,
+        requiresTwoFactor: true,
+        userId: user.id,
+        emailSent: emailResult.ok,
+        demoCode: emailResult.ok ? undefined : code
+      });
+    }
+
+    if (action === 'loginVerify') {
+      const allowed = await checkRateLimit({ key: `login_verify:${getClientIp(req)}`, max: 10, windowMinutes: 15 });
+      if (!allowed) return fail(res, 429, 'rate_limited');
+
+      const { userId, code } = body;
+      if (!userId || !code) return fail(res, 400, 'missing_fields');
+
+      const accountAllowed = await checkRateLimit({ key: `login_verify_account:${userId}`, max: 8, windowMinutes: 5 });
+      if (!accountAllowed) return fail(res, 429, 'rate_limited');
+
+      const pendingRows = await sql`SELECT * FROM pending_client_2fa WHERE user_id = ${userId} LIMIT 1`;
+      const pending = pendingRows[0];
+      if (!pending || new Date(pending.expires_at).getTime() < Date.now()) return fail(res, 401, 'code_expired');
+      if (pending.code !== String(code).trim()) return fail(res, 401, 'invalid_code');
+      await sql`DELETE FROM pending_client_2fa WHERE user_id = ${userId}`;
+
+      const rows = await sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1`;
+      const user = rows[0];
+      if (!user) return fail(res, 404, 'not_found');
+      if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
 
       await sql`UPDATE users SET last_login = now() WHERE id = ${user.id}`;
       const ua = (req.headers['user-agent'] || '').slice(0, 300);

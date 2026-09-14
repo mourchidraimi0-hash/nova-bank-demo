@@ -53,27 +53,54 @@
       </div>
     </div>
 
-    <form id="login-form" novalidate>
-      <div class="form-row">
-        <label for="identifier">Identifiant ou e-mail</label>
-        <input type="text" id="identifier" class="form-control" required>
-        <div class="field-error" id="error-identifier"></div>
-      </div>
-
-      <div class="form-row">
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" class="form-control" required>
-        <div class="field-error" id="error-password"></div>
-        <div style="text-align:right;margin-top:8px;">
-          <a href="#" id="forgot-link" class="text-sm">Mot de passe oublié ?</a>
+    <section id="step1">
+      <form id="login-form" novalidate>
+        <div class="form-row">
+          <label for="identifier">Identifiant ou e-mail</label>
+          <input type="text" id="identifier" class="form-control" required>
+          <div class="field-error" id="error-identifier"></div>
         </div>
+
+        <div class="form-row">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" class="form-control" required>
+          <div class="field-error" id="error-password"></div>
+          <div style="text-align:right;margin-top:8px;">
+            <a href="#" id="forgot-link" class="text-sm">Mot de passe oublié ?</a>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+      </form>
+
+      <p class="text-sm text-muted mt-24" style="text-align:center;">Pas encore de compte ? <a href="inscription.html">Ouvrir un compte</a></p>
+      <p class="text-sm text-muted" style="text-align:center;"><a href="index.html">Retour à l'accueil</a></p>
+    </section>
+
+    <!-- Étape 2 : code de connexion à usage unique -->
+    <section id="step2" class="hidden">
+      <div class="alert alert-success" id="step2-email-notice">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+        <div>Un code de connexion vient de vous être envoyé par e-mail.</div>
       </div>
-
-      <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
-    </form>
-
-    <p class="text-sm text-muted mt-24" style="text-align:center;">Pas encore de compte ? <a href="inscription.html">Ouvrir un compte</a></p>
-    <p class="text-sm text-muted" style="text-align:center;"><a href="index.html">Retour à l'accueil</a></p>
+      <div class="alert alert-warn hidden" id="step2-fallback-notice">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — votre code est affiché ci-dessous :</div>
+      </div>
+      <div class="code-display hidden" id="code-display">000000</div>
+      <p class="text-center text-muted text-sm" style="text-align:center;">Saisissez le code à 6 chiffres pour confirmer votre connexion.</p>
+      <div class="code-boxes" id="code-boxes">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="0">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="1">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="2">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="3">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="4">
+        <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="5">
+      </div>
+      <div class="field-error" id="step2-error" style="text-align:center;"></div>
+      <button type="button" class="btn btn-primary btn-block" id="btn-step2">Vérifier et se connecter</button>
+      <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="#" id="btn-back">&larr; Retour</a></p>
+    </section>
   </div>
 </div>
 
@@ -84,6 +111,13 @@
   const existing = await DB.getCurrentUser();
   if (existing) { window.location.href = 'espace-client.html'; return; }
 
+  // Pré-remplissage de l'identifiant si on arrive depuis l'inscription (?identifier=...)
+  const params = new URLSearchParams(window.location.search);
+  const prefill = params.get('identifier');
+  if (prefill) document.getElementById('identifier').value = prefill;
+
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
   const form = document.getElementById('login-form');
   const errorBox = document.getElementById('login-error');
   const errorText = document.getElementById('login-error-text');
@@ -151,6 +185,17 @@
     if (input) input.classList.add('error');
   }
 
+  const codeDisplay = document.getElementById('code-display');
+  const codeBoxes = Array.from(document.querySelectorAll('.code-box'));
+  const step2Error = document.getElementById('step2-error');
+  const step2EmailNotice = document.getElementById('step2-email-notice');
+  const step2FallbackNotice = document.getElementById('step2-fallback-notice');
+  const btnStep2 = document.getElementById('btn-step2');
+  const btnBack = document.getElementById('btn-back');
+
+  let pendingUserId = null;
+  let codeEntered = ['', '', '', '', '', ''];
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -169,25 +214,96 @@
 
     const res = await DB.login(identifier, password);
 
-    if (res.ok) {
-      window.location.href = 'espace-client.html';
-      return;
-    }
-
     submitBtn.disabled = false;
     submitBtn.textContent = 'Se connecter';
 
-    if (res.error === 'not_found') {
-      showLoginError('Aucun compte ne correspond à cet identifiant ou cet e-mail.');
-    } else if (res.error === 'wrong_password') {
-      showLoginError('Mot de passe incorrect.');
-    } else if (res.error === 'suspended') {
-      showLoginError('Votre compte a été suspendu. Motif : ' + escapeHtml(res.reason || 'non précisé') + '. Contactez notre support pour plus d\'informations.');
-    } else if (res.error === 'rate_limited') {
-      showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
-    } else {
-      showLoginError('Une erreur est survenue. Merci de réessayer.');
+    if (!res.ok) {
+      if (res.error === 'not_found') {
+        showLoginError('Aucun compte ne correspond à cet identifiant ou cet e-mail.');
+      } else if (res.error === 'wrong_password') {
+        showLoginError('Mot de passe incorrect.');
+      } else if (res.error === 'suspended') {
+        showLoginError('Votre compte a été suspendu. Motif : ' + escapeHtml(res.reason || 'non précisé') + '. Contactez notre support pour plus d\'informations.');
+      } else if (res.error === 'rate_limited') {
+        showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
+      } else {
+        showLoginError('Une erreur est survenue. Merci de réessayer.');
+      }
+      return;
     }
+
+    pendingUserId = res.userId;
+    codeEntered = ['', '', '', '', '', ''];
+    codeBoxes.forEach(b => b.value = '');
+    step2Error.textContent = '';
+    step2Error.classList.remove('show');
+
+    if (res.emailSent) {
+      step2EmailNotice.classList.remove('hidden');
+      step2FallbackNotice.classList.add('hidden');
+      codeDisplay.classList.add('hidden');
+    } else {
+      step2EmailNotice.classList.add('hidden');
+      step2FallbackNotice.classList.remove('hidden');
+      codeDisplay.textContent = res.demoCode;
+      codeDisplay.classList.remove('hidden');
+    }
+
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+    codeBoxes[0].focus();
+  });
+
+  codeBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      const v = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      box.value = v;
+      codeEntered[i] = v;
+      if (v && i < codeBoxes.length - 1) codeBoxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        codeBoxes[i - 1].focus();
+      }
+      if (e.key === 'Enter') { e.preventDefault(); btnStep2.click(); }
+    });
+  });
+
+  btnStep2.addEventListener('click', async () => {
+    const entered = codeEntered.join('');
+    if (entered.length !== 6) {
+      step2Error.textContent = 'Merci de saisir les 6 chiffres du code.';
+      step2Error.classList.add('show');
+      return;
+    }
+    if (!pendingUserId) { window.location.href = 'connexion.html'; return; }
+
+    btnStep2.disabled = true;
+    btnStep2.textContent = 'Vérification…';
+    const res = await DB.verifyLoginCode(pendingUserId, entered);
+    btnStep2.disabled = false;
+    btnStep2.textContent = 'Vérifier et se connecter';
+
+    if (!res.ok) {
+      step2Error.textContent = res.error === 'code_expired'
+        ? 'Le code a expiré. Veuillez recommencer la connexion.'
+        : res.error === 'rate_limited'
+        ? 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.'
+        : 'Le code saisi ne correspond pas. Veuillez réessayer.';
+      step2Error.classList.add('show');
+      return;
+    }
+    window.location.href = 'espace-client.html';
+  });
+
+  btnBack.addEventListener('click', (e) => {
+    e.preventDefault();
+    pendingUserId = null;
+    document.getElementById('password').value = '';
+    step2.classList.add('hidden');
+    step1.classList.remove('hidden');
+    clearErrors();
+    document.getElementById('password').focus();
   });
 })();
 </script>

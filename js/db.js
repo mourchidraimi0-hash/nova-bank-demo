@@ -65,8 +65,15 @@ const DB = (() => {
     return { user: r.user, verificationToken: r.verificationToken, emailSent: r.emailSent };
   }
 
+  // Étape 1 : mot de passe. En cas de succès, renvoie { ok:true, requiresTwoFactor:true, userId,
+  // emailSent, demoCode? } — aucune session n'est créée avant la vérification du code (étape 2).
   async function login(identifier, password) {
-    const r = await api('auth', { body: { action: 'login', identifier, password } });
+    return api('auth', { body: { action: 'login', identifier, password } });
+  }
+
+  // Étape 2 : code de connexion reçu par e-mail (ou affiché à l'écran en secours).
+  async function verifyLoginCode(userId, code) {
+    const r = await api('auth', { body: { action: 'loginVerify', userId, code } });
     if (!r.ok) return r;
     setToken(r.token);
     return { ok: true, user: r.user };
@@ -378,7 +385,7 @@ const DB = (() => {
 
   return {
     KEYS, uid, nowIso, generate2FACode, formatMoney,
-    createUser, login, getCurrentUser, logout, requireClientAuth, changePassword, updateProfile,
+    createUser, login, verifyLoginCode, getCurrentUser, logout, requireClientAuth, changePassword, updateProfile,
     requestPasswordReset, resetPassword, verifyEmail, resendVerification,
     getAvailableBalance, getPendingOutTotal, markNotificationRead, markAllNotificationsRead, createTransfer,
     getSavingsGoals, createSavingsGoal, contributeToSavingsGoal, withdrawFromSavingsGoal, deleteSavingsGoal,

@@ -185,7 +185,7 @@
         <p class="text-sm text-muted mt-8" style="margin-bottom:0;">Tant que l'e-mail n'est pas confirmé, les virements sortants sont bloqués. Vous pourrez aussi renvoyer ce lien depuis votre tableau de bord.</p>
       </div>
     </div>
-    <button type="button" class="btn btn-primary btn-block" id="modal-continue">Accéder à mon espace client</button>
+    <button type="button" class="btn btn-primary btn-block" id="modal-continue">Continuer vers la connexion</button>
   </div>
 </div>
 
@@ -288,9 +288,8 @@
         ? `Un e-mail de confirmation a été envoyé à ${email}. Vous pouvez aussi utiliser ce lien directement :`
         : `Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — voici votre lien de confirmation :`;
 
-      document.getElementById('modal-continue').onclick = async () => {
-        await DB.login(user.id, password);
-        window.location.href = 'espace-client.html';
+      document.getElementById('modal-continue').onclick = () => {
+        window.location.href = 'connexion.html?identifier=' + encodeURIComponent(user.id);
       };
 
       document.getElementById('success-modal').classList.add('open');

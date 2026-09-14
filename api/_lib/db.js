@@ -381,6 +381,11 @@ async function ensureSchema() {
       expires_at TIMESTAMPTZ NOT NULL,
       used BOOLEAN DEFAULT false
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS pending_client_2fa (
+      user_id TEXT PRIMARY KEY,
+      code TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL
+    )`;
 
     // Index — les clés primaires sont déjà indexées automatiquement ; ceux-ci accélèrent
     // les filtres/tris utilisés par le back-office (fiche client, listes paginées, stats).
