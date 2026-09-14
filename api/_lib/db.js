@@ -78,6 +78,29 @@ async function verifyTurnstile(token, remoteIp) {
   }
 }
 
+// ---------------------------------------------------------------- envoi d'e-mail (Resend)
+// Sans domaine personnalisé vérifié chez Resend, l'expéditeur de test onboarding@resend.dev
+// ne peut délivrer qu'à l'adresse du propriétaire du compte Resend (limitation anti-abus du
+// service, pas de notre code). L'échec d'envoi n'empêche jamais l'inscription : le lien reste
+// aussi affiché à l'écran comme filet de sécurité pour tous les autres comptes de démonstration.
+async function sendEmail({ to, subject, html }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) { console.error('RESEND_API_KEY manquante.'); return { ok: false, error: 'missing_api_key' }; }
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'NOVA BANK <onboarding@resend.dev>', to: [to], subject, html })
+    });
+    const data = await res.json();
+    if (!res.ok) { console.error('Erreur Resend :', data); return { ok: false, error: data.message || 'send_failed' }; }
+    return { ok: true, id: data.id };
+  } catch (err) {
+    console.error('Erreur d\'envoi e-mail :', err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
 // ---------------------------------------------------------------- mots de passe (scrypt, natif Node — pas de dépendance)
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -429,7 +452,7 @@ function fail(res, status, error, extra) {
 
 module.exports = {
   sql, uid, nowIso, hashPassword, verifyPassword, isStrongPassword,
-  getClientIp, checkRateLimit, verifyTurnstile,
+  getClientIp, checkRateLimit, verifyTurnstile, sendEmail,
   generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, destroyAllAdminSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,

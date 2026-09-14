@@ -180,7 +180,7 @@
     <div class="alert alert-success" style="text-align:left;">
       <i class="fa-solid fa-envelope-circle-check"></i>
       <div style="width:100%;">
-        Confirmez votre adresse e-mail (affiché ici car ce site n'a pas de serveur d'e-mail réel) :<br>
+        <span id="modal-verify-intro">Confirmez votre adresse e-mail :</span><br>
         <a href="#" id="modal-verify-link" style="word-break:break-all;"></a><br>
         <p class="text-sm text-muted mt-8" style="margin-bottom:0;">Tant que l'e-mail n'est pas confirmé, les virements sortants sont bloqués. Vous pourrez aussi renvoyer ce lien depuis votre tableau de bord.</p>
       </div>
@@ -270,7 +270,7 @@
     submitBtn.textContent = 'Création en cours…';
 
     try {
-      const { user, verificationToken } = await DB.createUser({
+      const { user, verificationToken, emailSent } = await DB.createUser({
         firstName, lastName, email, phone, birthDate, address, currency, password,
         idPhotoMeta, idDocumentMeta, turnstileToken
       });
@@ -284,6 +284,9 @@
       const verifyAnchor = document.getElementById('modal-verify-link');
       verifyAnchor.textContent = verifyLink;
       verifyAnchor.href = verifyLink;
+      document.getElementById('modal-verify-intro').textContent = emailSent
+        ? `Un e-mail de confirmation a été envoyé à ${email}. Vous pouvez aussi utiliser ce lien directement :`
+        : `Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — voici votre lien de confirmation :`;
 
       document.getElementById('modal-continue').onclick = async () => {
         await DB.login(user.id, password);

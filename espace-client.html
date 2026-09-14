@@ -163,13 +163,16 @@
           const btn = document.getElementById('resendVerifyBtn');
           btn.disabled = true;
           try {
-            const { verificationToken } = await DB.resendVerification();
+            const { verificationToken, emailSent } = await DB.resendVerification();
             const link = window.location.origin + '/verification-email.html?token=' + encodeURIComponent(verificationToken);
+            const intro = emailSent
+              ? `Un e-mail de confirmation a été envoyé à ${escapeHtml(fresh.email)}. Vous pouvez aussi utiliser ce lien directement :`
+              : `Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — voici votre lien de confirmation :`;
             document.getElementById('verifyLinkResult').innerHTML = `
               <div class="alert alert-success" style="margin-top:12px;">
                 <i class="fa-solid fa-circle-check"></i>
                 <div style="width:100%;">
-                  Lien de confirmation (affiché ici, aucun e-mail réel n'est envoyé) :<br>
+                  ${intro}<br>
                   <a href="${link}" style="word-break:break-all;">${escapeHtml(link)}</a>
                 </div>
               </div>`;

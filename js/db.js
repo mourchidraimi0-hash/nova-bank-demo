@@ -62,7 +62,7 @@ const DB = (() => {
   async function createUser(data) {
     const r = await api('auth', { body: { action: 'signup', ...data } });
     if (!r.ok) throw new Error(errorMessage(r.error));
-    return { user: r.user, verificationToken: r.verificationToken };
+    return { user: r.user, verificationToken: r.verificationToken, emailSent: r.emailSent };
   }
 
   async function login(identifier, password) {
@@ -121,7 +121,7 @@ const DB = (() => {
   async function resendVerification() {
     const r = await api('auth', { body: { action: 'resendVerification' } });
     if (!r.ok) throw new Error(errorMessage(r.error));
-    return { verificationToken: r.verificationToken };
+    return { verificationToken: r.verificationToken, emailSent: r.emailSent };
   }
 
   async function updateProfile(fields) {

@@ -1,11 +1,26 @@
 const {
-  sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit, verifyTurnstile,
+  sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit, verifyTurnstile, sendEmail,
   generateAccountNumber, generateIBAN,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,
   createEmailVerificationToken, consumeEmailVerificationToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
+
+const SITE_URL = 'https://nova-bank-demo-ten.vercel.app';
+
+function verificationEmailHtml(firstName, link) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
+      <h2 style="color:#15181B;">Bonjour ${firstName},</h2>
+      <p>Merci de vous être inscrit(e) sur NOVA BANK. Confirmez votre adresse e-mail pour activer les virements sortants sur votre compte :</p>
+      <p style="text-align:center;margin:28px 0;">
+        <a href="${link}" style="background:#22C55E;color:#15181B;font-weight:bold;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;">Confirmer mon adresse e-mail</a>
+      </p>
+      <p style="color:#5B6167;font-size:.85rem;">Ce lien expire dans 24 heures et ne peut être utilisé qu'une seule fois. Si le bouton ne fonctionne pas, copiez ce lien : ${link}</p>
+      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
+    </div>`;
+}
 
 // ---------------------------------------------------------------- mise en forme utilisateur (snake_case -> camelCase, identique au modèle historique)
 async function serializeUser(row) {
@@ -102,9 +117,18 @@ module.exports = async (req, res) => {
       await logActivity({ adminName: 'Client', action: 'inscription_client', detail: `Nouveau compte ${accountNumber} (${firstName} ${lastName})` });
 
       const verificationToken = await createEmailVerificationToken(id);
+      const verifyLink = `${SITE_URL}/verification-email.html?token=${encodeURIComponent(verificationToken)}`;
+      const emailResult = await sendEmail({
+        to: email,
+        subject: 'Confirmez votre adresse e-mail — NOVA BANK',
+        html: verificationEmailHtml(firstName, verifyLink)
+      });
+      if (!emailResult.ok) {
+        console.error(`E-mail de confirmation non envoyé pour ${email} : ${emailResult.error}`);
+      }
 
       const rows = await sql`SELECT * FROM users WHERE id = ${id} LIMIT 1`;
-      return send(res, 200, { ok: true, user: await serializeUser(rows[0]), verificationToken });
+      return send(res, 200, { ok: true, user: await serializeUser(rows[0]), verificationToken, emailSent: emailResult.ok });
     }
 
     if (action === 'login') {
@@ -246,7 +270,16 @@ module.exports = async (req, res) => {
       if (user.email_verified) return fail(res, 400, 'already_verified');
 
       const verificationToken = await createEmailVerificationToken(user.id);
-      return send(res, 200, { ok: true, verificationToken });
+      const verifyLink = `${SITE_URL}/verification-email.html?token=${encodeURIComponent(verificationToken)}`;
+      const emailResult = await sendEmail({
+        to: user.email,
+        subject: 'Confirmez votre adresse e-mail — NOVA BANK',
+        html: verificationEmailHtml(user.first_name, verifyLink)
+      });
+      if (!emailResult.ok) {
+        console.error(`E-mail de confirmation non envoyé pour ${user.email} : ${emailResult.error}`);
+      }
+      return send(res, 200, { ok: true, verificationToken, emailSent: emailResult.ok });
     }
 
     return fail(res, 400, 'unknown_action');
