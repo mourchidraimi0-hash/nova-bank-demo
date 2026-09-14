@@ -79,10 +79,9 @@ async function verifyTurnstile(token, remoteIp) {
 }
 
 // ---------------------------------------------------------------- envoi d'e-mail (Resend)
-// Sans domaine personnalisé vérifié chez Resend, l'expéditeur de test onboarding@resend.dev
-// ne peut délivrer qu'à l'adresse du propriétaire du compte Resend (limitation anti-abus du
-// service, pas de notre code). L'échec d'envoi n'empêche jamais l'inscription : le lien reste
-// aussi affiché à l'écran comme filet de sécurité pour tous les autres comptes de démonstration.
+// Domaine novabk.pro vérifié chez Resend : livraison réelle à tous les destinataires, pas
+// seulement au propriétaire du compte. L'échec d'envoi n'empêche jamais l'inscription : le
+// lien reste aussi affiché à l'écran comme filet de sécurité en cas de problème ponctuel.
 async function sendEmail({ to, subject, html }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) { console.error('RESEND_API_KEY manquante.'); return { ok: false, error: 'missing_api_key' }; }
@@ -90,7 +89,7 @@ async function sendEmail({ to, subject, html }) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'NOVA BANK <onboarding@resend.dev>', to: [to], subject, html })
+      body: JSON.stringify({ from: 'NOVA BANK <no-reply@novabk.pro>', to: [to], subject, html })
     });
     const data = await res.json();
     if (!res.ok) { console.error('Erreur Resend :', data); return { ok: false, error: data.message || 'send_failed' }; }
