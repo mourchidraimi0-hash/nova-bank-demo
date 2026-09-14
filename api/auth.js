@@ -7,7 +7,7 @@ const {
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
 
-const SITE_URL = 'https://nova-bank-demo-ten.vercel.app';
+const SITE_URL = 'https://novabk.pro';
 
 function verificationEmailHtml(firstName, link) {
   return `
