@@ -14,4 +14,4 @@ Disallow: /reinitialisation.html
 Disallow: /verification-email.html
 Disallow: /api/
 
-Sitemap: https://novabk.pro/sitemap.xml
+Sitemap: https://www.novabk.pro/sitemap.xml
