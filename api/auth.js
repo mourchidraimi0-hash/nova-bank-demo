@@ -22,6 +22,20 @@ function verificationEmailHtml(firstName, link) {
     </div>`;
 }
 
+function passwordResetEmailHtml(firstName, link) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
+      <h2 style="color:#15181B;">Bonjour ${firstName},</h2>
+      <p>Vous avez demandé la réinitialisation de votre mot de passe NOVA BANK. Cliquez ci-dessous pour en choisir un nouveau :</p>
+      <p style="text-align:center;margin:28px 0;">
+        <a href="${link}" style="background:#22C55E;color:#15181B;font-weight:bold;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;">Réinitialiser mon mot de passe</a>
+      </p>
+      <p style="color:#5B6167;font-size:.85rem;">Ce lien expire dans 30 minutes et ne peut être utilisé qu'une seule fois. Si le bouton ne fonctionne pas, copiez ce lien : ${link}</p>
+      <p style="color:#5B6167;font-size:.85rem;">Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail — votre mot de passe actuel reste inchangé.</p>
+      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
+    </div>`;
+}
+
 // ---------------------------------------------------------------- mise en forme utilisateur (snake_case -> camelCase, identique au modèle historique)
 async function serializeUser(row) {
   const [transactions, notifications, notes, savingsGoals, cards, loginHistory] = await Promise.all([
@@ -203,8 +217,17 @@ module.exports = async (req, res) => {
       if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
 
       const resetToken = await createPasswordResetToken(user.id);
+      const resetLink = `${SITE_URL}/reinitialisation.html?token=${encodeURIComponent(resetToken)}`;
+      const emailResult = await sendEmail({
+        to: user.email,
+        subject: 'Réinitialisation de votre mot de passe — NOVA BANK',
+        html: passwordResetEmailHtml(user.first_name, resetLink)
+      });
+      if (!emailResult.ok) {
+        console.error(`E-mail de réinitialisation non envoyé pour ${user.email} : ${emailResult.error}`);
+      }
       await logActivity({ adminName: 'Client', action: 'demande_reinitialisation_mdp', detail: `Demande de réinitialisation pour ${user.account_number}` });
-      return send(res, 200, { ok: true, resetToken });
+      return send(res, 200, { ok: true, resetToken, emailSent: emailResult.ok });
     }
 
     if (action === 'resetPassword') {

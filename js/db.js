@@ -102,7 +102,7 @@ const DB = (() => {
   async function requestPasswordReset(identifier) {
     const r = await api('auth', { body: { action: 'requestPasswordReset', identifier } });
     if (!r.ok) throw new Error(errorMessage(r.error));
-    return { resetToken: r.resetToken };
+    return { resetToken: r.resetToken, emailSent: r.emailSent };
   }
 
   async function resetPassword(token, newPassword) {
