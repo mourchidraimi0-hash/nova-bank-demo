@@ -55,6 +55,29 @@ async function checkRateLimit({ key, max, windowMinutes }) {
   return rows[0].count <= max;
 }
 
+// ---------------------------------------------------------------- CAPTCHA (Cloudflare Turnstile)
+// Vérifie le jeton résolu par le widget côté client auprès de Cloudflare. La clé secrète
+// n'existe que côté serveur (variable d'environnement) — jamais exposée au navigateur.
+async function verifyTurnstile(token, remoteIp) {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) { console.error('TURNSTILE_SECRET_KEY manquante.'); return false; }
+  if (!token) return false;
+  try {
+    const params = new URLSearchParams({ secret, response: token });
+    if (remoteIp) params.set('remoteip', remoteIp);
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    });
+    const data = await res.json();
+    return data.success === true;
+  } catch (err) {
+    console.error('Erreur de vérification Turnstile :', err.message);
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------- mots de passe (scrypt, natif Node — pas de dépendance)
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -406,7 +429,7 @@ function fail(res, status, error, extra) {
 
 module.exports = {
   sql, uid, nowIso, hashPassword, verifyPassword, isStrongPassword,
-  getClientIp, checkRateLimit,
+  getClientIp, checkRateLimit, verifyTurnstile,
   generateAccountNumber, generateIBAN, generateTrxRef, generate2FACode,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, destroyAllAdminSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,

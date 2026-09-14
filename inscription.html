@@ -21,6 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 <nav class="navbar scrolled">
@@ -145,6 +146,9 @@
       </div>
       <div class="field-error" id="error-terms" style="margin-top:-20px;margin-bottom:20px;"></div>
 
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAEziNT2CiqosyUVl" style="margin-bottom:16px;"></div>
+      <div class="field-error" id="error-captcha"></div>
+
       <button type="submit" class="btn btn-primary btn-block">Créer mon compte</button>
     </form>
 
@@ -253,6 +257,9 @@
 
     if (!termsChecked) { setError('terms', 'Vous devez accepter les Conditions Générales d\'Utilisation pour continuer.'); hasError = true; }
 
+    const turnstileToken = window.turnstile ? window.turnstile.getResponse() : '';
+    if (!turnstileToken) { setError('captcha', 'Merci de valider la vérification anti-robot.'); hasError = true; }
+
     if (hasError) return;
 
     const idPhotoMeta = getDzFileMeta('idPhoto');
@@ -265,7 +272,7 @@
     try {
       const { user, verificationToken } = await DB.createUser({
         firstName, lastName, email, phone, birthDate, address, currency, password,
-        idPhotoMeta, idDocumentMeta
+        idPhotoMeta, idDocumentMeta, turnstileToken
       });
 
       document.getElementById('modal-id').textContent = user.id;
@@ -287,8 +294,9 @@
     } catch (err) {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Créer mon compte';
+      if (window.turnstile) window.turnstile.reset();
       const msg = err && err.message ? err.message : 'Une erreur est survenue lors de la création du compte. Merci de réessayer.';
-      const field = /mot de passe/i.test(msg) ? 'password' : 'email';
+      const field = /mot de passe/i.test(msg) ? 'password' : /anti-robot/i.test(msg) ? 'captcha' : 'email';
       setError(field, msg);
     }
   });

@@ -363,6 +363,7 @@ const DB = (() => {
       invalid_role: 'Rôle invalide.',
       cannot_modify_self: 'Vous ne pouvez pas modifier votre propre compte de cette façon.',
       last_super_admin: 'Impossible de désactiver le dernier compte Super Admin actif.',
+      captcha_failed: 'La vérification anti-robot a échoué. Merci de recommencer.',
       email_not_verified: "Votre adresse e-mail n'est pas encore confirmée. Confirmez-la depuis votre tableau de bord pour effectuer un virement.",
       already_verified: 'Votre adresse e-mail est déjà confirmée.',
       reason_required: 'Un motif est obligatoire pour cette action.',

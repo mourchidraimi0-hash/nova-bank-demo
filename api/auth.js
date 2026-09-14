@@ -1,5 +1,5 @@
 const {
-  sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit,
+  sql, uid, hashPassword, verifyPassword, isStrongPassword, getClientIp, checkRateLimit, verifyTurnstile,
   generateAccountNumber, generateIBAN,
   createSession, getSession, refreshSession, destroySession, destroyAllUserSessions, getBearerToken,
   createPasswordResetToken, consumePasswordResetToken,
@@ -78,7 +78,10 @@ module.exports = async (req, res) => {
       const allowed = await checkRateLimit({ key: `signup:${getClientIp(req)}`, max: 5, windowMinutes: 60 });
       if (!allowed) return fail(res, 429, 'rate_limited');
 
-      const { firstName, lastName, email, phone, birthDate, address, currency, password, idPhotoMeta, idDocumentMeta } = body;
+      const { firstName, lastName, email, phone, birthDate, address, currency, password, idPhotoMeta, idDocumentMeta, turnstileToken } = body;
+      const captchaOk = await verifyTurnstile(turnstileToken, getClientIp(req));
+      if (!captchaOk) return fail(res, 400, 'captcha_failed');
+
       if (!firstName || !lastName || !email || !password) return fail(res, 400, 'missing_fields');
       if (!isStrongPassword(password)) return fail(res, 400, 'weak_password');
       const existing = await sql`SELECT id FROM users WHERE lower(email) = lower(${email}) LIMIT 1`;
