@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /espace-client.html
+Disallow: /comptes.html
+Disallow: /transactions.html
+Disallow: /virement.html
+Disallow: /cartes.html
+Disallow: /epargne.html
+Disallow: /notifications.html
+Disallow: /profil.html
+Disallow: /securite.html
+Disallow: /admin-*.html
+Disallow: /reinitialisation.html
+Disallow: /verification-email.html
+Disallow: /api/
+
+Sitemap: https://nova-bank-demo-ten.vercel.app/sitemap.xml

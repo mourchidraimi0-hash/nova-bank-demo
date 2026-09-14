@@ -159,6 +159,12 @@ module.exports = async (req, res) => {
       `;
       const user = rows[0];
       if (!user) return fail(res, 401, 'not_found');
+
+      // Limite par compte en plus de la limite par IP : empêche un attaquant disposant de
+      // plusieurs adresses IP de cibler un seul compte par force brute.
+      const accountAllowed = await checkRateLimit({ key: `login_account:${user.id}`, max: 8, windowMinutes: 15 });
+      if (!accountAllowed) return fail(res, 429, 'rate_limited');
+
       if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
       if (!verifyPassword(password, user.password_hash)) return fail(res, 401, 'wrong_password');
 
