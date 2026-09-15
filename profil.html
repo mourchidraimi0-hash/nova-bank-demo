@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Gérez vos informations personnelles et vos préférences de compte sur NOVA BANK.">
+<meta name="description" content="Manage your personal information and account preferences on NOVA BANK.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Profil &amp; paramètres — NOVA BANK</title>
+<title>Profile &amp; settings — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,45 +24,45 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html" class="active"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html" class="active"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1>Profil &amp; paramètres</h1>
-      <p>Vos informations personnelles et vos préférences de compte.</p>
+      <h1>Profile &amp; settings</h1>
+      <p>Your personal information and account preferences.</p>
     </div>
 
     <div data-animate-group>
 
       <div class="card mb-24">
-        <h3>Informations personnelles</h3>
+        <h3>Personal information</h3>
         <div class="info-grid" id="infoGridWrap"></div>
       </div>
 
       <div class="card mb-24">
-        <h3 class="mb-16">Préférences de notifications</h3>
+        <h3 class="mb-16">Notification preferences</h3>
         <div class="switch-row">
           <div class="switch-label">
-            <b>Notifications par e-mail</b>
-            <span>Recevez un e-mail pour les opérations importantes de votre compte.</span>
+            <b>Email notifications</b>
+            <span>Receive an email for important operations on your account.</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="prefEmail">
@@ -71,8 +71,8 @@
         </div>
         <div class="switch-row">
           <div class="switch-label">
-            <b>Notifications par SMS</b>
-            <span>Recevez un SMS pour les alertes urgentes (fraude, blocage de carte...).</span>
+            <b>SMS notifications</b>
+            <span>Receive an SMS for urgent alerts (fraud, card block...).</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="prefSms">
@@ -81,8 +81,8 @@
         </div>
         <div class="switch-row">
           <div class="switch-label">
-            <b>Résumé mensuel par e-mail</b>
-            <span>Recevez un récapitulatif mensuel de votre activité bancaire.</span>
+            <b>Monthly summary by email</b>
+            <span>Receive a monthly summary of your banking activity.</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="prefDigest">
@@ -92,21 +92,21 @@
       </div>
 
       <div class="card mb-24">
-        <h3 class="mb-16">Langue et devise</h3>
+        <h3 class="mb-16">Language and currency</h3>
         <div class="info-grid">
-          <div class="info-item"><span>Langue</span><b>Français</b></div>
-          <div class="info-item"><span>Devise du compte</span><b id="currencyValue"></b></div>
+          <div class="info-item"><span>Language</span><b>English</b></div>
+          <div class="info-item"><span>Account currency</span><b id="currencyValue"></b></div>
         </div>
-        <p class="field-hint mt-16">La devise du compte est définie à l'ouverture et ne peut pas être modifiée depuis cette page de démonstration.</p>
+        <p class="field-hint mt-16">The account currency is set at opening and cannot be changed from this demo page.</p>
       </div>
 
       <div class="card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
         <div class="icon-box" style="margin-bottom:0;"><i class="fa-solid fa-shield-halved"></i></div>
         <div style="flex:1;min-width:220px;">
-          <h3 style="margin-bottom:4px;">Mot de passe et sécurité</h3>
-          <p class="text-muted text-sm">Pour changer votre mot de passe ou consulter l'activité de sécurité de votre compte, rendez-vous dans l'onglet Sécurité.</p>
+          <h3 style="margin-bottom:4px;">Password and security</h3>
+          <p class="text-muted text-sm">To change your password or view your account's security activity, go to the Security tab.</p>
         </div>
-        <a href="securite.html" class="btn btn-outline btn-sm">Aller à Sécurité <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="securite.html" class="btn btn-outline btn-sm">Go to Security <i class="fa-solid fa-arrow-right"></i></a>
       </div>
 
     </div>
@@ -127,32 +127,32 @@
       if (!d) return '—';
       const dt = new Date(d);
       if (isNaN(dt.getTime())) return escapeHtml(d);
-      return dt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+      return dt.toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' });
     }
 
     function kycLabel(status) {
       return {
-        none: 'Aucun document déposé',
-        submitted: 'Documents en cours de vérification',
-        verified: 'Identité vérifiée'
-      }[status] || (status || 'Aucun document déposé');
+        none: 'No document submitted',
+        submitted: 'Documents under review',
+        verified: 'Identity verified'
+      }[status] || (status || 'No document submitted');
     }
 
-    // ---- informations personnelles (lecture seule)
+    // ---- personal information (read-only)
     document.getElementById('infoGridWrap').innerHTML = `
-      <div class="info-item"><span>Prénom</span><b>${escapeHtml(fresh.firstName)}</b></div>
-      <div class="info-item"><span>Nom</span><b>${escapeHtml(fresh.lastName)}</b></div>
-      <div class="info-item"><span>E-mail</span><b>${escapeHtml(fresh.email)}</b></div>
-      <div class="info-item"><span>Téléphone</span><b>${escapeHtml(fresh.phone)}</b></div>
-      <div class="info-item"><span>Date de naissance</span><b>${formatDate(fresh.birthDate)}</b></div>
-      <div class="info-item"><span>Adresse</span><b>${escapeHtml(fresh.address)}</b></div>
-      <div class="info-item"><span>Numéro de compte</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
-      <div class="info-item"><span>Date d'adhésion</span><b>${timeAgo(fresh.createdAt)}</b></div>
-      <div class="info-item"><span>Statut KYC</span><b>${escapeHtml(kycLabel(fresh.kyc && fresh.kyc.status))}</b></div>`;
+      <div class="info-item"><span>First name</span><b>${escapeHtml(fresh.firstName)}</b></div>
+      <div class="info-item"><span>Last name</span><b>${escapeHtml(fresh.lastName)}</b></div>
+      <div class="info-item"><span>Email</span><b>${escapeHtml(fresh.email)}</b></div>
+      <div class="info-item"><span>Phone</span><b>${escapeHtml(fresh.phone)}</b></div>
+      <div class="info-item"><span>Date of birth</span><b>${formatDate(fresh.birthDate)}</b></div>
+      <div class="info-item"><span>Address</span><b>${escapeHtml(fresh.address)}</b></div>
+      <div class="info-item"><span>Account number</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
+      <div class="info-item"><span>Membership date</span><b>${timeAgo(fresh.createdAt)}</b></div>
+      <div class="info-item"><span>KYC status</span><b>${escapeHtml(kycLabel(fresh.kyc && fresh.kyc.status))}</b></div>`;
 
     document.getElementById('currencyValue').textContent = fresh.currency || '—';
 
-    // ---- préférences de notifications (cosmétiques, stockées localement par utilisateur)
+    // ---- notification preferences (cosmetic, stored locally per user)
     const PREFS_KEY = 'novabank_prefs_' + user.id;
     const DEFAULT_PREFS = { emailNotif: true, smsNotif: false, monthlyDigest: true };
 

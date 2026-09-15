@@ -52,7 +52,7 @@ const DB = (() => {
   function formatMoney(amount, currency) {
     const n = Number(amount || 0);
     try {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: currency || 'EUR' }).format(n);
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'EUR' }).format(n);
     } catch (e) {
       return n.toFixed(2) + ' ' + (currency || '');
     }
@@ -292,7 +292,7 @@ const DB = (() => {
 
   // Un motif est systématiquement exigé et journalisé : aucun ajustement de solde silencieux n'est possible.
   async function adjustBalance(userId, type, amount, reason) {
-    if (!reason || !reason.trim()) throw new Error('Un motif est obligatoire pour tout ajustement de solde.');
+    if (!reason || !reason.trim()) throw new Error('A reason is required for any balance adjustment.');
     const signed = type === 'credit' ? Math.abs(Number(amount)) : -Math.abs(Number(amount));
     const r = await api('admin', { admin: true, body: { action: 'adjustBalance', userId, amount: signed, reason } });
     if (!r.ok) throw new Error(errorMessage(r.error));
@@ -353,34 +353,34 @@ const DB = (() => {
   // ---------------------------------------------------------------- messages d'erreur (fr)
   function errorMessage(code) {
     const messages = {
-      missing_fields: 'Veuillez renseigner tous les champs obligatoires.',
-      email_taken: 'Cette adresse e-mail est déjà associée à un compte.',
-      not_found: 'Compte introuvable.',
-      wrong_password: 'Mot de passe incorrect.',
-      suspended: 'Ce compte est suspendu.',
-      not_authenticated: 'Votre session a expiré. Veuillez vous reconnecter.',
-      insufficient_funds: 'Solde disponible insuffisant.',
-      invalid_amount: 'Montant invalide.',
-      weak_password: 'Le mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.',
-      rate_limited: 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.',
-      invalid_token: 'Ce lien est invalide ou a déjà été utilisé. Merci de recommencer la procédure.',
-      account_disabled: 'Ce compte administrateur a été désactivé.',
-      forbidden: "Vous n'avez pas les droits pour effectuer cette action.",
-      username_taken: 'Cet identifiant est déjà utilisé par un autre compte admin.',
-      invalid_role: 'Rôle invalide.',
-      cannot_modify_self: 'Vous ne pouvez pas modifier votre propre compte de cette façon.',
-      last_super_admin: 'Impossible de désactiver le dernier compte Super Admin actif.',
-      captcha_failed: 'La vérification anti-robot a échoué. Merci de recommencer.',
-      email_not_verified: "Votre adresse e-mail n'est pas encore confirmée. Confirmez-la depuis votre tableau de bord pour effectuer un virement.",
-      already_verified: 'Votre adresse e-mail est déjà confirmée.',
-      reason_required: 'Un motif est obligatoire pour cette action.',
-      invalid_credentials: 'Identifiants incorrects.',
-      code_expired: 'Le code a expiré. Veuillez recommencer la connexion.',
-      invalid_code: 'Code incorrect.',
-      server_error: 'Une erreur est survenue. Veuillez réessayer.',
-      network_error: 'Impossible de contacter le serveur. Vérifiez votre connexion.'
+      missing_fields: 'Please fill in all required fields.',
+      email_taken: 'This email address is already associated with an account.',
+      not_found: 'Account not found.',
+      wrong_password: 'Incorrect password.',
+      suspended: 'This account is suspended.',
+      not_authenticated: 'Your session has expired. Please log in again.',
+      insufficient_funds: 'Insufficient available balance.',
+      invalid_amount: 'Invalid amount.',
+      weak_password: 'Password must be at least 8 characters long, with at least one letter and one digit.',
+      rate_limited: 'Too many attempts. Please wait a few minutes before trying again.',
+      invalid_token: 'This link is invalid or has already been used. Please start over.',
+      account_disabled: 'This admin account has been disabled.',
+      forbidden: "You don't have permission to perform this action.",
+      username_taken: 'This username is already used by another admin account.',
+      invalid_role: 'Invalid role.',
+      cannot_modify_self: 'You cannot modify your own account this way.',
+      last_super_admin: 'Cannot deactivate the last active Super Admin account.',
+      captcha_failed: 'Anti-bot verification failed. Please try again.',
+      email_not_verified: "Your email address is not yet confirmed. Confirm it from your dashboard to make a transfer.",
+      already_verified: 'Your email address is already confirmed.',
+      reason_required: 'A reason is required for this action.',
+      invalid_credentials: 'Incorrect credentials.',
+      code_expired: 'The code has expired. Please log in again.',
+      invalid_code: 'Incorrect code.',
+      server_error: 'An error occurred. Please try again.',
+      network_error: 'Unable to reach the server. Check your connection.'
     };
-    return messages[code] || 'Une erreur est survenue.';
+    return messages[code] || 'An error occurred.';
   }
 
   return {

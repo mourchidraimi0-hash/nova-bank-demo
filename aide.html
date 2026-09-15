@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Centre d'aide NOVA BANK : questions fréquentes, recherche et formulaire de contact de l'assistance.">
+<meta name="description" content="NOVA BANK Help Center: frequently asked questions, search and support contact form.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
-<title>Centre d'aide — NOVA BANK</title>
+<title>Help Center — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -23,216 +23,216 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; Settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html" class="active"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html" class="active"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1>Centre d'aide</h1>
-      <p>Trouvez rapidement une réponse, ou contactez-nous.</p>
+      <h1>Help Center</h1>
+      <p>Quickly find an answer, or contact us.</p>
     </div>
 
     <div class="help-search">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="helpSearch" class="form-control" placeholder="Rechercher une question, un mot-clé…" autocomplete="off">
+      <input type="text" id="helpSearch" class="form-control" placeholder="Search a question, a keyword…" autocomplete="off">
     </div>
 
     <div class="grid grid-3 mb-24" id="helpCatsWrap" data-animate-group>
       <div class="help-cat" data-target="cat-compte">
         <div class="icon-box"><i class="fa-solid fa-user-lock"></i></div>
-        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Compte &amp; Connexion</h4><span class="text-sm text-muted">Accès, mot de passe, infos</span></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Account &amp; Login</h4><span class="text-sm text-muted">Access, password, info</span></div>
       </div>
       <div class="help-cat" data-target="cat-virements">
         <div class="icon-box"><i class="fa-solid fa-paper-plane"></i></div>
-        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Virements</h4><span class="text-sm text-muted">Envoyer, suivre, annuler</span></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Transfers</h4><span class="text-sm text-muted">Send, track, cancel</span></div>
       </div>
       <div class="help-cat" data-target="cat-cartes">
         <div class="icon-box"><i class="fa-solid fa-credit-card"></i></div>
-        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Cartes bancaires</h4><span class="text-sm text-muted">Geler, sécuriser</span></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Bank Cards</h4><span class="text-sm text-muted">Freeze, secure</span></div>
       </div>
       <div class="help-cat" data-target="cat-epargne">
         <div class="icon-box"><i class="fa-solid fa-piggy-bank"></i></div>
-        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Épargne</h4><span class="text-sm text-muted">Objectifs, mises de côté</span></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Savings</h4><span class="text-sm text-muted">Goals, set-asides</span></div>
       </div>
       <div class="help-cat" data-target="cat-securite">
         <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
-        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Sécurité</h4><span class="text-sm text-muted">Compte, données, connexions</span></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Security</h4><span class="text-sm text-muted">Account, data, connections</span></div>
       </div>
       <div class="help-cat" data-target="cat-facturation">
         <div class="icon-box"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Facturation &amp; Frais</h4><span class="text-sm text-muted">Opérations, relevés</span></div>
+        <div><h4 style="font-size:.95rem;margin-bottom:2px;">Billing &amp; Fees</h4><span class="text-sm text-muted">Operations, statements</span></div>
       </div>
     </div>
 
     <div id="faqEmptyState" class="empty-state hidden">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <p>Aucune question ne correspond à votre recherche.</p>
+      <p>No question matches your search.</p>
     </div>
 
     <section id="cat-compte" class="mb-24">
-      <h3 class="mb-16">Compte &amp; Connexion</h3>
+      <h3 class="mb-16">Account &amp; Login</h3>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment créer un compte NOVA BANK ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Cliquez sur « Ouvrir un compte » depuis la page d'accueil et suivez les étapes du formulaire d'inscription (identité, coordonnées, choix de devise). Un compte de démonstration est créé instantanément sur notre serveur partagé, sans vérification bancaire réelle.</div></div>
+        <div class="faq-question"><span>How do I create a NOVA BANK account?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Click "Open an Account" from the home page and follow the steps in the registration form (identity, contact details, currency choice). A demonstration account is created instantly on our shared server, with no real banking verification.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>J'ai oublié mon mot de passe, que faire ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Cliquez sur « Mot de passe oublié ? » depuis la page de connexion et saisissez votre identifiant ou e-mail. Un e-mail contenant le lien de réinitialisation (valable 30 minutes, usage unique) vous est envoyé ; ce lien reste aussi affiché directement à l'écran par sécurité, au cas où l'e-mail ne pourrait pas être délivré. Si vous êtes déjà connecté, vous pouvez aussi changer votre mot de passe depuis la page Sécurité.</div></div>
+        <div class="faq-question"><span>I forgot my password, what should I do?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Click "Forgot password?" from the login page and enter your username or email. An email containing the reset link (valid for 30 minutes, single use) is sent to you; this link is also displayed directly on screen for safety, in case the email cannot be delivered. If you are already logged in, you can also change your password from the Security page.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment mettre à jour mes informations personnelles ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Rendez-vous dans « Profil &amp; paramètres » pour modifier vos coordonnées. Ces informations sont enregistrées dans notre base de données partagée et ne sont partagées avec aucun tiers extérieur au site.</div></div>
+        <div class="faq-question"><span>How do I update my personal information?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Go to "Profile &amp; Settings" to change your contact details. This information is stored in our shared database and is not shared with any third party outside the site.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Pourquoi mon compte est-il suspendu ou en attente d'informations ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Dans la maquette, un compte administrateur de démonstration peut simuler une suspension ou une demande d'informations complémentaires, afin d'illustrer le fonctionnement d'un vrai back-office bancaire. Un message vous explique alors le motif dans vos notifications.</div></div>
+        <div class="faq-question"><span>Why is my account suspended or pending information?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">In this demo, a demonstration administrator account can simulate a suspension or a request for additional information, in order to illustrate how a real banking back-office works. A message will then explain the reason in your notifications.</div></div>
       </div>
     </section>
 
     <section id="cat-virements" class="mb-24">
-      <h3 class="mb-16">Virements</h3>
+      <h3 class="mb-16">Transfers</h3>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment effectuer un virement ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Depuis le menu « Virement », renseignez le bénéficiaire, son IBAN, le montant et le motif, puis validez à l'aide du code de confirmation affiché à l'écran. Le virement est ensuite placé en attente de validation.</div></div>
+        <div class="faq-question"><span>How do I make a transfer?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">From the "Transfer" menu, enter the beneficiary, their IBAN, the amount and the purpose, then confirm using the confirmation code shown on screen. The transfer is then placed pending validation.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Pourquoi mon virement est-il en attente de validation ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Pour reproduire fidèlement un vrai parcours bancaire, chaque virement sortant est d'abord créé au statut « En attente ». Il est ensuite confirmé, mis en cours de traitement ou rejeté par le back-office de démonstration, ce qui met à jour votre solde en conséquence.</div></div>
+        <div class="faq-question"><span>Why is my transfer pending validation?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">To faithfully reproduce a real banking journey, every outgoing transfer is first created with the status "Pending." It is then confirmed, put into processing, or rejected by the demonstration back-office, which updates your balance accordingly.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Puis-je annuler un virement après l'avoir envoyé ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Un virement encore « en attente » ou « en cours » peut être annulé par le back-office de démonstration ; le montant, s'il avait déjà été débité, est alors recrédité automatiquement sur votre compte. Il n'existe pas d'action d'annulation directe côté client dans cette version.</div></div>
+        <div class="faq-question"><span>Can I cancel a transfer after sending it?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">A transfer still "pending" or "in progress" can be canceled by the demonstration back-office; the amount, if already debited, is then automatically credited back to your account. There is no direct client-side cancellation action in this version.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Quels sont les délais d'exécution d'un virement ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Il s'agit d'une simulation : les délais affichés (immédiat, jour ouvré suivant, etc.) sont uniquement indicatifs et ne correspondent à aucun traitement bancaire réel.</div></div>
+        <div class="faq-question"><span>What are the processing times for a transfer?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">This is a simulation: the times shown (immediate, next business day, etc.) are for illustration only and do not correspond to any real banking processing.</div></div>
       </div>
     </section>
 
     <section id="cat-cartes" class="mb-24">
-      <h3 class="mb-16">Cartes bancaires</h3>
+      <h3 class="mb-16">Bank Cards</h3>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment geler ou dégeler ma carte ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Rendez-vous dans « Cartes » et utilisez le bouton dédié sur votre carte. Le gel est immédiat et enregistré sur notre serveur ; il ne bloque aucune transaction réelle puisque la carte n'existe pas physiquement.</div></div>
+        <div class="faq-question"><span>How do I freeze or unfreeze my card?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Go to "Cards" and use the dedicated button on your card. The freeze is immediate and recorded on our server; it does not block any real transaction since the card does not exist physically.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Où puis-je voir le numéro complet de ma carte ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Pour cette démonstration, seuls les 4 derniers chiffres de votre carte sont générés et affichés. Aucun numéro de carte complet, aucune date d'expiration ni cryptogramme réels ne sont créés ou stockés.</div></div>
+        <div class="faq-question"><span>Where can I see my card's full number?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">For this demonstration, only the last 4 digits of your card are generated and displayed. No real full card number, expiration date, or security code is ever created or stored.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Que faire si ma carte semble compromise ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Comme il s'agit d'un prototype, aucune carte réelle n'est jamais associée à votre compte : vous pouvez geler la carte de démonstration à tout moment depuis la page Cartes, sans conséquence financière.</div></div>
+        <div class="faq-question"><span>What should I do if my card seems compromised?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Since this is a prototype, no real card is ever linked to your account: you can freeze the demonstration card at any time from the Cards page, with no financial consequence.</div></div>
       </div>
     </section>
 
     <section id="cat-epargne" class="mb-24">
-      <h3 class="mb-16">Épargne</h3>
+      <h3 class="mb-16">Savings</h3>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment créer un objectif d'épargne ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Depuis la page « Épargne », cliquez sur « Nouvel objectif », donnez-lui un nom et un montant cible, puis alimentez-le quand vous le souhaitez depuis votre solde disponible.</div></div>
+        <div class="faq-question"><span>How do I create a savings goal?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">From the "Savings" page, click "New Goal," give it a name and a target amount, then fund it whenever you wish from your available balance.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>La mise de côté est-elle un vrai virement bancaire ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Non : il s'agit d'un mouvement interne à votre compte de démonstration. Le montant est simplement déplacé de votre solde disponible vers l'objectif choisi, sans passer par un quelconque circuit bancaire réel.</div></div>
+        <div class="faq-question"><span>Is a set-aside a real bank transfer?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">No: it is a movement internal to your demonstration account. The amount is simply moved from your available balance to the chosen goal, without going through any real banking channel.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Puis-je retirer l'argent d'un objectif à tout moment ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Oui, un retrait recrédite instantanément le montant sur votre solde disponible. Aucun délai ni pénalité ne s'applique dans cette simulation.</div></div>
+        <div class="faq-question"><span>Can I withdraw money from a goal at any time?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">Yes, a withdrawal instantly credits the amount back to your available balance. No delay or penalty applies in this simulation.</div></div>
       </div>
     </section>
 
     <section id="cat-securite" class="mb-24">
-      <h3 class="mb-16">Sécurité</h3>
+      <h3 class="mb-16">Security</h3>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Mes documents d'identité sont-ils stockés en toute sécurité ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Dans cet environnement de démonstration, seules les métadonnées de vos documents (nom, type, taille de fichier) sont envoyées à notre serveur et conservées dans la base de données — jamais leur contenu réel, qui n'est ni transmis ni stocké.</div></div>
+        <div class="faq-question"><span>Are my identity documents stored securely?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">In this demonstration environment, only the metadata of your documents (name, type, file size) is sent to our server and kept in the database — never their actual content, which is neither transmitted nor stored.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment changer mon mot de passe ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Depuis la page Sécurité, renseignez votre mot de passe actuel puis le nouveau (8 caractères minimum). Il est immédiatement re-haché (scrypt) et stocké ainsi sur notre serveur ; personne, pas même l'équipe du back-office, ne peut le consulter en clair.</div></div>
+        <div class="faq-question"><span>How do I change my password?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">From the Security page, enter your current password and then the new one (8 characters minimum). It is immediately re-hashed (scrypt) and stored that way on our server; no one, not even the back-office team, can view it in plain text.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment consulter l'historique de mes connexions ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">La page Sécurité affiche vos 20 dernières connexions enregistrées, avec la date et une estimation du navigateur et du système utilisés.</div></div>
+        <div class="faq-question"><span>How do I view my login history?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">The Security page shows your last 20 recorded logins, with the date and an estimate of the browser and system used.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>NOVA BANK est-elle une vraie banque agréée ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Non. NOVA BANK est une plateforme de démonstration technique : elle ne détient aucune licence bancaire, n'est certifiée par aucun organisme de sécurité et ne doit jamais recevoir de véritables identifiants financiers. Plus de détails sont disponibles sur la page Sécurité.</div></div>
+        <div class="faq-question"><span>Is NOVA BANK a real licensed bank?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">No. NOVA BANK is a technical demonstration platform: it holds no banking license, is not certified by any security body, and should never receive real financial credentials. More details are available on the Security page.</div></div>
       </div>
     </section>
 
     <section id="cat-facturation" class="mb-24">
-      <h3 class="mb-16">Facturation &amp; Frais</h3>
+      <h3 class="mb-16">Billing &amp; Fees</h3>
 
       <div class="faq-item">
-        <div class="faq-question"><span>NOVA BANK facture-t-elle des frais réels ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Non, aucun frais réel n'est jamais prélevé : il n'existe aucun moyen de paiement réel connecté à ce site. Les montants affichés servent uniquement à illustrer le fonctionnement d'une interface bancaire.</div></div>
+        <div class="faq-question"><span>Does NOVA BANK charge real fees?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">No, no real fees are ever charged: there is no real payment method connected to this site. The amounts shown are only there to illustrate how a banking interface works.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Comment consulter l'historique de mes opérations ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">La page « Transactions » liste l'ensemble de vos opérations, avec filtres par statut et par type, ainsi que leur date et leur montant.</div></div>
+        <div class="faq-question"><span>How do I view my transaction history?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">The "Transactions" page lists all of your operations, with filters by status and type, along with their date and amount.</div></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question"><span>Puis-je exporter mes relevés ?</span><i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-answer"><div class="inner">Cette fonctionnalité n'est pas proposée dans la version actuelle de la démonstration. Toutes vos données restent consultables à tout moment dans votre espace client, centralisées dans notre base de données partagée.</div></div>
+        <div class="faq-question"><span>Can I export my statements?</span><i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-answer"><div class="inner">This feature is not offered in the current version of the demonstration. All of your data remains viewable at any time in your client portal, centralized in our shared database.</div></div>
       </div>
     </section>
 
     <div class="form-card wide" style="margin:0 0 40px;">
-      <h1 style="font-size:1.3rem;">Nous contacter</h1>
-      <p class="sub">Une question qui ne trouve pas de réponse ci-dessus ? Écrivez-nous.</p>
+      <h1 style="font-size:1.3rem;">Contact Us</h1>
+      <p class="sub">A question not answered above? Write to us.</p>
       <div id="contactAlertWrap"></div>
       <form id="contactForm" novalidate>
         <div class="form-row">
-          <label for="contactName">Nom</label>
+          <label for="contactName">Name</label>
           <input type="text" id="contactName" class="form-control" required>
         </div>
         <div class="form-row">
-          <label for="contactEmail">E-mail</label>
+          <label for="contactEmail">Email</label>
           <input type="email" id="contactEmail" class="form-control" required>
         </div>
         <div class="form-row">
           <label for="contactMessage">Message</label>
           <textarea id="contactMessage" class="form-control" rows="4" required></textarea>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Envoyer</button>
+        <button type="submit" class="btn btn-primary btn-block">Send</button>
       </form>
     </div>
 
@@ -246,7 +246,7 @@
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
-    // ---- clic sur une catégorie : défilement vers la section FAQ correspondante
+    // ---- click on a category: scroll to the corresponding FAQ section
     document.getElementById('helpCatsWrap').addEventListener('click', (e) => {
       const cat = e.target.closest('.help-cat');
       if (!cat) return;
@@ -254,7 +254,7 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
-    // ---- recherche en direct dans les FAQ
+    // ---- live search in the FAQ
     const searchInput = document.getElementById('helpSearch');
     const faqSections = [...document.querySelectorAll('section[id^="cat-"]')];
     const emptyState = document.getElementById('faqEmptyState');
@@ -279,14 +279,14 @@
       emptyState.classList.toggle('hidden', totalVisible > 0);
     });
 
-    // ---- formulaire de contact (démonstration uniquement, aucun envoi réel)
+    // ---- contact form (demonstration only, no real submission)
     document.getElementById('contactForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const alertWrap = document.getElementById('contactAlertWrap');
       alertWrap.innerHTML = `
         <div class="alert alert-success">
           <i class="fa-solid fa-circle-check"></i>
-          <div>Message envoyé (démonstration) — Ceci est un site de démonstration : aucun message n'est réellement transmis à une équipe support.</div>
+          <div>Message sent (demonstration) — This is a demonstration site: no message is actually transmitted to a support team.</div>
         </div>`;
       e.target.reset();
     });

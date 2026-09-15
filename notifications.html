@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Consultez toutes les notifications et alertes liées à votre compte NOVA BANK.">
+<meta name="description" content="View all notifications and alerts related to your NOVA BANK account.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
@@ -24,23 +24,23 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html" class="active"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
@@ -48,17 +48,17 @@
     <div class="page-head flex-between">
       <div>
         <h1>Notifications</h1>
-        <p>Toutes les alertes et informations relatives à votre compte.</p>
+        <p>All alerts and information related to your account.</p>
       </div>
-      <button class="btn btn-outline btn-sm hidden" id="markAllBtn"><i class="fa-solid fa-check-double"></i> Tout marquer comme lu</button>
+      <button class="btn btn-outline btn-sm hidden" id="markAllBtn"><i class="fa-solid fa-check-double"></i> Mark all as read</button>
     </div>
 
     <div class="segmented mb-24" id="notifFilters">
-      <button class="active" data-filter="all">Toutes</button>
+      <button class="active" data-filter="all">All</button>
       <button data-filter="info">Info</button>
-      <button data-filter="success">Succès</button>
-      <button data-filter="warn">Avertissement</button>
-      <button data-filter="danger">Sécurité</button>
+      <button data-filter="success">Success</button>
+      <button data-filter="warn">Warning</button>
+      <button data-filter="danger">Security</button>
     </div>
 
     <div id="notifListWrap" data-animate-group></div>
@@ -90,7 +90,7 @@
         wrap.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-bell-slash"></i>
-            <p>${all.length ? "Aucune notification ne correspond à ce filtre." : "Vous n'avez aucune notification pour le moment."}</p>
+            <p>${all.length ? "No notification matches this filter." : "You have no notifications at this time."}</p>
           </div>`;
         return;
       }

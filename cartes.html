@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Gérez votre carte bancaire virtuelle NOVA BANK : gel de la carte, paramètres de paiement et sécurité.">
+<meta name="description" content="Manage your NOVA BANK virtual bank card: card freeze, payment settings, and security.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Cartes — NOVA BANK</title>
+<title>Cards — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,30 +24,30 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html" class="active"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html" class="active"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1>Cartes</h1>
-      <p>Gérez votre/vos carte(s) bancaire(s) et leurs paramètres.</p>
+      <h1>Cards</h1>
+      <p>Manage your bank card(s) and their settings.</p>
     </div>
 
     <div id="cardsWrap" data-animate-group></div>
@@ -62,7 +62,7 @@
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
-    // ---- expiration calculée à la volée (createdAt + 4 ans), rien n'est stocké
+    // ---- expiration computed on the fly (createdAt + 4 years), nothing is stored
     function cardExpiry(createdAt) {
       const d = new Date(createdAt);
       d.setFullYear(d.getFullYear() + 4);
@@ -71,7 +71,7 @@
       return `${mm}/${yy}`;
     }
 
-    // ---- préférences cosmétiques de carte (localStorage, purement démo)
+    // ---- cosmetic card preferences (localStorage, purely demo)
     function getCardPrefs(cardId) {
       try {
         const raw = localStorage.getItem('novabank_card_prefs_' + cardId);
@@ -107,7 +107,7 @@
         wrap.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-credit-card"></i>
-            <p>Aucune carte n'est associée à votre compte pour le moment.</p>
+            <p>No card is associated with your account at this time.</p>
           </div>`;
         return;
       }
@@ -119,26 +119,26 @@
         return `
         <div style="margin-bottom:36px;">
           <div class="bank-card compact${card.frozen ? ' frozen' : ''}">
-            ${card.frozen ? '<div class="frozen-badge">Gelée</div>' : ''}
+            ${card.frozen ? '<div class="frozen-badge">Frozen</div>' : ''}
             <div class="chip"></div>
             <div class="num">•••• •••• •••• ${escapeHtml(card.last4)}</div>
             <div class="row">
-              <div><span>Titulaire</span><b>${escapeHtml(holder)}</b></div>
-              <div><span>Expire</span><b>${cardExpiry(card.createdAt)}</b></div>
+              <div><span>Holder</span><b>${escapeHtml(holder)}</b></div>
+              <div><span>Expires</span><b>${cardExpiry(card.createdAt)}</b></div>
             </div>
           </div>
           <div class="card-actions-row">
             <button class="btn ${card.frozen ? 'btn-cyan' : 'btn-outline'} btn-sm" data-freeze-btn data-card-id="${escapeHtml(card.id)}">
               <i class="fa-solid ${card.frozen ? 'fa-lock-open' : 'fa-lock'}"></i>
-              ${card.frozen ? 'Dégeler la carte' : 'Geler la carte'}
+              ${card.frozen ? 'Unfreeze card' : 'Freeze card'}
             </button>
           </div>
 
           <div class="card" style="margin-top:20px;">
-            <h3 class="mb-16">Paramètres de la carte${cards.length > 1 ? ' — ' + escapeHtml(card.label) : ''}</h3>
-            ${switchRow(card.id, 'online', prefs.online, 'Paiements en ligne', 'Autoriser les achats sur internet avec cette carte.')}
-            ${switchRow(card.id, 'contactless', prefs.contactless, 'Paiements sans contact', 'Autoriser le paiement sans contact en magasin.')}
-            ${switchRow(card.id, 'abroad', prefs.abroad, "Retraits à l'étranger", 'Autoriser les retraits distributeur hors de votre pays de résidence.')}
+            <h3 class="mb-16">Card settings${cards.length > 1 ? ' — ' + escapeHtml(card.label) : ''}</h3>
+            ${switchRow(card.id, 'online', prefs.online, 'Online payments', 'Allow online purchases with this card.')}
+            ${switchRow(card.id, 'contactless', prefs.contactless, 'Contactless payments', 'Allow contactless in-store payment.')}
+            ${switchRow(card.id, 'abroad', prefs.abroad, "Withdrawals abroad", 'Allow ATM withdrawals outside your country of residence.')}
           </div>
         </div>`;
       }).join('');

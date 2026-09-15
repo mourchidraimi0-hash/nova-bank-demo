@@ -12,41 +12,41 @@ const SITE_URL = 'https://www.novabk.pro';
 function verificationEmailHtml(firstName, link) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
-      <h2 style="color:#15181B;">Bonjour ${firstName},</h2>
-      <p>Merci de vous être inscrit(e) sur NOVA BANK. Confirmez votre adresse e-mail pour activer les virements sortants sur votre compte :</p>
+      <h2 style="color:#15181B;">Hello ${firstName},</h2>
+      <p>Thank you for signing up with NOVA BANK. Confirm your email address to enable outgoing transfers on your account:</p>
       <p style="text-align:center;margin:28px 0;">
-        <a href="${link}" style="background:#22C55E;color:#15181B;font-weight:bold;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;">Confirmer mon adresse e-mail</a>
+        <a href="${link}" style="background:#22C55E;color:#15181B;font-weight:bold;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;">Confirm my email address</a>
       </p>
-      <p style="color:#5B6167;font-size:.85rem;">Ce lien expire dans 24 heures et ne peut être utilisé qu'une seule fois. Si le bouton ne fonctionne pas, copiez ce lien : ${link}</p>
-      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
+      <p style="color:#5B6167;font-size:.85rem;">This link expires in 24 hours and can only be used once. If the button doesn't work, copy this link: ${link}</p>
+      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK is a fictional technical demo site, with no real banking license.</p>
     </div>`;
 }
 
 function passwordResetEmailHtml(firstName, link) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
-      <h2 style="color:#15181B;">Bonjour ${firstName},</h2>
-      <p>Vous avez demandé la réinitialisation de votre mot de passe NOVA BANK. Cliquez ci-dessous pour en choisir un nouveau :</p>
+      <h2 style="color:#15181B;">Hello ${firstName},</h2>
+      <p>You requested a password reset for your NOVA BANK account. Click below to choose a new one:</p>
       <p style="text-align:center;margin:28px 0;">
-        <a href="${link}" style="background:#22C55E;color:#15181B;font-weight:bold;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;">Réinitialiser mon mot de passe</a>
+        <a href="${link}" style="background:#22C55E;color:#15181B;font-weight:bold;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;">Reset my password</a>
       </p>
-      <p style="color:#5B6167;font-size:.85rem;">Ce lien expire dans 30 minutes et ne peut être utilisé qu'une seule fois. Si le bouton ne fonctionne pas, copiez ce lien : ${link}</p>
-      <p style="color:#5B6167;font-size:.85rem;">Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail — votre mot de passe actuel reste inchangé.</p>
-      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
+      <p style="color:#5B6167;font-size:.85rem;">This link expires in 30 minutes and can only be used once. If the button doesn't work, copy this link: ${link}</p>
+      <p style="color:#5B6167;font-size:.85rem;">If you did not request this, simply ignore this email — your current password remains unchanged.</p>
+      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK is a fictional technical demo site, with no real banking license.</p>
     </div>`;
 }
 
 function loginCodeEmailHtml(firstName, code) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
-      <h2 style="color:#15181B;">Bonjour ${firstName},</h2>
-      <p>Voici votre code de connexion à usage unique pour accéder à votre espace client NOVA BANK :</p>
+      <h2 style="color:#15181B;">Hello ${firstName},</h2>
+      <p>Here is your one-time login code to access your NOVA BANK client portal:</p>
       <p style="text-align:center;margin:28px 0;">
         <span style="display:inline-block;background:#ECFDF5;color:#047857;font-size:2rem;font-weight:bold;letter-spacing:.3em;padding:14px 24px;border-radius:8px;">${code}</span>
       </p>
-      <p style="color:#5B6167;font-size:.85rem;">Ce code expire dans 5 minutes et ne peut être utilisé qu'une seule fois.</p>
-      <p style="color:#5B6167;font-size:.85rem;">Si vous n'êtes pas à l'origine de cette tentative de connexion, changez votre mot de passe immédiatement depuis la page Sécurité.</p>
-      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK est un site de démonstration technique fictif, sans licence bancaire réelle.</p>
+      <p style="color:#5B6167;font-size:.85rem;">This code expires in 5 minutes and can only be used once.</p>
+      <p style="color:#5B6167;font-size:.85rem;">If you did not attempt to log in, change your password immediately from the Security page.</p>
+      <p style="color:#5B6167;font-size:.8rem;margin-top:24px;">NOVA BANK is a fictional technical demo site, with no real banking license.</p>
     </div>`;
 }
 

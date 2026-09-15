@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Consultez la vue d'ensemble de votre compte courant et de vos objectifs d'épargne sur NOVA BANK.">
+<meta name="description" content="View an overview of your checking account and your savings goals on NOVA BANK.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Comptes — NOVA BANK</title>
+<title>Accounts — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,40 +24,40 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html" class="active"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html" class="active"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1>Comptes</h1>
-      <p>Vue d'ensemble de votre compte courant et de vos objectifs d'épargne.</p>
+      <h1>Accounts</h1>
+      <p>Overview of your checking account and your savings goals.</p>
     </div>
 
     <div class="account-grid" id="accountGridWrap" data-animate-group></div>
 
     <div class="card" id="compte-detail" style="margin-bottom:16px;">
-      <h3 class="mb-16">Détails du compte courant</h3>
+      <h3 class="mb-16">Checking account details</h3>
       <div class="info-grid" id="infoGridWrap"></div>
     </div>
 
-    <p class="field-hint">Ce site de démonstration ne permet pas d'ouvrir plusieurs comptes courants réels ; vos objectifs d'épargne fonctionnent comme des sous-comptes virtuels internes à votre compte principal.</p>
+    <p class="field-hint">This demo site does not allow opening multiple real checking accounts; your savings goals work as internal virtual sub-accounts of your main account.</p>
 
   </main>
 </div>
@@ -73,14 +73,14 @@
       const fresh = (await DB.getUserById(user.id)) || user;
       const goals = DB.getSavingsGoals(fresh);
 
-      // ---- account grid : compte courant + objectifs d'épargne (sous-comptes) + ajout
+      // ---- account grid: checking account + savings goals (sub-accounts) + add
       let cardsHtml = `
         <a href="#compte-detail" class="account-card">
-          <div class="acc-type"><i class="fa-solid fa-building-columns"></i> Compte courant</div>
+          <div class="acc-type"><i class="fa-solid fa-building-columns"></i> Checking account</div>
           <div class="acc-amount">${DB.formatMoney(fresh.balance, fresh.currency)}</div>
           <div class="acc-foot">
-            <div><span>Numéro</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
-            <div><span>Statut</span><b>${statusBadge(fresh.status)}</b></div>
+            <div><span>Number</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
+            <div><span>Status</span><b>${statusBadge(fresh.status)}</b></div>
           </div>
         </a>`;
 
@@ -91,8 +91,8 @@
             <div class="acc-type"><i class="fa-solid ${escapeHtml(g.icon || 'fa-piggy-bank')}"></i> ${escapeHtml(g.name)}</div>
             <div class="acc-amount">${DB.formatMoney(g.currentAmount, fresh.currency)}</div>
             <div class="acc-foot">
-              <div><span>Objectif</span><b>${DB.formatMoney(g.targetAmount, fresh.currency)}</b></div>
-              <div><span>Progression</span><b>${pct}%</b></div>
+              <div><span>Goal</span><b>${DB.formatMoney(g.targetAmount, fresh.currency)}</b></div>
+              <div><span>Progress</span><b>${pct}%</b></div>
             </div>
           </a>`;
       });
@@ -100,19 +100,19 @@
       cardsHtml += `
         <a href="epargne.html" class="account-card add-account">
           <i class="fa-solid fa-plus"></i>
-          <span>Créer un nouvel objectif d'épargne</span>
+          <span>Create a new savings goal</span>
         </a>`;
 
       document.getElementById('accountGridWrap').innerHTML = cardsHtml;
 
-      // ---- détail du compte courant
+      // ---- checking account details
       document.getElementById('infoGridWrap').innerHTML = `
-        <div class="info-item"><span>Numéro de compte</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
+        <div class="info-item"><span>Account number</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
         <div class="info-item"><span>IBAN</span><b>${escapeHtml(fresh.iban)}</b></div>
-        <div class="info-item"><span>BIC</span><b>Non applicable — compte non SEPA</b></div>
-        <div class="info-item"><span>Devise</span><b>${escapeHtml(fresh.currency)}</b></div>
-        <div class="info-item"><span>Statut</span><b>${statusBadge(fresh.status)}</b></div>
-        <div class="info-item"><span>Date d'ouverture</span><b>${timeAgo(fresh.createdAt)}</b></div>`;
+        <div class="info-item"><span>BIC</span><b>Not applicable — non-SEPA account</b></div>
+        <div class="info-item"><span>Currency</span><b>${escapeHtml(fresh.currency)}</b></div>
+        <div class="info-item"><span>Status</span><b>${statusBadge(fresh.status)}</b></div>
+        <div class="info-item"><span>Opening date</span><b>${timeAgo(fresh.createdAt)}</b></div>`;
     }
 
     await renderPage();

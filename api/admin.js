@@ -278,7 +278,7 @@ module.exports = async (req, res) => {
         INSERT INTO transactions (ref, user_id, type, description, amount, currency, status, settled, admin_name, reason)
         VALUES (${ref}, ${userId}, ${amt > 0 ? 'credit' : 'debit'}, ${reason}, ${Math.abs(amt)}, ${user.currency}, 'confirmed', true, ${actorName}, ${reason})
       `;
-      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, ${(amt > 0 ? 'Votre compte a été crédité de ' : 'Votre compte a été débité de ') + Math.abs(amt) + ' ' + user.currency + '. Motif : ' + reason}, 'info')`;
+      await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, ${(amt > 0 ? 'Your account was credited ' : 'Your account was debited ') + Math.abs(amt) + ' ' + user.currency + '. Reason: ' + reason}, 'info')`;
       await logActivity({ adminId: actorId, adminName: actorName, role: actorRole, action: 'ajustement_solde', detail: `${ref} — ${amt > 0 ? '+' : ''}${amt} ${user.currency} sur ${user.account_number} — motif : ${reason}` });
       return send(res, 200, { ok: true, ref });
     }
@@ -306,12 +306,12 @@ module.exports = async (req, res) => {
       if (newStatus === 'confirmed' && !trx.settled && trx.type === 'transfer_out') {
         await sql`UPDATE users SET balance = balance - ${amt} WHERE id = ${trx.user_id}`;
         settled = true;
-        await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${trx.user_id}, ${`Votre virement ${ref} de ${amt} ${trx.currency} vers ${trx.beneficiary} a été confirmé et débité de votre compte.`}, 'success')`;
+        await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${trx.user_id}, ${`Your transfer ${ref} of ${amt} ${trx.currency} to ${trx.beneficiary} has been confirmed and debited from your account.`}, 'success')`;
       } else if ((newStatus === 'rejected' || newStatus === 'cancelled') && oldStatus !== newStatus) {
-        const verb = newStatus === 'rejected' ? 'rejeté' : 'annulé';
+        const verb = newStatus === 'rejected' ? 'rejected' : 'cancelled';
         const message = trx.type === 'transfer_out'
-          ? `Votre virement ${ref} de ${amt} ${trx.currency} vers ${trx.beneficiary} a été ${verb}. ${trx.settled ? 'Le montant déjà débité vous a été recrédité.' : "Aucun montant n'a été débité."}`
-          : `L'opération ${ref} (${trx.description}) a été ${newStatus === 'rejected' ? 'rejetée' : 'annulée'} et son effet sur votre solde a été annulé.`;
+          ? `Your transfer ${ref} of ${amt} ${trx.currency} to ${trx.beneficiary} has been ${verb}. ${trx.settled ? 'The amount already debited has been credited back to you.' : "No amount was debited."}`
+          : `Operation ${ref} (${trx.description}) has been ${newStatus === 'rejected' ? 'rejected' : 'cancelled'} and its effect on your balance has been reversed.`;
         await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${trx.user_id}, ${message}, 'warning')`;
         if (trx.settled) {
           // Un crédit avait augmenté le solde : l'annulation le diminue. Un débit/virement avait diminué le solde : l'annulation le recrédite.
@@ -320,7 +320,7 @@ module.exports = async (req, res) => {
           settled = false;
         }
       } else if (newStatus === 'processing') {
-        await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${trx.user_id}, ${`Votre virement ${ref} est en cours de traitement par nos équipes.`}, 'info')`;
+        await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${trx.user_id}, ${`Your transfer ${ref} is being processed by our team.`}, 'info')`;
       }
 
       await sql`UPDATE transactions SET status = ${newStatus}, settled = ${settled}, updated_at = now() WHERE ref = ${ref}`;

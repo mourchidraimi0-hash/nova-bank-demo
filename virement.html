@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Effectuez un virement depuis votre espace client NOVA BANK. Parcours de virement simulé à des fins de démonstration.">
+<meta name="description" content="Make a transfer from your NOVA BANK client portal. Simulated transfer flow for demonstration purposes.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Nouveau virement — NOVA BANK</title>
+<title>New transfer — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,30 +24,30 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html" class="active"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html" class="active"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1>Nouveau virement</h1>
-      <p>Suivez les étapes ci-dessous pour effectuer un virement sortant.</p>
+      <h1>New transfer</h1>
+      <p>Follow the steps below to make an outgoing transfer.</p>
     </div>
 
     <div class="wizard-steps" id="wizardSteps">
@@ -60,21 +60,21 @@
 
     <div class="panel">
 
-      <!-- STEP 1 : formulaire -->
+      <!-- STEP 1 : form -->
       <div class="wizard-step" id="step1">
-        <h3 class="mb-16">Détails du bénéficiaire</h3>
+        <h3 class="mb-16">Beneficiary details</h3>
         <form id="trxForm" novalidate>
           <div class="form-row">
-            <label for="f-beneficiary">Bénéficiaire (nom complet)</label>
+            <label for="f-beneficiary">Beneficiary (full name)</label>
             <input type="text" id="f-beneficiary" class="form-control" required>
           </div>
           <div class="form-row">
-            <label for="f-bankName">Banque du bénéficiaire</label>
+            <label for="f-bankName">Beneficiary's bank</label>
             <input type="text" id="f-bankName" class="form-control" required>
           </div>
           <div class="form-row two">
             <div>
-              <label for="f-iban">IBAN / numéro de compte</label>
+              <label for="f-iban">IBAN / account number</label>
               <input type="text" id="f-iban" class="form-control" required>
             </div>
             <div>
@@ -84,11 +84,11 @@
           </div>
           <div class="form-row two">
             <div>
-              <label for="f-amount">Montant</label>
+              <label for="f-amount">Amount</label>
               <input type="number" id="f-amount" class="form-control" min="0.01" step="0.01" required>
             </div>
             <div>
-              <label for="f-currency">Devise</label>
+              <label for="f-currency">Currency</label>
               <select id="f-currency" class="form-control">
                 <option value="EUR">EUR</option>
                 <option value="USD">USD</option>
@@ -101,37 +101,37 @@
           </div>
           <div class="field-hint" id="currencyHint" style="display:none;"></div>
           <div class="form-row">
-            <label for="f-reason">Motif</label>
+            <label for="f-reason">Reason</label>
             <input type="text" id="f-reason" class="form-control" required>
           </div>
           <div class="form-row">
-            <label for="f-executionDate">Date d'exécution</label>
+            <label for="f-executionDate">Execution date</label>
             <input type="date" id="f-executionDate" class="form-control" required>
           </div>
           <div class="field-error" id="step1Error"></div>
-          <button type="submit" class="btn btn-primary btn-block">Continuer <i class="fa-solid fa-arrow-right"></i></button>
+          <button type="submit" class="btn btn-primary btn-block">Continue <i class="fa-solid fa-arrow-right"></i></button>
         </form>
       </div>
 
-      <!-- STEP 2 : récapitulatif -->
+      <!-- STEP 2 : summary -->
       <div class="wizard-step hidden" id="step2">
-        <h3 class="mb-16">Récapitulatif du virement</h3>
+        <h3 class="mb-16">Transfer summary</h3>
         <div id="recapWrap"></div>
         <div class="flex gap-12 mt-24">
-          <button type="button" class="btn btn-outline" id="btnStep2Back">Modifier</button>
-          <button type="button" class="btn btn-primary" id="btnStep2Confirm">Confirmer <i class="fa-solid fa-arrow-right"></i></button>
+          <button type="button" class="btn btn-outline" id="btnStep2Back">Edit</button>
+          <button type="button" class="btn btn-primary" id="btnStep2Confirm">Confirm <i class="fa-solid fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- STEP 3 : vérification par code -->
+      <!-- STEP 3 : code verification -->
       <div class="wizard-step hidden" id="step3">
-        <h3 class="mb-16">Vérification de sécurité</h3>
+        <h3 class="mb-16">Security verification</h3>
         <div class="alert alert-warn">
           <i class="fa-solid fa-triangle-exclamation"></i>
-          <div>Ce code est affiché uniquement à l'écran à des fins de démonstration. Aucun SMS ni e-mail n'est réellement envoyé.</div>
+          <div>This code is displayed on screen only for demonstration purposes. No SMS or email is actually sent.</div>
         </div>
         <div class="code-display" id="codeDisplay">000000</div>
-        <p class="text-center text-muted text-sm">Veuillez saisir le code affiché ci-dessus pour confirmer le virement.</p>
+        <p class="text-center text-muted text-sm">Please enter the code shown above to confirm the transfer.</p>
         <div class="code-boxes" id="codeBoxes">
           <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="0">
           <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="1">
@@ -141,10 +141,10 @@
           <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="5">
         </div>
         <div class="field-error text-center" id="step3Error"></div>
-        <button type="button" class="btn btn-primary btn-block" id="btnStep3Confirm">Confirmer le virement</button>
+        <button type="button" class="btn btn-primary btn-block" id="btnStep3Confirm">Confirm the transfer</button>
       </div>
 
-      <!-- STEP 4 : progression animée -->
+      <!-- STEP 4 : animated progress -->
       <div class="wizard-step hidden" id="step4">
         <div class="progress-ring-wrap">
           <svg width="140" height="140" viewBox="0 0 140 140">
@@ -152,27 +152,27 @@
             <circle id="ringProgress" cx="70" cy="70" r="60" fill="none" stroke="#047857" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" transform="rotate(-90 70 70)"/>
           </svg>
           <div class="progress-ring-pct" id="ringPct">0%</div>
-          <div class="progress-ring-msg" id="ringMsg">Initialisation du virement…</div>
+          <div class="progress-ring-msg" id="ringMsg">Initializing transfer…</div>
         </div>
       </div>
 
-      <!-- STEP 5 : en attente de validation -->
+      <!-- STEP 5 : awaiting validation -->
       <div class="wizard-step hidden" id="step5">
         <div class="result-icon pending"><i class="fa-solid fa-hourglass-half"></i></div>
-        <h3 class="text-center mb-16">Virement en file d'attente de validation</h3>
+        <h3 class="text-center mb-16">Transfer queued for validation</h3>
         <div class="trx-ref-box">
-          Référence : <span class="ref" id="trxRefText"></span>
-          <button type="button" class="btn btn-sm btn-outline mt-8" id="copyRefBtn"><i class="fa-solid fa-copy"></i> Copier</button>
+          Reference: <span class="ref" id="trxRefText"></span>
+          <button type="button" class="btn btn-sm btn-outline mt-8" id="copyRefBtn"><i class="fa-solid fa-copy"></i> Copy</button>
         </div>
         <p class="text-muted text-sm">
-          Le montant de ce virement n'a <b>pas</b> été débité de votre compte. Il ne le sera qu'une fois l'opération confirmée par notre processus de validation interne
-          — un processus simulé et local, mis en place uniquement à des fins de démonstration, sans intervention d'une véritable équipe de conformité.
-          Vous serez notifié directement dans votre espace client dès que l'opération sera confirmée ou rejetée, et vous pouvez en suivre le statut à tout moment depuis votre historique des transactions.
+          The amount of this transfer has <b>not</b> been debited from your account. It will only be debited once the operation is confirmed by our internal validation process
+          — a simulated, local process set up solely for demonstration purposes, without the involvement of a real compliance team.
+          You will be notified directly in your client portal as soon as the operation is confirmed or rejected, and you can track its status at any time from your transaction history.
         </p>
         <div class="flex gap-12 mt-24" style="flex-wrap:wrap;">
-          <a href="espace-client.html" class="btn btn-outline">Retour au tableau de bord</a>
-          <button type="button" class="btn btn-primary" id="btnNewTransfer">Effectuer un autre virement</button>
-          <button type="button" class="btn btn-outline" id="btnLogoutAfterTransfer"><i class="fa-solid fa-right-from-bracket"></i> Terminer et me déconnecter</button>
+          <a href="espace-client.html" class="btn btn-outline">Back to dashboard</a>
+          <button type="button" class="btn btn-primary" id="btnNewTransfer">Make another transfer</button>
+          <button type="button" class="btn btn-outline" id="btnLogoutAfterTransfer"><i class="fa-solid fa-right-from-bracket"></i> Finish and log out</button>
         </div>
       </div>
 
@@ -237,7 +237,7 @@
       const executionDate = executionDateInput.value;
 
       if (!beneficiary || !bankName || !iban || !bic || !reason || !executionDate || !amount || isNaN(amount) || amount <= 0) {
-        errorEl.textContent = 'Veuillez renseigner tous les champs avec un montant valide.';
+        errorEl.textContent = 'Please fill in all fields with a valid amount.';
         errorEl.classList.add('show');
         return;
       }
@@ -246,7 +246,7 @@
       if (currency === freshUser.currency) {
         const available = DB.getAvailableBalance(freshUser);
         if (amount > available) {
-          errorEl.textContent = `Solde disponible insuffisant. Solde disponible : ${DB.formatMoney(available, freshUser.currency)}.`;
+          errorEl.textContent = `Insufficient available balance. Available balance: ${DB.formatMoney(available, freshUser.currency)}.`;
           errorEl.classList.add('show');
           return;
         }
@@ -260,7 +260,7 @@
     currencySelect.addEventListener('change', async () => {
       const freshUser = (await DB.getUserById(user.id)) || user;
       if (currencySelect.value !== freshUser.currency) {
-        currencyHint.textContent = `Votre compte est en ${freshUser.currency}. Ce virement est libellé dans une devise différente (${currencySelect.value}) — la vérification de solde disponible ne s'applique pas dans cette démonstration.`;
+        currencyHint.textContent = `Your account is in ${freshUser.currency}. This transfer is denominated in a different currency (${currencySelect.value}) — the available balance check does not apply in this demo.`;
         currencyHint.style.display = 'block';
       } else {
         currencyHint.style.display = 'none';
@@ -281,13 +281,13 @@
     // ---------------------------------------------------------------- step 2
     function renderRecap() {
       const rows = [
-        ['Bénéficiaire', wizardData.beneficiary],
-        ['Banque du bénéficiaire', wizardData.bankName],
-        ['IBAN / numéro de compte', wizardData.iban],
+        ['Beneficiary', wizardData.beneficiary],
+        ["Beneficiary's bank", wizardData.bankName],
+        ['IBAN / account number', wizardData.iban],
         ['BIC', wizardData.bic],
-        ['Montant', DB.formatMoney(wizardData.amount, wizardData.currency)],
-        ['Motif', wizardData.reason],
-        ["Date d'exécution", wizardData.executionDate]
+        ['Amount', DB.formatMoney(wizardData.amount, wizardData.currency)],
+        ['Reason', wizardData.reason],
+        ["Execution date", wizardData.executionDate]
       ];
       document.getElementById('recapWrap').innerHTML = rows.map(([label, val]) => `
         <div class="recap-row"><span>${escapeHtml(label)}</span><b>${escapeHtml(String(val))}</b></div>
@@ -334,7 +334,7 @@
       const entered = codeEntered.join('');
       const errorEl = document.getElementById('step3Error');
       if (entered.length !== 6 || entered !== wizardData.code) {
-        errorEl.textContent = 'Le code saisi ne correspond pas. Veuillez réessayer.';
+        errorEl.textContent = 'The code entered does not match. Please try again.';
         errorEl.classList.add('show');
         return;
       }
@@ -351,10 +351,10 @@
       const msgEl = document.getElementById('ringMsg');
       const CIRC = 377;
       const messages = [
-        'Initialisation du virement…',
-        'Vérification des informations bénéficiaire…',
-        'Chiffrement de la transaction…',
-        'Mise en file d\'attente pour validation…'
+        'Initializing transfer…',
+        'Verifying beneficiary information…',
+        'Encrypting the transaction…',
+        'Queuing for validation…'
       ];
 
       ring.style.strokeDashoffset = CIRC;

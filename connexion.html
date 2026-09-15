@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Connectez-vous à votre espace client NOVA BANK. Site de démonstration technique, aucune opération bancaire réelle.">
+<meta name="description" content="Log in to your NOVA BANK client portal. Technical demo site, no real banking operations.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
-<title>Connexion — NOVA BANK</title>
+<title>Log In — NOVA BANK</title>
 <meta property="og:type" content="website">
-<meta property="og:title" content="Connexion — NOVA BANK">
-<meta property="og:description" content="Connectez-vous à votre espace client NOVA BANK. Site de démonstration technique, aucune opération bancaire réelle.">
+<meta property="og:title" content="Log In — NOVA BANK">
+<meta property="og:description" content="Log in to your NOVA BANK client portal. Technical demo site, no real banking operations.">
 <meta property="og:image" content="https://www.novabk.pro/images/og-logo.png">
 <meta property="og:url" content="https://www.novabk.pro/connexion.html">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Connexion — NOVA BANK">
-<meta name="twitter:description" content="Connectez-vous à votre espace client NOVA BANK. Site de démonstration technique, aucune opération bancaire réelle.">
+<meta name="twitter:title" content="Log In — NOVA BANK">
+<meta name="twitter:description" content="Log in to your NOVA BANK client portal. Technical demo site, no real banking operations.">
 <meta name="twitter:image" content="https://www.novabk.pro/images/og-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -26,14 +26,14 @@
 <nav class="navbar scrolled">
   <div class="container">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
-    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back to site</a></div>
   </div>
 </nav>
 
 <div class="form-page">
   <div class="form-card">
-    <h1>Connexion</h1>
-    <p class="sub">Accédez à votre espace client NOVA BANK.</p>
+    <h1>Log In</h1>
+    <p class="sub">Access your NOVA BANK client portal.</p>
 
     <div class="alert alert-error hidden" id="login-error">
       <i class="fa-solid fa-circle-exclamation"></i>
@@ -43,11 +43,11 @@
     <div class="alert alert-warn hidden" id="reset-panel">
       <i class="fa-solid fa-key"></i>
       <div style="width:100%;">
-        <p class="text-sm mb-8"><strong>Réinitialiser votre mot de passe</strong></p>
-        <p class="text-sm text-muted mb-8">Saisissez votre identifiant ou e-mail. Ce site de démonstration n'a pas de serveur d'e-mail réel : le lien de réinitialisation sera affiché directement ci-dessous.</p>
+        <p class="text-sm mb-8"><strong>Reset your password</strong></p>
+        <p class="text-sm text-muted mb-8">Enter your username or email. This demo site has no real email server: the reset link will be shown directly below.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <input type="text" id="reset-identifier" class="form-control" placeholder="Identifiant ou e-mail" style="flex:1;min-width:180px;">
-          <button type="button" id="reset-submit" class="btn btn-primary btn-sm">Générer le lien</button>
+          <input type="text" id="reset-identifier" class="form-control" placeholder="Username or email" style="flex:1;min-width:180px;">
+          <button type="button" id="reset-submit" class="btn btn-primary btn-sm">Generate link</button>
         </div>
         <div id="reset-result" class="mt-16"></div>
       </div>
@@ -56,39 +56,39 @@
     <section id="step1">
       <form id="login-form" novalidate>
         <div class="form-row">
-          <label for="identifier">Identifiant ou e-mail</label>
+          <label for="identifier">Username or email</label>
           <input type="text" id="identifier" class="form-control" required>
           <div class="field-error" id="error-identifier"></div>
         </div>
 
         <div class="form-row">
-          <label for="password">Mot de passe</label>
+          <label for="password">Password</label>
           <input type="password" id="password" class="form-control" required>
           <div class="field-error" id="error-password"></div>
           <div style="text-align:right;margin-top:8px;">
-            <a href="#" id="forgot-link" class="text-sm">Mot de passe oublié ?</a>
+            <a href="#" id="forgot-link" class="text-sm">Forgot password?</a>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+        <button type="submit" class="btn btn-primary btn-block">Log In</button>
       </form>
 
-      <p class="text-sm text-muted mt-24" style="text-align:center;">Pas encore de compte ? <a href="inscription.html">Ouvrir un compte</a></p>
-      <p class="text-sm text-muted" style="text-align:center;"><a href="index.html">Retour à l'accueil</a></p>
+      <p class="text-sm text-muted mt-24" style="text-align:center;">Don't have an account yet? <a href="inscription.html">Open an Account</a></p>
+      <p class="text-sm text-muted" style="text-align:center;"><a href="index.html">Back to Home</a></p>
     </section>
 
-    <!-- Étape 2 : code de connexion à usage unique -->
+    <!-- Step 2: one-time login code -->
     <section id="step2" class="hidden">
       <div class="alert alert-success" id="step2-email-notice">
         <i class="fa-solid fa-envelope-circle-check"></i>
-        <div>Un code de connexion vient de vous être envoyé par e-mail.</div>
+        <div>A login code has just been sent to you by email.</div>
       </div>
       <div class="alert alert-warn hidden" id="step2-fallback-notice">
         <i class="fa-solid fa-triangle-exclamation"></i>
-        <div>Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — votre code est affiché ci-dessous :</div>
+        <div>Unable to send the email at this time (demo service limit) — your code is shown below:</div>
       </div>
       <div class="code-display hidden" id="code-display">000000</div>
-      <p class="text-center text-muted text-sm" style="text-align:center;">Saisissez le code à 6 chiffres pour confirmer votre connexion.</p>
+      <p class="text-center text-muted text-sm" style="text-align:center;">Enter the 6-digit code to confirm your login.</p>
       <div class="code-boxes" id="code-boxes">
         <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="0">
         <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="1">
@@ -98,8 +98,8 @@
         <input type="text" maxlength="1" inputmode="numeric" class="code-box" data-idx="5">
       </div>
       <div class="field-error" id="step2-error" style="text-align:center;"></div>
-      <button type="button" class="btn btn-primary btn-block" id="btn-step2">Vérifier et se connecter</button>
-      <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="#" id="btn-back">&larr; Retour</a></p>
+      <button type="button" class="btn btn-primary btn-block" id="btn-step2">Verify and Log In</button>
+      <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="#" id="btn-back">&larr; Back</a></p>
     </section>
   </div>
 </div>
@@ -111,7 +111,7 @@
   const existing = await DB.getCurrentUser();
   if (existing) { window.location.href = 'espace-client.html'; return; }
 
-  // Pré-remplissage de l'identifiant si on arrive depuis l'inscription (?identifier=...)
+  // Pre-fill the identifier if arriving from signup (?identifier=...)
   const params = new URLSearchParams(window.location.search);
   const prefill = params.get('identifier');
   if (prefill) document.getElementById('identifier').value = prefill;
@@ -136,22 +136,22 @@
     if (!identifier) return;
 
     resetSubmit.disabled = true;
-    resetSubmit.textContent = 'Génération…';
+    resetSubmit.textContent = 'Generating…';
 
     try {
       const { resetToken, emailSent } = await DB.requestPasswordReset(identifier);
       const link = window.location.origin + '/reinitialisation.html?token=' + encodeURIComponent(resetToken);
       const intro = emailSent
-        ? 'Un e-mail avec le lien de réinitialisation vient de vous être envoyé. Vous pouvez aussi utiliser ce lien directement :'
-        : "Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — voici votre lien de réinitialisation :";
+        ? 'An email with the reset link has just been sent to you. You can also use this link directly:'
+        : "Unable to send the email at this time (demo service limit) — here is your reset link:";
       resetResult.innerHTML = `
         <div class="alert alert-success" style="margin-top:12px;margin-bottom:0;">
           <i class="fa-solid fa-circle-check"></i>
           <div style="width:100%;">
             ${intro}<br>
             <a href="${link}" id="reset-link-anchor" style="word-break:break-all;">${escapeHtml(link)}</a><br>
-            <button type="button" class="btn btn-sm btn-outline mt-8" id="reset-copy-btn"><i class="fa-solid fa-copy"></i> Copier le lien</button>
-            <p class="text-sm text-muted mt-8" style="margin-bottom:0;">Ce lien expire dans 30 minutes et ne peut être utilisé qu'une seule fois.</p>
+            <button type="button" class="btn btn-sm btn-outline mt-8" id="reset-copy-btn"><i class="fa-solid fa-copy"></i> Copy link</button>
+            <p class="text-sm text-muted mt-8" style="margin-bottom:0;">This link expires in 30 minutes and can only be used once.</p>
           </div>
         </div>`;
       document.getElementById('reset-copy-btn').addEventListener('click', () => {
@@ -166,7 +166,7 @@
     }
 
     resetSubmit.disabled = false;
-    resetSubmit.textContent = 'Générer le lien';
+    resetSubmit.textContent = 'Generate link';
   });
 
   function showLoginError(msg) {
@@ -204,30 +204,30 @@
     const password = document.getElementById('password').value;
 
     let hasError = false;
-    if (!identifier) { setFieldError('identifier', 'Merci de renseigner votre identifiant ou e-mail.'); hasError = true; }
-    if (!password) { setFieldError('password', 'Merci de renseigner votre mot de passe.'); hasError = true; }
+    if (!identifier) { setFieldError('identifier', 'Please enter your username or email.'); hasError = true; }
+    if (!password) { setFieldError('password', 'Please enter your password.'); hasError = true; }
     if (hasError) return;
 
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Connexion en cours…';
+    submitBtn.textContent = 'Logging in…';
 
     const res = await DB.login(identifier, password);
 
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Se connecter';
+    submitBtn.textContent = 'Log In';
 
     if (!res.ok) {
       if (res.error === 'not_found') {
-        showLoginError('Aucun compte ne correspond à cet identifiant ou cet e-mail.');
+        showLoginError('No account matches this username or email.');
       } else if (res.error === 'wrong_password') {
-        showLoginError('Mot de passe incorrect.');
+        showLoginError('Incorrect password.');
       } else if (res.error === 'suspended') {
-        showLoginError('Votre compte a été suspendu. Motif : ' + escapeHtml(res.reason || 'non précisé') + '. Contactez notre support pour plus d\'informations.');
+        showLoginError('Your account has been suspended. Reason: ' + escapeHtml(res.reason || 'not specified') + '. Contact our support for more information.');
       } else if (res.error === 'rate_limited') {
-        showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
+        showLoginError('Too many login attempts. Please wait a few minutes before trying again.');
       } else {
-        showLoginError('Une erreur est survenue. Merci de réessayer.');
+        showLoginError('An error occurred. Please try again.');
       }
       return;
     }
@@ -272,24 +272,24 @@
   btnStep2.addEventListener('click', async () => {
     const entered = codeEntered.join('');
     if (entered.length !== 6) {
-      step2Error.textContent = 'Merci de saisir les 6 chiffres du code.';
+      step2Error.textContent = 'Please enter the 6 digits of the code.';
       step2Error.classList.add('show');
       return;
     }
     if (!pendingUserId) { window.location.href = 'connexion.html'; return; }
 
     btnStep2.disabled = true;
-    btnStep2.textContent = 'Vérification…';
+    btnStep2.textContent = 'Verifying…';
     const res = await DB.verifyLoginCode(pendingUserId, entered);
     btnStep2.disabled = false;
-    btnStep2.textContent = 'Vérifier et se connecter';
+    btnStep2.textContent = 'Verify and Log In';
 
     if (!res.ok) {
       step2Error.textContent = res.error === 'code_expired'
-        ? 'Le code a expiré. Veuillez recommencer la connexion.'
+        ? 'The code has expired. Please restart the login process.'
         : res.error === 'rate_limited'
-        ? 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.'
-        : 'Le code saisi ne correspond pas. Veuillez réessayer.';
+        ? 'Too many attempts. Please wait a few minutes before trying again.'
+        : 'The code entered does not match. Please try again.';
       step2Error.classList.add('show');
       return;
     }

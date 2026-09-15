@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Créez des objectifs d'épargne et suivez votre progression avec l'espace client NOVA BANK.">
+<meta name="description" content="Create savings goals and track your progress with the NOVA BANK client portal.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Épargne — NOVA BANK</title>
+<title>Savings — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,38 +24,38 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html" class="active"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html" class="active"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head flex-between" style="align-items:flex-start;flex-wrap:wrap;gap:16px;">
       <div>
-        <h1>Épargne</h1>
-        <p>Créez des objectifs et mettez de l'argent de côté à votre rythme.</p>
+        <h1>Savings</h1>
+        <p>Create goals and set money aside at your own pace.</p>
       </div>
-      <button class="btn btn-primary" id="newGoalBtn"><i class="fa-solid fa-plus"></i> Nouvel objectif</button>
+      <button class="btn btn-primary" id="newGoalBtn"><i class="fa-solid fa-plus"></i> New goal</button>
     </div>
 
     <div class="alert alert-warn">
       <i class="fa-solid fa-triangle-exclamation"></i>
-      <div>Mettre de l'argent de côté débite réellement votre solde disponible ; vous pouvez le récupérer à tout moment en retirant depuis un objectif.</div>
+      <div>Setting money aside actually debits your available balance; you can get it back at any time by withdrawing from a goal.</div>
     </div>
 
     <div class="tile-grid" id="tileGridWrap" data-animate-group></div>
@@ -65,53 +65,53 @@
   </main>
 </div>
 
-<!-- Modale : nouvel objectif -->
+<!-- Modal: new goal -->
 <div class="modal-overlay" id="goalModalOverlay">
   <div class="modal">
-    <h3>Nouvel objectif d'épargne</h3>
+    <h3>New savings goal</h3>
     <form id="goalForm">
       <div class="form-row">
-        <label>Nom de l'objectif</label>
-        <input type="text" class="form-control" id="goalName" maxlength="60" placeholder="Ex. Vacances d'été" required>
+        <label>Goal name</label>
+        <input type="text" class="form-control" id="goalName" maxlength="60" placeholder="E.g. Summer vacation" required>
       </div>
       <div class="form-row">
-        <label>Montant cible</label>
+        <label>Target amount</label>
         <input type="number" class="form-control" id="goalTarget" min="1" step="0.01" placeholder="1000" required>
       </div>
       <div class="form-row">
-        <label>Icône</label>
+        <label>Icon</label>
         <select class="form-control" id="goalIcon">
-          <option value="fa-piggy-bank">Tirelire</option>
-          <option value="fa-plane">Voyage</option>
-          <option value="fa-house">Maison</option>
-          <option value="fa-car">Voiture</option>
-          <option value="fa-graduation-cap">Études</option>
-          <option value="fa-umbrella-beach">Vacances</option>
-          <option value="fa-gift">Cadeau</option>
+          <option value="fa-piggy-bank">Piggy bank</option>
+          <option value="fa-plane">Travel</option>
+          <option value="fa-house">Home</option>
+          <option value="fa-car">Car</option>
+          <option value="fa-graduation-cap">Education</option>
+          <option value="fa-umbrella-beach">Vacation</option>
+          <option value="fa-gift">Gift</option>
         </select>
       </div>
       <div class="field-error" id="goalFormError"></div>
       <div class="modal-actions">
-        <button type="button" class="btn btn-outline btn-sm" id="goalCancelBtn">Annuler</button>
-        <button type="submit" class="btn btn-primary btn-sm">Créer l'objectif</button>
+        <button type="button" class="btn btn-outline btn-sm" id="goalCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Create goal</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Modale générique : mettre de côté / retirer -->
+<!-- Generic modal: set aside / withdraw -->
 <div class="modal-overlay" id="amountModalOverlay">
   <div class="modal">
-    <h3 id="amountModalTitle">Mettre de côté</h3>
+    <h3 id="amountModalTitle">Set aside</h3>
     <form id="amountForm">
       <div class="form-row">
-        <label id="amountModalLabel">Montant</label>
+        <label id="amountModalLabel">Amount</label>
         <input type="number" class="form-control" id="amountInput" min="0.01" step="0.01" placeholder="0.00" required>
       </div>
       <div class="field-error" id="amountFormError"></div>
       <div class="modal-actions">
-        <button type="button" class="btn btn-outline btn-sm" id="amountCancelBtn">Annuler</button>
-        <button type="submit" class="btn btn-primary btn-sm" id="amountSubmitBtn">Confirmer</button>
+        <button type="button" class="btn btn-outline btn-sm" id="amountCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="amountSubmitBtn">Confirm</button>
       </div>
     </form>
   </div>
@@ -131,7 +131,7 @@
       const fresh = (await DB.getUserById(user.id)) || user;
       const goals = DB.getSavingsGoals(fresh);
 
-      // ---- tuiles récapitulatives
+      // ---- summary tiles
       const totalSaved = goals.reduce((s, g) => s + Number(g.currentAmount), 0);
       let closest = null;
       goals.forEach(g => {
@@ -142,27 +142,27 @@
         <div class="stat-tile">
           <div class="top"><div class="icon"><i class="fa-solid fa-piggy-bank"></i></div></div>
           <div class="value">${DB.formatMoney(totalSaved, fresh.currency)}</div>
-          <div class="label">Total épargné</div>
+          <div class="label">Total saved</div>
         </div>
         <div class="stat-tile">
           <div class="top"><div class="icon"><i class="fa-solid fa-bullseye"></i></div></div>
           <div class="value">${goals.length}</div>
-          <div class="label">Objectifs actifs</div>
+          <div class="label">Active goals</div>
         </div>
         <div class="stat-tile">
           <div class="top"><div class="icon"><i class="fa-solid fa-chart-line"></i></div></div>
           <div class="value">${closest ? Math.round(Math.min(100, closest.pct)) + '%' : '—'}</div>
-          <div class="label">${closest ? 'Plus proche du but : ' + escapeHtml(closest.name) : 'Aucun objectif pour le moment'}</div>
+          <div class="label">${closest ? 'Closest to goal: ' + escapeHtml(closest.name) : 'No goal at this time'}</div>
         </div>`;
 
-      // ---- grille des objectifs
+      // ---- goals grid
       const wrap = document.getElementById('goalsWrap');
       if (!goals.length) {
         wrap.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
             <i class="fa-solid fa-piggy-bank"></i>
-            <p>Vous n'avez pas encore d'objectif d'épargne.</p>
-            <button class="btn btn-primary btn-sm mt-16" id="emptyNewGoalBtn">Créer mon premier objectif</button>
+            <p>You don't have any savings goals yet.</p>
+            <button class="btn btn-primary btn-sm mt-16" id="emptyNewGoalBtn">Create my first goal</button>
           </div>`;
         document.getElementById('emptyNewGoalBtn')?.addEventListener('click', openGoalModal);
         return;
@@ -174,14 +174,14 @@
           <div class="goal-card">
             <div class="goal-head">
               <div class="goal-icon"><i class="fa-solid ${escapeHtml(g.icon)}"></i></div>
-              <button class="btn btn-sm btn-outline btn-icon" title="Supprimer l'objectif" data-delete="${g.id}"><i class="fa-solid fa-trash"></i></button>
+              <button class="btn btn-sm btn-outline btn-icon" title="Delete goal" data-delete="${g.id}"><i class="fa-solid fa-trash"></i></button>
             </div>
             <h3>${escapeHtml(g.name)}</h3>
-            <div class="goal-amounts"><b>${DB.formatMoney(g.currentAmount, fresh.currency)}</b><span class="text-muted">sur ${DB.formatMoney(g.targetAmount, fresh.currency)}</span></div>
+            <div class="goal-amounts"><b>${DB.formatMoney(g.currentAmount, fresh.currency)}</b><span class="text-muted">of ${DB.formatMoney(g.targetAmount, fresh.currency)}</span></div>
             <div class="progress-bar"><span data-width="${pct}" style="width:${pct}%"></span></div>
             <div class="card-actions-row">
-              <button class="btn btn-sm btn-ghost" data-contribute="${g.id}">Mettre de côté</button>
-              <button class="btn btn-sm btn-outline" data-withdraw="${g.id}">Retirer</button>
+              <button class="btn btn-sm btn-ghost" data-contribute="${g.id}">Set aside</button>
+              <button class="btn btn-sm btn-outline" data-withdraw="${g.id}">Withdraw</button>
             </div>
           </div>`;
       }).join('');
@@ -192,9 +192,9 @@
           const goal = goals.find(x => x.id === goalId);
           if (!goal) return;
           const extra = goal.currentAmount > 0
-            ? ` Le montant déjà mis de côté (${DB.formatMoney(goal.currentAmount, fresh.currency)}) sera automatiquement recrédité sur votre solde disponible.`
+            ? ` The amount already set aside (${DB.formatMoney(goal.currentAmount, fresh.currency)}) will automatically be credited back to your available balance.`
             : '';
-          if (confirm(`Supprimer l'objectif « ${goal.name} » ?${extra}`)) {
+          if (confirm(`Delete the goal "${goal.name}"?${extra}`)) {
             try {
               await DB.deleteSavingsGoal(fresh.id, goalId);
               await renderPage();
@@ -212,7 +212,7 @@
       });
     }
 
-    // ---- modale : nouvel objectif
+    // ---- modal: new goal
     function openGoalModal() {
       document.getElementById('goalForm').reset();
       const err = document.getElementById('goalFormError');
@@ -235,7 +235,7 @@
       const icon = document.getElementById('goalIcon').value;
       const err = document.getElementById('goalFormError');
       if (!name || !target || target <= 0) {
-        err.textContent = 'Merci de renseigner un nom et un montant cible valide.';
+        err.textContent = 'Please provide a name and a valid target amount.';
         err.classList.add('show');
         return;
       }
@@ -249,12 +249,12 @@
       }
     });
 
-    // ---- modale générique : mettre de côté / retirer
+    // ---- generic modal: set aside / withdraw
     function openAmountModal(goalId, mode) {
       currentAmountAction = { goalId, mode };
-      document.getElementById('amountModalTitle').textContent = mode === 'contribute' ? 'Mettre de côté' : 'Retirer';
-      document.getElementById('amountModalLabel').textContent = mode === 'contribute' ? 'Montant à mettre de côté' : 'Montant à retirer';
-      document.getElementById('amountSubmitBtn').textContent = mode === 'contribute' ? 'Mettre de côté' : 'Retirer';
+      document.getElementById('amountModalTitle').textContent = mode === 'contribute' ? 'Set aside' : 'Withdraw';
+      document.getElementById('amountModalLabel').textContent = mode === 'contribute' ? 'Amount to set aside' : 'Amount to withdraw';
+      document.getElementById('amountSubmitBtn').textContent = mode === 'contribute' ? 'Set aside' : 'Withdraw';
       document.getElementById('amountForm').reset();
       const err = document.getElementById('amountFormError');
       err.textContent = '';

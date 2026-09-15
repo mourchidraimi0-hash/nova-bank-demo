@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Changez votre mot de passe, consultez votre historique de connexions et vos paramètres de sécurité NOVA BANK.">
+<meta name="description" content="Change your password, view your login history, and your NOVA BANK security settings.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Sécurité — NOVA BANK</title>
+<title>Security — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,91 +24,91 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html" class="active"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html" class="active"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1>Sécurité</h1>
-      <p>Gérez votre mot de passe, vos connexions et vos préférences de sécurité.</p>
+      <h1>Security</h1>
+      <p>Manage your password, your logins, and your security preferences.</p>
     </div>
 
     <div class="alert alert-warn" style="align-items:flex-start;">
       <i class="fa-solid fa-triangle-exclamation"></i>
       <div>
-        <b>NOVA BANK est une plateforme de démonstration technique.</b><br>
-        Elle ne détient aucune licence bancaire réelle, n'est certifiée par aucun organisme de sécurité ou de conformité, et ne bénéficie d'aucun fonds de garantie des dépôts. Contrairement à une ancienne version de ce site, vos données (comptes, soldes, cartes, historiques) ne restent plus seulement dans votre navigateur : chaque action passe par notre API et est enregistrée dans une base de données Postgres centralisée et partagée, comme dans une vraie banque. Votre mot de passe est haché (algorithme scrypt) avant d'être stocké — il n'est jamais conservé en clair et n'est jamais visible, même par l'équipe du back-office. Chaque opération administrative est consignée dans un journal d'activité append-only côté serveur, que personne ne peut modifier ou effacer après coup. Cela reste malgré tout un site de démonstration : merci de ne jamais utiliser vos véritables identifiants bancaires, mots de passe habituels ou informations personnelles sensibles ici.
+        <b>NOVA BANK is a technical demonstration platform.</b><br>
+        It does not hold any real banking license, is not certified by any security or compliance body, and does not benefit from any deposit guarantee fund. Unlike an earlier version of this site, your data (accounts, balances, cards, histories) no longer stays only in your browser: every action goes through our API and is recorded in a centralized, shared Postgres database, just like at a real bank. Your password is hashed (scrypt algorithm) before being stored — it is never kept in plain text and is never visible, even to the back-office team. Every administrative operation is logged in a server-side, append-only activity log that no one can modify or erase after the fact. This nonetheless remains a demonstration site: please never use your real banking credentials, usual passwords, or sensitive personal information here.
       </div>
     </div>
 
     <div class="card mb-24">
-      <h3 class="mb-16">Changer le mot de passe</h3>
+      <h3 class="mb-16">Change password</h3>
       <div id="pwdAlertWrap"></div>
       <form id="pwdForm" novalidate>
         <div class="form-row">
-          <label for="currentPassword">Mot de passe actuel</label>
+          <label for="currentPassword">Current password</label>
           <input type="password" id="currentPassword" class="form-control" autocomplete="current-password" required>
           <div class="field-error" id="err-currentPassword"></div>
         </div>
         <div class="form-row">
-          <label for="password">Nouveau mot de passe</label>
+          <label for="password">New password</label>
           <input type="password" id="password" class="form-control" autocomplete="new-password" required>
           <div class="pw-strength"><span></span><span></span><span></span><span></span></div>
           <div class="pw-strength-label"></div>
-          <div class="field-hint">8 caractères minimum.</div>
+          <div class="field-hint">8 characters minimum.</div>
           <div class="field-error" id="err-password"></div>
         </div>
         <div class="form-row">
-          <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+          <label for="confirmPassword">Confirm new password</label>
           <input type="password" id="confirmPassword" class="form-control" autocomplete="new-password" required>
           <div class="field-error" id="err-confirmPassword"></div>
         </div>
-        <button type="submit" class="btn btn-primary">Mettre à jour le mot de passe</button>
+        <button type="submit" class="btn btn-primary">Update password</button>
       </form>
     </div>
 
     <div class="mb-24">
-      <h3 class="mb-16">Historique des connexions</h3>
+      <h3 class="mb-16">Login history</h3>
       <div class="table-wrap">
         <div id="loginHistoryWrap"></div>
       </div>
     </div>
 
     <div class="card mb-24">
-      <h3 class="mb-16">Bonnes pratiques de sécurité</h3>
+      <h3 class="mb-16">Security best practices</h3>
       <div class="info-grid">
-        <div class="info-item"><span><i class="fa-solid fa-lock"></i> Mot de passe</span><b>Ne partagez jamais votre mot de passe, même avec le support.</b></div>
-        <div class="info-item"><span><i class="fa-solid fa-link"></i> Adresse du site</span><b>Vérifiez toujours l'URL avant de saisir vos identifiants.</b></div>
-        <div class="info-item"><span><i class="fa-solid fa-right-from-bracket"></i> Appareil partagé</span><b>Déconnectez-vous systématiquement sur un ordinateur partagé.</b></div>
-        <div class="info-item"><span><i class="fa-solid fa-wifi"></i> Réseaux publics</span><b>Évitez de vous connecter via un Wi-Fi public non sécurisé.</b></div>
-        <div class="info-item"><span><i class="fa-solid fa-envelope-open-text"></i> Hameçonnage</span><b>Méfiez-vous des e-mails ou messages demandant vos identifiants.</b></div>
-        <div class="info-item"><span><i class="fa-solid fa-rotate"></i> Mise à jour</span><b>Utilisez un mot de passe unique, différent de vos autres comptes.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-lock"></i> Password</span><b>Never share your password, even with support.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-link"></i> Site address</span><b>Always check the URL before entering your credentials.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-right-from-bracket"></i> Shared device</span><b>Always log out on a shared computer.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-wifi"></i> Public networks</span><b>Avoid connecting via unsecured public Wi-Fi.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-envelope-open-text"></i> Phishing</span><b>Be wary of emails or messages asking for your credentials.</b></div>
+        <div class="info-item"><span><i class="fa-solid fa-rotate"></i> Update</span><b>Use a unique password, different from your other accounts.</b></div>
       </div>
     </div>
 
     <div class="card">
-      <h3 class="mb-16">Alertes de sécurité</h3>
+      <h3 class="mb-16">Security alerts</h3>
       <div class="switch-row">
         <div class="switch-label">
-          <b>M'alerter par e-mail à chaque nouvelle connexion</b>
-          <span>Préférence d'interface uniquement — démonstration, aucun e-mail n'est réellement envoyé.</span>
+          <b>Alert me by email on every new login</b>
+          <span>Interface preference only — demo, no email is actually sent.</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="alertNewLogin">
@@ -117,8 +117,8 @@
       </div>
       <div class="switch-row">
         <div class="switch-label">
-          <b>Recevoir un résumé hebdomadaire de mon activité</b>
-          <span>Préférence d'interface uniquement — démonstration, aucun e-mail n'est réellement envoyé.</span>
+          <b>Receive a weekly summary of my activity</b>
+          <span>Interface preference only — demo, no email is actually sent.</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="alertWeeklySummary">
@@ -139,10 +139,10 @@
 
     const PREFS_KEY = 'novabank_security_prefs_' + user.id;
 
-    // ---------------------------------------------------------------- historique des connexions
+    // ---------------------------------------------------------------- login history
     function guessDevice(userAgent) {
       const ua = String(userAgent || '');
-      let browser = 'Navigateur inconnu';
+      let browser = 'Unknown browser';
       if (ua.includes('Edg/')) browser = 'Edge';
       else if (ua.includes('Chrome/') && !ua.includes('Chromium')) browser = 'Chrome';
       else if (ua.includes('Firefox/')) browser = 'Firefox';
@@ -155,8 +155,8 @@
       else if (ua.includes('Mac OS')) os = 'Mac';
       else if (ua.includes('Linux')) os = 'Linux';
 
-      if (browser === 'Navigateur inconnu' && !os) return 'Navigateur inconnu';
-      return os ? `${browser} sur ${os}` : browser;
+      if (browser === 'Unknown browser' && !os) return 'Unknown browser';
+      return os ? `${browser} on ${os}` : browser;
     }
 
     async function renderLoginHistory() {
@@ -167,7 +167,7 @@
         wrap.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-clock-rotate-left"></i>
-            <p>Aucune connexion enregistrée pour le moment.</p>
+            <p>No login recorded at this time.</p>
           </div>`;
         return;
       }
@@ -178,13 +178,13 @@
         </tr>`).join('');
       wrap.innerHTML = `
         <table class="data-table">
-          <thead><tr><th>Date</th><th>Appareil / Navigateur</th></tr></thead>
+          <thead><tr><th>Date</th><th>Device / Browser</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>`;
     }
     await renderLoginHistory();
 
-    // ---------------------------------------------------------------- changement de mot de passe
+    // ---------------------------------------------------------------- password change
     function clearPwdErrors() {
       ['currentPassword', 'password', 'confirmPassword'].forEach(id => {
         const el = document.getElementById('err-' + id);
@@ -208,9 +208,9 @@
       const confirm = document.getElementById('confirmPassword').value;
 
       let hasError = false;
-      if (!current) { showPwdError('currentPassword', 'Veuillez saisir votre mot de passe actuel.'); hasError = true; }
-      if (!newPwd || newPwd.length < 8 || !/[a-zA-Z]/.test(newPwd) || !/[0-9]/.test(newPwd)) { showPwdError('password', 'Le nouveau mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.'); hasError = true; }
-      if (confirm !== newPwd || !confirm) { showPwdError('confirmPassword', 'La confirmation ne correspond pas au nouveau mot de passe.'); hasError = true; }
+      if (!current) { showPwdError('currentPassword', 'Please enter your current password.'); hasError = true; }
+      if (!newPwd || newPwd.length < 8 || !/[a-zA-Z]/.test(newPwd) || !/[0-9]/.test(newPwd)) { showPwdError('password', 'The new password must contain at least 8 characters, with at least one letter and one number.'); hasError = true; }
+      if (confirm !== newPwd || !confirm) { showPwdError('confirmPassword', 'The confirmation does not match the new password.'); hasError = true; }
       if (hasError) return;
 
       try {
@@ -218,19 +218,19 @@
         document.getElementById('pwdAlertWrap').innerHTML = `
           <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
-            <div>Mot de passe modifié avec succès.</div>
+            <div>Password changed successfully.</div>
           </div>`;
         e.target.reset();
         document.querySelectorAll('.pw-strength span').forEach(s => s.style.background = '');
         document.querySelector('.pw-strength-label').textContent = '';
       } catch (err) {
-        const msg = err.message || 'Une erreur est survenue.';
-        const field = /mot de passe actuel|incorrect/i.test(msg) ? 'currentPassword' : /nouveau mot de passe|8 caractères/i.test(msg) ? 'password' : 'currentPassword';
+        const msg = err.message || 'An error occurred.';
+        const field = /incorrect/i.test(msg) ? 'currentPassword' : /8 characters/i.test(msg) ? 'password' : 'currentPassword';
         showPwdError(field, msg);
       }
     });
 
-    // ---------------------------------------------------------------- alertes de sécurité (préférences cosmétiques)
+    // ---------------------------------------------------------------- security alerts (cosmetic preferences)
     function loadPrefs() {
       try {
         const raw = localStorage.getItem(PREFS_KEY);

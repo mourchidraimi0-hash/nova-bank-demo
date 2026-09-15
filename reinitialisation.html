@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Réinitialisez votre mot de passe NOVA BANK à l'aide de votre lien de réinitialisation.">
+<meta name="description" content="Reset your NOVA BANK password using your reset link.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Nouveau mot de passe — NOVA BANK</title>
+<title>New Password — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -18,14 +18,14 @@
 <nav class="navbar scrolled">
   <div class="container">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
-    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back to site</a></div>
   </div>
 </nav>
 
 <div class="form-page">
   <div class="form-card">
-    <h1>Nouveau mot de passe</h1>
-    <p class="sub">Choisissez un nouveau mot de passe pour votre compte NOVA BANK.</p>
+    <h1>New Password</h1>
+    <p class="sub">Choose a new password for your NOVA BANK account.</p>
 
     <div class="alert alert-error hidden" id="error-box">
       <i class="fa-solid fa-circle-exclamation"></i>
@@ -35,30 +35,30 @@
     <section id="form-section">
       <form id="reset-form" novalidate>
         <div class="form-row">
-          <label for="password">Nouveau mot de passe</label>
+          <label for="password">New password</label>
           <input type="password" id="password" class="form-control" autocomplete="new-password" required>
           <div class="pw-strength"><span></span><span></span><span></span><span></span></div>
           <div class="pw-strength-label"></div>
           <div class="field-error" id="error-password"></div>
         </div>
         <div class="form-row">
-          <label for="confirmPassword">Confirmer le mot de passe</label>
+          <label for="confirmPassword">Confirm password</label>
           <input type="password" id="confirmPassword" class="form-control" autocomplete="new-password" required>
           <div class="field-error" id="error-confirmPassword"></div>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Réinitialiser le mot de passe</button>
+        <button type="submit" class="btn btn-primary btn-block">Reset password</button>
       </form>
     </section>
 
     <section id="success-section" class="hidden">
       <div class="alert alert-success">
         <i class="fa-solid fa-circle-check"></i>
-        <div>Votre mot de passe a été réinitialisé avec succès. Pour votre sécurité, toutes vos sessions actives ont été déconnectées.</div>
+        <div>Your password has been reset successfully. For your security, all your active sessions have been logged out.</div>
       </div>
-      <a href="connexion.html" class="btn btn-primary btn-block mt-16">Se connecter</a>
+      <a href="connexion.html" class="btn btn-primary btn-block mt-16">Log In</a>
     </section>
 
-    <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="connexion.html">Retour à la connexion</a></p>
+    <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="connexion.html">Back to login</a></p>
   </div>
 </div>
 
@@ -80,7 +80,7 @@
 
   if (!token) {
     formSection.classList.add('hidden');
-    showError("Ce lien de réinitialisation est invalide. Merci de recommencer la procédure depuis la page de connexion.");
+    showError("This reset link is invalid. Please restart the process from the login page.");
     return;
   }
 
@@ -105,18 +105,18 @@
 
     let hasError = false;
     if (!password || password.length < 8 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-      setFieldError('password', 'Le mot de passe doit contenir au moins 8 caractères, avec au moins une lettre et un chiffre.');
+      setFieldError('password', 'The password must contain at least 8 characters, with at least one letter and one digit.');
       hasError = true;
     }
     if (!confirmPassword || confirmPassword !== password) {
-      setFieldError('confirmPassword', 'Les mots de passe ne correspondent pas.');
+      setFieldError('confirmPassword', 'The passwords do not match.');
       hasError = true;
     }
     if (hasError) return;
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Réinitialisation en cours…';
+    submitBtn.textContent = 'Resetting…';
 
     try {
       await DB.resetPassword(token, password);
@@ -124,7 +124,7 @@
       successSection.classList.remove('hidden');
     } catch (err) {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Réinitialiser le mot de passe';
+      submitBtn.textContent = 'Reset password';
       showError(err.message);
     }
   });

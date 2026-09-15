@@ -106,9 +106,9 @@ function initCounters() {
     const step = (t) => {
       const p = Math.min(1, (t - start) / duration);
       const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.floor(eased * target).toLocaleString('fr-FR') + suffix;
+      el.textContent = Math.floor(eased * target).toLocaleString('en-US') + suffix;
       if (p < 1) requestAnimationFrame(step);
-      else el.textContent = target.toLocaleString('fr-FR') + suffix;
+      else el.textContent = target.toLocaleString('en-US') + suffix;
     };
     requestAnimationFrame(step);
   };
@@ -210,11 +210,11 @@ function setupDropzone(zone) {
     clearError();
     if (!file) return;
     if (accept.length && !accept.includes(file.type)) {
-      showError('Format non pris en charge. Formats acceptés : ' + accept.map(a => a.split('/')[1]).join(', ').toUpperCase());
+      showError('Unsupported format. Accepted formats: ' + accept.map(a => a.split('/')[1]).join(', ').toUpperCase());
       return;
     }
     if (file.size > maxSize) {
-      showError('Fichier trop volumineux (max ' + (maxSize / 1048576).toFixed(0) + ' Mo).');
+      showError('File too large (max ' + (maxSize / 1048576).toFixed(0) + ' MB).');
       return;
     }
     window.dzFiles[key] = file;
@@ -226,7 +226,7 @@ function setupDropzone(zone) {
       const imgEl = preview.querySelector('img');
       const iconEl = preview.querySelector('.dz-icon');
       if (nameEl) nameEl.textContent = file.name;
-      if (sizeEl) sizeEl.textContent = (file.size / 1024).toFixed(0) + ' Ko';
+      if (sizeEl) sizeEl.textContent = (file.size / 1024).toFixed(0) + ' KB';
       if (file.type.startsWith('image/') && imgEl) {
         const reader = new FileReader();
         reader.onload = (e) => { imgEl.src = e.target.result; imgEl.classList.remove('hidden'); if (iconEl) iconEl.classList.add('hidden'); };
@@ -280,9 +280,9 @@ function initPasswordStrength() {
     if (/\d/.test(v)) score++;
     if (/[^A-Za-z0-9]/.test(v)) score++;
     const colors = ['#C0392B', '#e08e0b', '#22C55E', '#166534'];
-    const labels = ['Très faible', 'Faible', 'Bon', 'Excellent'];
+    const labels = ['Very weak', 'Weak', 'Good', 'Excellent'];
     bars.forEach((b, i) => { b.style.background = i < score ? colors[Math.max(score - 1, 0)] : '#e6e6e6'; });
-    if (label) label.textContent = v ? 'Force du mot de passe : ' + (labels[Math.max(score - 1, 0)] || 'Très faible') : '';
+    if (label) label.textContent = v ? 'Password strength: ' + (labels[Math.max(score - 1, 0)] || 'Very weak') : '';
   });
 }
 
@@ -293,16 +293,16 @@ function loadScript(src) {
     const s = document.createElement('script');
     s.src = src;
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error('Échec du chargement : ' + src));
+    s.onerror = () => reject(new Error('Failed to load: ' + src));
     document.head.appendChild(s);
   });
 }
 
 // ---------------------------------------------------------------- status helpers (partagé public/admin)
 const STATUS_LABELS = {
-  confirmed: 'Confirmée', pending: 'En attente', processing: 'En cours',
-  rejected: 'Rejetée', cancelled: 'Annulée',
-  active: 'Actif', suspended: 'Suspendu', pending_info: 'Infos requises'
+  confirmed: 'Confirmed', pending: 'Pending', processing: 'Processing',
+  rejected: 'Rejected', cancelled: 'Cancelled',
+  active: 'Active', suspended: 'Suspended', pending_info: 'Info Required'
 };
 function statusBadge(status) {
   const label = STATUS_LABELS[status] || status;
@@ -313,5 +313,5 @@ function escapeHtml(str) {
 }
 function timeAgo(iso) {
   const d = new Date(iso);
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) + ' at ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }

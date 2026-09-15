@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Espace client NOVA BANK : consultez votre solde, vos transactions et gérez votre compte. Site de démonstration technique.">
+<meta name="description" content="NOVA BANK Client Portal: check your balance, your transactions, and manage your account. Technical demo site.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Espace client — NOVA BANK</title>
+<title>Client Portal — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,29 +24,29 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html" class="active"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
-      <h1 id="greeting">Bonjour</h1>
+      <h1 id="greeting">Hello</h1>
       <p id="greetingSub"></p>
     </div>
 
@@ -62,16 +62,16 @@
 
     <div class="chart-panel" data-animate-group>
       <div class="chart-head">
-        <h3>Évolution du solde</h3>
-        <div class="chart-legend"><span><i style="background:var(--cyan-dark)"></i> Solde (14 derniers jours)</span></div>
+        <h3>Balance trend</h3>
+        <div class="chart-legend"><span><i style="background:var(--cyan-dark)"></i> Balance (last 14 days)</span></div>
       </div>
       <canvas id="balanceChart" height="90"></canvas>
     </div>
 
     <div style="margin-bottom:32px;">
       <div class="flex-between mb-16">
-        <h3>Dernières transactions</h3>
-        <a href="transactions.html" class="text-sm">Voir tout l'historique →</a>
+        <h3>Latest transactions</h3>
+        <a href="transactions.html" class="text-sm">View full history →</a>
       </div>
       <div class="table-wrap">
         <div id="historyWrap"></div>
@@ -97,7 +97,7 @@
       for (let i = days - 1; i >= 0; i--) {
         const d = new Date(today); d.setDate(d.getDate() - i);
         const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
-        labels.push(d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+        labels.push(d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' }));
         let bal = 0;
         settled.forEach(t => {
           if (new Date(t.createdAt) <= dayEnd) {
@@ -146,18 +146,18 @@
       const fresh = (await DB.getUserById(user.id)) || user;
 
       // ---- greeting
-      document.getElementById('greeting').textContent = `Bonjour, ${fresh.firstName}`;
-      const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-      document.getElementById('greetingSub').textContent = `Nous sommes le ${today}. Voici un aperçu de votre compte.`;
+      document.getElementById('greeting').textContent = `Hello, ${fresh.firstName}`;
+      const today = new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('greetingSub').textContent = `Today is ${today}. Here's an overview of your account.`;
 
-      // ---- bandeau de confirmation d'e-mail (bloque les virements sortants tant qu'il est actif)
+      // ---- email confirmation banner (blocks outgoing transfers while active)
       const verifyWrap = document.getElementById('verifyBannerWrap');
       if (fresh.emailVerified === false) {
         verifyWrap.innerHTML = `
           <div class="notif-banner warn">
             <i class="fa-solid fa-envelope-circle-exclamation"></i>
-            <div class="msg">Votre adresse e-mail n'est pas confirmée. Les virements sortants sont bloqués tant qu'elle ne l'est pas.</div>
-            <button class="btn btn-sm btn-outline" id="resendVerifyBtn">Renvoyer le lien</button>
+            <div class="msg">Your email address is not confirmed. Outgoing transfers are blocked until it is.</div>
+            <button class="btn btn-sm btn-outline" id="resendVerifyBtn">Resend link</button>
           </div>
           <div id="verifyLinkResult"></div>`;
         document.getElementById('resendVerifyBtn').addEventListener('click', async () => {
@@ -167,8 +167,8 @@
             const { verificationToken, emailSent } = await DB.resendVerification();
             const link = window.location.origin + '/verification-email.html?token=' + encodeURIComponent(verificationToken);
             const intro = emailSent
-              ? `Un e-mail de confirmation a été envoyé à ${escapeHtml(fresh.email)}. Vous pouvez aussi utiliser ce lien directement :`
-              : `Impossible d'envoyer l'e-mail pour le moment (limite du service de démonstration) — voici votre lien de confirmation :`;
+              ? `A confirmation email has been sent to ${escapeHtml(fresh.email)}. You can also use this link directly:`
+              : `Unable to send the email at this time (demo service limit) — here is your confirmation link:`;
             document.getElementById('verifyLinkResult').innerHTML = `
               <div class="alert alert-success" style="margin-top:12px;">
                 <i class="fa-solid fa-circle-check"></i>
@@ -203,7 +203,7 @@
           <div class="notif-banner ${cls}">
             <i class="fa-solid ${icon}"></i>
             <div class="msg">${escapeHtml(unread.message)}</div>
-            <button class="btn btn-sm btn-outline" id="markReadBtn">Marquer comme lu</button>
+            <button class="btn btn-sm btn-outline" id="markReadBtn">Mark as read</button>
           </div>`;
         document.getElementById('markReadBtn').addEventListener('click', async () => {
           await DB.markNotificationRead(fresh.id, unread.id);
@@ -217,14 +217,14 @@
       const pendingTotal = DB.getPendingOutTotal(fresh);
       document.getElementById('balanceCardWrap').innerHTML = `
         <div class="balance-card">
-          <div class="lbl">Solde disponible</div>
+          <div class="lbl">Available balance</div>
           <div class="amount">${DB.formatMoney(fresh.balance, fresh.currency)}</div>
-          ${pendingTotal > 0 ? `<div class="pending-note">dont ${DB.formatMoney(pendingTotal, fresh.currency)} en attente de validation</div>` : ''}
+          ${pendingTotal > 0 ? `<div class="pending-note">including ${DB.formatMoney(pendingTotal, fresh.currency)} pending validation</div>` : ''}
           <div class="meta">
-            <div><span>Numéro de compte</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
-            <div><span>Devise</span><b>${escapeHtml(fresh.currency)}</b></div>
+            <div><span>Account number</span><b>${escapeHtml(fresh.accountNumber)}</b></div>
+            <div><span>Currency</span><b>${escapeHtml(fresh.currency)}</b></div>
             <div><span>IBAN</span><b>${escapeHtml(fresh.iban)}</b></div>
-            <div><span>Statut</span><b>${statusBadge(fresh.status)}</b></div>
+            <div><span>Status</span><b>${statusBadge(fresh.status)}</b></div>
           </div>
         </div>`;
 
@@ -236,39 +236,39 @@
       const sorties = recent.filter(t => (t.type === 'transfer_out' || t.type === 'debit') && t.settled).reduce((s, t) => s + Number(t.amount), 0);
       const enAttente = txs0.filter(t => t.status === 'pending' || t.status === 'processing').length;
       document.getElementById('tileGridWrap').innerHTML = `
-        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-arrow-down"></i></div><span class="trend up">30j</span></div><div class="value">${DB.formatMoney(entrees, fresh.currency)}</div><div class="label">Entrées récentes</div></div>
-        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-arrow-up"></i></div><span class="trend down">30j</span></div><div class="value">${DB.formatMoney(sorties, fresh.currency)}</div><div class="label">Sorties récentes</div></div>
-        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-hourglass-half"></i></div></div><div class="value">${enAttente}</div><div class="label">Opérations en attente</div></div>
-        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-receipt"></i></div></div><div class="value">${txs0.length}</div><div class="label">Opérations au total</div></div>`;
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-arrow-down"></i></div><span class="trend up">30d</span></div><div class="value">${DB.formatMoney(entrees, fresh.currency)}</div><div class="label">Recent inflows</div></div>
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-arrow-up"></i></div><span class="trend down">30d</span></div><div class="value">${DB.formatMoney(sorties, fresh.currency)}</div><div class="label">Recent outflows</div></div>
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-hourglass-half"></i></div></div><div class="value">${enAttente}</div><div class="label">Pending operations</div></div>
+        <div class="stat-tile"><div class="top"><div class="icon"><i class="fa-solid fa-receipt"></i></div></div><div class="value">${txs0.length}</div><div class="label">Total operations</div></div>`;
 
       // ---- quick actions
       document.getElementById('quickActionsWrap').innerHTML = `
         <a href="virement.html" class="quick-action">
           <i class="fa-solid fa-paper-plane"></i>
-          <h4>Virement</h4>
+          <h4>Transfer</h4>
         </a>
         <a href="cartes.html" class="quick-action">
           <i class="fa-solid fa-credit-card"></i>
-          <h4>Ma carte</h4>
+          <h4>My card</h4>
         </a>
         <a href="epargne.html" class="quick-action">
           <i class="fa-solid fa-piggy-bank"></i>
-          <h4>Épargne</h4>
+          <h4>Savings</h4>
         </a>
         <a href="aide.html" class="quick-action">
           <i class="fa-solid fa-headset"></i>
-          <h4>Assistance</h4>
+          <h4>Support</h4>
         </a>`;
 
       await renderChart(fresh);
 
-      // ---- history (5 dernières — voir transactions.html pour l'historique complet)
+      // ---- history (5 most recent — see transactions.html for the full history)
       const txs = (fresh.transactions || []).slice(0, 5);
       if (!txs.length) {
         document.getElementById('historyWrap').innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-inbox"></i>
-            <p>Aucune opération pour le moment.</p>
+            <p>No operations yet.</p>
           </div>`;
       } else {
         const rows = txs.map(t => {
@@ -286,7 +286,7 @@
         document.getElementById('historyWrap').innerHTML = `
           <table class="data-table">
             <thead>
-              <tr><th>Description</th><th>Date</th><th>Statut</th><th>Montant</th></tr>
+              <tr><th>Description</th><th>Date</th><th>Status</th><th>Amount</th></tr>
             </thead>
             <tbody>${rows}</tbody>
           </table>`;

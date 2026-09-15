@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Historique complet et filtrable de vos transactions NOVA BANK, avec export CSV.">
+<meta name="description" content="Complete, filterable history of your NOVA BANK transactions, with CSV export.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
@@ -24,49 +24,49 @@
   <aside class="app-sidebar" id="sidebar">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
     <nav class="app-nav">
-      <div class="app-nav-section">Général</div>
-      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
-      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Comptes</a>
+      <div class="app-nav-section">General</div>
+      <a href="espace-client.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="comptes.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
       <a href="transactions.html" class="active"><i class="fa-solid fa-clock-rotate-left"></i> Transactions</a>
-      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Virement</a>
-      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cartes</a>
-      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Épargne</a>
-      <div class="app-nav-section">Compte</div>
+      <a href="virement.html"><i class="fa-solid fa-paper-plane"></i> Transfer</a>
+      <a href="cartes.html"><i class="fa-solid fa-credit-card"></i> Cards</a>
+      <a href="epargne.html"><i class="fa-solid fa-piggy-bank"></i> Savings</a>
+      <div class="app-nav-section">Account</div>
       <a href="notifications.html"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge hidden" data-notif-badge></span></a>
-      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profil &amp; paramètres</a>
-      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Sécurité</a>
+      <a href="profil.html"><i class="fa-solid fa-user-gear"></i> Profile &amp; settings</a>
+      <a href="securite.html"><i class="fa-solid fa-shield-halved"></i> Security</a>
       <div class="app-nav-section">Support</div>
-      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Centre d'aide</a>
+      <a href="aide.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
     </nav>
     <div class="bottom-links">
-      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
-      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a>
+      <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a>
     </div>
   </aside>
   <main class="app-main">
 
     <div class="page-head">
       <h1>Transactions</h1>
-      <p>Historique complet et filtrable de toutes vos opérations.</p>
+      <p>Complete, filterable history of all your operations.</p>
     </div>
 
     <div class="filters-row">
-      <input type="text" class="form-control" id="searchInput" placeholder="Rechercher par description, référence ou bénéficiaire…" style="max-width:340px">
+      <input type="text" class="form-control" id="searchInput" placeholder="Search by description, reference, or beneficiary…" style="max-width:340px">
       <select class="form-control" id="statusFilter">
-        <option value="">Tous les statuts</option>
-        <option value="pending">En attente</option>
-        <option value="processing">En cours</option>
-        <option value="confirmed">Confirmée</option>
-        <option value="rejected">Rejetée</option>
-        <option value="cancelled">Annulée</option>
+        <option value="">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="processing">Processing</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="rejected">Rejected</option>
+        <option value="cancelled">Cancelled</option>
       </select>
       <select class="form-control" id="typeFilter">
-        <option value="">Tous les types</option>
-        <option value="transfer_out">Virements sortants</option>
-        <option value="credit">Crédits</option>
-        <option value="debit">Débits</option>
+        <option value="">All types</option>
+        <option value="transfer_out">Outgoing transfers</option>
+        <option value="credit">Credits</option>
+        <option value="debit">Debits</option>
       </select>
-      <button class="btn btn-outline btn-sm" id="exportBtn" style="margin-left:auto"><i class="fa-solid fa-download"></i> Exporter en CSV</button>
+      <button class="btn btn-outline btn-sm" id="exportBtn" style="margin-left:auto"><i class="fa-solid fa-download"></i> Export as CSV</button>
     </div>
 
     <div class="table-wrap">
@@ -83,7 +83,7 @@
   if (user) {
     document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); DB.logout(); window.location.href = 'connexion.html'; });
 
-    const TYPE_LABELS = { transfer_out: 'Virement sortant', credit: 'Crédit', debit: 'Débit' };
+    const TYPE_LABELS = { transfer_out: 'Outgoing transfer', credit: 'Credit', debit: 'Debit' };
     function humanType(t) { return TYPE_LABELS[t] || t; }
 
     function getFiltered(all) {
@@ -111,7 +111,7 @@
         wrap.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-inbox"></i>
-            <p>Aucune opération pour le moment.</p>
+            <p>No operations yet.</p>
           </div>`;
         return;
       }
@@ -119,7 +119,7 @@
         wrap.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-filter-circle-xmark"></i>
-            <p>Aucune opération ne correspond à ces filtres.</p>
+            <p>No operations match these filters.</p>
           </div>`;
         return;
       }
@@ -143,7 +143,7 @@
       wrap.innerHTML = `
         <table class="data-table">
           <thead>
-            <tr><th>Référence</th><th>Description</th><th>Date</th><th>Type</th><th>Statut</th><th>Montant</th></tr>
+            <tr><th>Reference</th><th>Description</th><th>Date</th><th>Type</th><th>Status</th><th>Amount</th></tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>`;
@@ -152,7 +152,7 @@
     async function exportCsv() {
       const fresh = (await DB.getUserById(user.id)) || user;
       const filtered = getFiltered(fresh.transactions || []);
-      const header = ['Référence', 'Description', 'Date', 'Type', 'Statut', 'Montant', 'Devise'];
+      const header = ['Reference', 'Description', 'Date', 'Type', 'Status', 'Amount', 'Currency'];
       const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
       const lines = [header.map(esc).join(';')];
       filtered.forEach(t => {

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>/* gh-pages-redirect */if(location.hostname==="mourchidraimi0-hash.github.io"){location.replace("https://www.novabk.pro"+location.pathname.replace(/^\/nova-bank-demo/,"")+location.search);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Confirmez votre adresse e-mail NOVA BANK.">
+<meta name="description" content="Confirm your NOVA BANK email address.">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <meta name="robots" content="noindex, nofollow">
-<title>Confirmation d'e-mail — NOVA BANK</title>
+<title>Email Confirmation — NOVA BANK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -18,14 +18,14 @@
 <nav class="navbar scrolled">
   <div class="container">
     <a href="index.html" class="nav-logo"><img src="images/logo-mark.png" alt="NOVA BANK" class="logo-mark"> NOVA BANK</a>
-    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+    <div class="nav-actions"><a href="index.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back to site</a></div>
   </div>
 </nav>
 
 <div class="form-page">
   <div class="form-card">
-    <h1>Confirmation de votre e-mail</h1>
-    <p class="sub">Une dernière étape pour activer tous les services de votre compte NOVA BANK.</p>
+    <h1>Confirm your email</h1>
+    <p class="sub">One last step to activate all the services of your NOVA BANK account.</p>
 
     <div class="alert alert-error hidden" id="error-box">
       <i class="fa-solid fa-circle-exclamation"></i>
@@ -33,19 +33,19 @@
     </div>
 
     <section id="confirm-section">
-      <p class="text-sm text-muted mb-16">Cliquez sur le bouton ci-dessous pour confirmer que cette adresse e-mail vous appartient. Tant qu'elle n'est pas confirmée, les virements sortants restent bloqués.</p>
-      <button type="button" class="btn btn-primary btn-block" id="confirm-btn">Confirmer mon adresse e-mail</button>
+      <p class="text-sm text-muted mb-16">Click the button below to confirm that this email address belongs to you. As long as it is not confirmed, outgoing transfers remain blocked.</p>
+      <button type="button" class="btn btn-primary btn-block" id="confirm-btn">Confirm my email address</button>
     </section>
 
     <section id="success-section" class="hidden">
       <div class="alert alert-success">
         <i class="fa-solid fa-circle-check"></i>
-        <div>Votre adresse e-mail a été confirmée avec succès. Vous pouvez désormais effectuer des virements.</div>
+        <div>Your email address has been confirmed successfully. You can now make transfers.</div>
       </div>
-      <a href="espace-client.html" class="btn btn-primary btn-block mt-16">Accéder à mon espace client</a>
+      <a href="espace-client.html" class="btn btn-primary btn-block mt-16">Go to my client portal</a>
     </section>
 
-    <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="espace-client.html">Retour à l'espace client</a></p>
+    <p class="text-sm text-muted mt-24" style="text-align:center;"><a href="espace-client.html">Back to client portal</a></p>
   </div>
 </div>
 
@@ -68,14 +68,14 @@
 
   if (!token) {
     confirmSection.classList.add('hidden');
-    showError("Ce lien de confirmation est invalide. Depuis votre tableau de bord, vous pouvez en générer un nouveau.");
+    showError("This confirmation link is invalid. You can generate a new one from your dashboard.");
     return;
   }
 
   confirmBtn.addEventListener('click', async () => {
     errorBox.classList.add('hidden');
     confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Confirmation en cours…';
+    confirmBtn.textContent = 'Confirming…';
 
     try {
       await DB.verifyEmail(token);
@@ -83,7 +83,7 @@
       successSection.classList.remove('hidden');
     } catch (err) {
       confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Confirmer mon adresse e-mail';
+      confirmBtn.textContent = 'Confirm my email address';
       showError(err.message);
     }
   });

@@ -61,6 +61,16 @@
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
 <script>
+// Étiquettes de statut en français pour le back-office (surcharge la version anglaise de js/main.js).
+const STATUS_LABELS_ADMIN = {
+  confirmed: 'Confirmée', pending: 'En attente', processing: 'En cours',
+  rejected: 'Rejetée', cancelled: 'Annulée',
+  active: 'Actif', suspended: 'Suspendu', pending_info: 'Infos requises'
+};
+function statusBadge(status) {
+  const label = STATUS_LABELS_ADMIN[status] || status;
+  return `<span class="badge badge-${status}">${label}</span>`;
+}
 (async function () {
   const session = await ADMIN_UI.guard();
   if (session) {
