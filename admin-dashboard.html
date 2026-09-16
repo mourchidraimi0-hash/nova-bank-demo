@@ -45,19 +45,6 @@
     <div class="stat-grid" id="stat-grid"></div>
 
     <div class="admin-card">
-      <h3>Mon profil</h3>
-      <p class="text-sm text-muted mb-16">Le nom ci-dessous est celui affiché sur les opérations que vous effectuez (crédit/débit, suspension...) et dans le journal d'activité.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;max-width:420px;">
-        <div style="flex:1;min-width:200px;">
-          <label for="profile-name" class="text-sm" style="display:block;margin-bottom:6px;">Nom affiché</label>
-          <input type="text" id="profile-name" class="form-control" maxlength="100">
-        </div>
-        <button type="button" class="btn btn-primary btn-sm" id="profile-save">Enregistrer</button>
-      </div>
-      <div id="profile-result" class="mt-8"></div>
-    </div>
-
-    <div class="admin-card">
       <h3>Solde total par devise</h3>
       <div id="balances-box"></div>
     </div>
@@ -86,27 +73,6 @@
 (async function () {
   const session = await ADMIN_UI.guard();
   if (!session) return;
-
-  // ---------------------------------------------------------------- profil admin
-  const profileNameInput = document.getElementById('profile-name');
-  const profileSaveBtn = document.getElementById('profile-save');
-  const profileResult = document.getElementById('profile-result');
-  profileNameInput.value = session.name;
-  profileSaveBtn.addEventListener('click', async () => {
-    const newName = profileNameInput.value.trim();
-    if (!newName) return;
-    profileSaveBtn.disabled = true;
-    profileSaveBtn.textContent = 'Enregistrement…';
-    try {
-      await DB.updateAdminProfile(newName);
-      profileResult.innerHTML = '<div class="alert alert-success" style="margin-top:0;"><i class="fa-solid fa-circle-check"></i><span>Nom mis à jour.</span></div>';
-      document.querySelectorAll('[data-admin-name]').forEach(el => el.textContent = newName);
-    } catch (err) {
-      profileResult.innerHTML = `<div class="alert alert-error" style="margin-top:0;"><i class="fa-solid fa-circle-exclamation"></i><span>${escapeHtml(err.message)}</span></div>`;
-    }
-    profileSaveBtn.disabled = false;
-    profileSaveBtn.textContent = 'Enregistrer';
-  });
 
   // ---------------------------------------------------------------- stats
   const stats = await DB.getStats();

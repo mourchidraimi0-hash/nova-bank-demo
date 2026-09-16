@@ -238,20 +238,6 @@ module.exports = async (req, res) => {
     if (!session) return fail(res, 401, 'not_authenticated');
     const actorName = session.name, actorRole = session.role, actorId = session.admin_id;
 
-    // ---------------------------------------------------------------- profil admin (chaque admin gère son propre nom affiché)
-    if (action === 'updateAdminProfile') {
-      const { name } = body;
-      if (!name || !name.trim()) return fail(res, 400, 'missing_fields');
-      const newName = name.trim().slice(0, 100);
-      await sql`UPDATE admins SET name = ${newName} WHERE id = ${actorId}`;
-      // Le nom est aussi dupliqué dans les sessions actives (jeton courant inclus) : sans cette mise à
-      // jour, les actions de cette session (ajustements, journal...) resteraient signées de l'ancien nom
-      // jusqu'à la prochaine connexion.
-      await sql`UPDATE sessions SET name = ${newName} WHERE admin_id = ${actorId} AND is_admin = true`;
-      await logActivity({ adminId: actorId, adminName: newName, role: actorRole, action: 'modification_profil_admin', detail: `${actorName} a renommé son profil en ${newName}` });
-      return send(res, 200, { ok: true, name: newName });
-    }
-
     if (action === 'suspendUser' || action === 'reactivateUser' || action === 'activateUser') {
       const { userId, reason } = body;
       if (action === 'suspendUser' && !reason) return fail(res, 400, 'reason_required');
@@ -278,7 +264,7 @@ module.exports = async (req, res) => {
 
     // ---------------------------------------------------------------- ajustement de solde (motif obligatoire, jamais silencieux, journalisé)
     if (action === 'adjustBalance') {
-      const { userId, amount, reason } = body;
+      const { userId, amount, reason, displayName } = body;
       const amt = Number(amount);
       if (!amt || amt === 0) return fail(res, 400, 'invalid_amount');
       if (!reason || !reason.trim()) return fail(res, 400, 'reason_required');
@@ -286,14 +272,19 @@ module.exports = async (req, res) => {
       const user = rows[0];
       if (!user) return fail(res, 404, 'not_found');
 
+      // Nom affiché sur l'opération : choisi librement par l'admin dans le formulaire de crédit/débit
+      // pour cette opération précise (défaut : son propre nom de session). Le journal d'activité, lui,
+      // conserve toujours le vrai nom de l'admin connecté (actorName) pour la traçabilité.
+      const shownName = (displayName && displayName.trim()) ? displayName.trim().slice(0, 100) : actorName;
+
       const ref = generateTrxRef();
       await sql`UPDATE users SET balance = balance + ${amt} WHERE id = ${userId}`;
       await sql`
         INSERT INTO transactions (ref, user_id, type, description, amount, currency, status, settled, admin_name, reason)
-        VALUES (${ref}, ${userId}, ${amt > 0 ? 'credit' : 'debit'}, ${reason}, ${Math.abs(amt)}, ${user.currency}, 'confirmed', true, ${actorName}, ${reason})
+        VALUES (${ref}, ${userId}, ${amt > 0 ? 'credit' : 'debit'}, ${reason}, ${Math.abs(amt)}, ${user.currency}, 'confirmed', true, ${shownName}, ${reason})
       `;
       await sql`INSERT INTO notifications (id, user_id, message, type) VALUES (${uid('NOTIF-')}, ${userId}, ${(amt > 0 ? 'Your account was credited ' : 'Your account was debited ') + Math.abs(amt) + ' ' + user.currency + '. Reason: ' + reason}, 'info')`;
-      await logActivity({ adminId: actorId, adminName: actorName, role: actorRole, action: 'ajustement_solde', detail: `${ref} — ${amt > 0 ? '+' : ''}${amt} ${user.currency} sur ${user.account_number} — motif : ${reason}` });
+      await logActivity({ adminId: actorId, adminName: actorName, role: actorRole, action: 'ajustement_solde', detail: `${ref} — ${amt > 0 ? '+' : ''}${amt} ${user.currency} sur ${user.account_number} — motif : ${reason}${shownName !== actorName ? ` — affiché sous : ${shownName}` : ''}` });
       return send(res, 200, { ok: true, ref });
     }
 

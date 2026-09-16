@@ -291,10 +291,10 @@ const DB = (() => {
   }
 
   // Un motif est systématiquement exigé et journalisé : aucun ajustement de solde silencieux n'est possible.
-  async function adjustBalance(userId, type, amount, reason) {
+  async function adjustBalance(userId, type, amount, reason, displayName) {
     if (!reason || !reason.trim()) throw new Error('A reason is required for any balance adjustment.');
     const signed = type === 'credit' ? Math.abs(Number(amount)) : -Math.abs(Number(amount));
-    const r = await api('admin', { admin: true, body: { action: 'adjustBalance', userId, amount: signed, reason } });
+    const r = await api('admin', { admin: true, body: { action: 'adjustBalance', userId, amount: signed, reason, displayName } });
     if (!r.ok) throw new Error(errorMessage(r.error));
     return { ref: r.ref };
   }
@@ -326,11 +326,6 @@ const DB = (() => {
     const r = await api('admin', { admin: true, body: { action: 'setAdminActive', adminId, active } });
     if (!r.ok) throw new Error(errorMessage(r.error));
     return true;
-  }
-  async function updateAdminProfile(name) {
-    const r = await api('admin', { admin: true, body: { action: 'updateAdminProfile', name } });
-    if (!r.ok) throw new Error(errorMessage(r.error));
-    return { name: r.name };
   }
 
   // ---------------------------------------------------------------- admin — statistiques et journal
@@ -399,7 +394,7 @@ const DB = (() => {
     roleLabel, canManageAccounts, canManageAdmins,
     getUserById, getAllClients, suspendUser, reactivateUser, activateUser, requestMoreInfo,
     adjustBalance, updateTransactionStatus, addAdminNote,
-    getAdmins, createAdmin, setAdminActive, updateAdminProfile,
+    getAdmins, createAdmin, setAdminActive,
     getAllOperations, getStats, getSignupSeries, getOpsVolumeSeries, getActivityLog,
     errorMessage
   };

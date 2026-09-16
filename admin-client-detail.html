@@ -137,6 +137,11 @@
             <input type="text" class="form-control" id="balanceReason" placeholder="Ex : Régularisation manuelle, remboursement…" data-requires="manage">
             <p class="field-hint">Un crédit ne peut jamais être effectué sans motif — aucune création de solde non justifiée n'est possible.</p>
           </div>
+          <div class="form-row">
+            <label>Nom affiché sur l'opération</label>
+            <input type="text" class="form-control" id="balanceDisplayName" data-requires="manage">
+            <p class="field-hint">Le nom qui apparaîtra sur cette opération précise (par défaut, votre nom de connexion). Le journal d'activité conserve toujours votre nom réel.</p>
+          </div>
           <p class="field-hint" id="balanceFormError" style="display:none;color:var(--danger);"></p>
           <button type="submit" class="btn btn-primary btn-sm" data-requires="manage">Ajuster le solde</button>
         </form>
@@ -213,6 +218,8 @@ function statusBadge(status) {
 
     let currentActionType = null; // 'suspend' | 'reactivate' | 'activate' | 'requestInfo'
     let pendingBalanceOp = null;
+    const balanceDisplayNameInput = document.getElementById('balanceDisplayName');
+    balanceDisplayNameInput.value = session.name;
 
     async function refresh() { clientUser = await DB.getUserById(clientId); }
 
@@ -481,9 +488,10 @@ function statusBadge(status) {
       const type = document.getElementById('balanceType').value;
       const amount = parseFloat(document.getElementById('balanceAmount').value);
       const reason = (document.getElementById('balanceReason').value || '').trim();
+      const displayName = (balanceDisplayNameInput.value || '').trim() || session.name;
       if (!amount || amount <= 0) { balanceFormError.textContent = 'Veuillez saisir un montant valide.'; balanceFormError.style.display = ''; return; }
       if (!reason) { balanceFormError.textContent = 'Un motif est obligatoire.'; balanceFormError.style.display = ''; return; }
-      pendingBalanceOp = { type, amount, reason };
+      pendingBalanceOp = { type, amount, reason, displayName };
       balanceModalError.style.display = 'none';
       balanceModalBody.innerHTML = `
         <div class="info-grid">
@@ -491,6 +499,7 @@ function statusBadge(status) {
           <div class="info-item"><span>Type</span><b>${type === 'credit' ? 'Crédit' : 'Débit'}</b></div>
           <div class="info-item"><span>Montant</span><b>${DB.formatMoney(amount, clientUser.currency)}</b></div>
           <div class="info-item"><span>Motif</span><b>${escapeHtml(reason)}</b></div>
+          <div class="info-item"><span>Nom affiché</span><b>${escapeHtml(displayName)}</b></div>
         </div>`;
       balanceModal.classList.add('open');
     });
@@ -504,7 +513,7 @@ function statusBadge(status) {
       if (!DB.canManageAccounts(session.role)) { balanceModal.classList.remove('open'); return; }
       if (!pendingBalanceOp) return;
       try {
-        await DB.adjustBalance(clientId, pendingBalanceOp.type, pendingBalanceOp.amount, pendingBalanceOp.reason);
+        await DB.adjustBalance(clientId, pendingBalanceOp.type, pendingBalanceOp.amount, pendingBalanceOp.reason, pendingBalanceOp.displayName);
       } catch (err) {
         balanceModalError.textContent = err.message;
         balanceModalError.style.display = '';
@@ -513,6 +522,7 @@ function statusBadge(status) {
       pendingBalanceOp = null;
       balanceModal.classList.remove('open');
       document.getElementById('balanceForm').reset();
+      balanceDisplayNameInput.value = session.name;
       await renderAll();
     });
 
