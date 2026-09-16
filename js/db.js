@@ -327,6 +327,11 @@ const DB = (() => {
     if (!r.ok) throw new Error(errorMessage(r.error));
     return true;
   }
+  async function updateAdminProfile(name) {
+    const r = await api('admin', { admin: true, body: { action: 'updateAdminProfile', name } });
+    if (!r.ok) throw new Error(errorMessage(r.error));
+    return { name: r.name };
+  }
 
   // ---------------------------------------------------------------- admin — statistiques et journal
   async function getAllOperations({ page = 1, pageSize = 25, q = '', status = 'all' } = {}) {
@@ -394,7 +399,7 @@ const DB = (() => {
     roleLabel, canManageAccounts, canManageAdmins,
     getUserById, getAllClients, suspendUser, reactivateUser, activateUser, requestMoreInfo,
     adjustBalance, updateTransactionStatus, addAdminNote,
-    getAdmins, createAdmin, setAdminActive,
+    getAdmins, createAdmin, setAdminActive, updateAdminProfile,
     getAllOperations, getStats, getSignupSeries, getOpsVolumeSeries, getActivityLog,
     errorMessage
   };

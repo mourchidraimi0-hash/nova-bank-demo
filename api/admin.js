@@ -238,6 +238,20 @@ module.exports = async (req, res) => {
     if (!session) return fail(res, 401, 'not_authenticated');
     const actorName = session.name, actorRole = session.role, actorId = session.admin_id;
 
+    // ---------------------------------------------------------------- profil admin (chaque admin gère son propre nom affiché)
+    if (action === 'updateAdminProfile') {
+      const { name } = body;
+      if (!name || !name.trim()) return fail(res, 400, 'missing_fields');
+      const newName = name.trim().slice(0, 100);
+      await sql`UPDATE admins SET name = ${newName} WHERE id = ${actorId}`;
+      // Le nom est aussi dupliqué dans les sessions actives (jeton courant inclus) : sans cette mise à
+      // jour, les actions de cette session (ajustements, journal...) resteraient signées de l'ancien nom
+      // jusqu'à la prochaine connexion.
+      await sql`UPDATE sessions SET name = ${newName} WHERE admin_id = ${actorId} AND is_admin = true`;
+      await logActivity({ adminId: actorId, adminName: newName, role: actorRole, action: 'modification_profil_admin', detail: `${actorName} a renommé son profil en ${newName}` });
+      return send(res, 200, { ok: true, name: newName });
+    }
+
     if (action === 'suspendUser' || action === 'reactivateUser' || action === 'activateUser') {
       const { userId, reason } = body;
       if (action === 'suspendUser' && !reason) return fail(res, 400, 'reason_required');
