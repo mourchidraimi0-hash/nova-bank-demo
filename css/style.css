@@ -390,7 +390,7 @@ textarea.form-control{resize:vertical;min-height:100px;}
 
 .data-table{width:100%;border-collapse:collapse;background:var(--white);}
 .data-table th{text-align:left;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:var(--anthracite-light);padding:12px 16px;border-bottom:2px solid var(--border);}
-.data-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:.9rem;}
+.data-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:.9rem;transition:background-color .2s ease;}
 .data-table tr:hover td{background:#fafcff;}
 .table-wrap{overflow-x:auto;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-md);}
 .amount-pos{color:#1e8449;font-weight:600;}
@@ -445,8 +445,9 @@ body.admin{color:var(--admin-text);}
 .admin-sidebar .nav-logo{color:#fff;margin-bottom:8px;flex-shrink:0;}
 .admin-role-tag{font-size:.72rem;color:var(--cyan);background:rgba(110,231,183,.12);display:inline-block;padding:4px 10px;border-radius:999px;margin-bottom:26px;flex-shrink:0;}
 .admin-nav{flex:1;min-height:0;overflow-y:auto;}
-.admin-nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;margin-bottom:4px;}
+.admin-nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;margin-bottom:4px;transition:background-color .2s ease, color .2s ease, transform .2s ease;}
 .admin-nav a:hover,.admin-nav a.active{background:rgba(255,255,255,.1);color:#fff;text-decoration:none;}
+.admin-nav a:hover{transform:translateX(2px);}
 .admin-nav a.active{color:var(--cyan);}
 .admin-sidebar .bottom-links{margin-top:auto;flex-shrink:0;border-top:1px solid rgba(255,255,255,.12);padding-top:14px;display:flex;flex-direction:column;gap:4px;}
 .admin-main{flex:1;margin-left:250px;padding:32px 36px 60px;}
@@ -466,7 +467,8 @@ body.admin{color:var(--admin-text);}
 .stat-card .value{font-family:var(--font-head);font-size:1.7rem;color:var(--admin-text);}
 .stat-card .label{font-size:.82rem;color:var(--admin-text-light);}
 
-.admin-card{background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-md);padding:26px;margin-bottom:24px;}
+.admin-card{background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-md);padding:26px;margin-bottom:24px;transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, background-color .3s ease, border-color .3s ease;}
+.admin-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm);}
 .admin-card h3{color:var(--admin-text);font-size:1.05rem;margin-bottom:18px;}
 body.admin .data-table{background:var(--admin-card);}
 body.admin .data-table th{color:var(--admin-text-light);border-color:var(--admin-border);}
@@ -522,7 +524,8 @@ body.admin .copy-row{background:var(--admin-bg);border-color:var(--admin-border)
 .animate-in{animation:fadeInUp .55s cubic-bezier(.2,.8,.2,1) both;}
 .animate-pop{animation:popIn .4s cubic-bezier(.2,.8,.2,1) both;}
 @media (prefers-reduced-motion: reduce){
-  .animate-in,.animate-pop,.bank-card,[data-aos]{animation:none !important;transition:none !important;}
+  .animate-in,.animate-pop,.bank-card,[data-aos],.modal-overlay.open .modal,.alert{animation:none !important;}
+  *{transition-duration:.001ms !important;}
 }
 
 /* ---------- Boutons : micro-interaction supplémentaire ---------- */
@@ -656,3 +659,30 @@ body.admin .copy-row{background:var(--admin-bg);border-color:var(--admin-border)
   .balance-card .amount{font-size:2.1rem;}
   .chart-panel .chart-head{flex-direction:column;align-items:flex-start;}
 }
+
+/* ---------- Polish transversal : micro-interactions sur tout le site ---------- */
+
+/* Ouverture automatique de toutes les modales (structure .modal-overlay.open > .modal déjà
+   utilisée partout) et de toutes les alertes, sans avoir à toucher chaque page. */
+.modal-overlay.open .modal{animation:popIn .35s cubic-bezier(.2,.8,.2,1) both;}
+.alert{animation:fadeInUp .35s cubic-bezier(.2,.8,.2,1) both;}
+
+/* Transition douce du thème clair/sombre de l'admin (au lieu d'un changement brutal). */
+body.admin,.admin-mobile-topbar,.data-table,.form-control{transition:background-color .3s ease, color .3s ease, border-color .3s ease;}
+
+/* Effet de survol cohérent sur les listes de notifications et les lignes de tableau. */
+.notif-list-item{transition:background .2s ease, border-color .2s ease, transform .2s ease;}
+.notif-list-item:hover{transform:translateX(3px);}
+
+/* Douce mise en avant du badge de statut à son apparition. */
+.badge{animation:popIn .3s cubic-bezier(.2,.8,.2,1) both;}
+
+/* Icônes de la sidebar client : même micro-glissement que l'admin (déjà en place plus haut
+   pour .app-nav/.admin-nav, ceci couvre les icônes ajoutées dynamiquement). */
+.theme-toggle{transition:transform .25s ease;}
+.theme-toggle:hover{transform:rotate(15deg);}
+
+/* Révélation douce et générique appliquée par js/main.js (initAutoReveal) à tout élément de
+   contenu répété — cartes, lignes de tableau, tuiles — qu'il soit déjà présent au chargement
+   ou injecté dynamiquement après un appel serveur. */
+.reveal-on{animation:fadeInUp .5s cubic-bezier(.2,.8,.2,1) both;}

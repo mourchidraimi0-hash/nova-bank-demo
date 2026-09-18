@@ -17,7 +17,38 @@ document.addEventListener('DOMContentLoaded', () => {
   initFaqAccordions();
   initSidebarToggle();
   initNotifBadge();
+  initAutoReveal();
 });
+
+// ---------------------------------------------------------------- révélation douce et générique
+// Applique une légère animation d'entrée à tout élément de contenu répété (cartes, lignes de
+// tableau, tuiles...), qu'il soit déjà présent au chargement de la page ou injecté plus tard par
+// un appel serveur (la plupart des tableaux/grilles du site sont peuplés après coup en JS, donc
+// initEntranceAnimations seul — qui ne s'exécute qu'une fois au chargement — ne les couvre pas).
+function initAutoReveal() {
+  const SELECTOR = [
+    '.card', '.admin-card', '.stat-tile', '.stat-card', '.goal-card', '.account-card',
+    '.notif-list-item', '.job-card', '.info-item', '.data-table tbody tr', '.log-item', '.help-cat'
+  ].join(',');
+
+  const reveal = (el) => {
+    if (!el.classList || el.classList.contains('reveal-on')) return;
+    el.classList.add('reveal-on');
+  };
+
+  document.querySelectorAll(SELECTOR).forEach(reveal);
+
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      m.addedNodes.forEach((node) => {
+        if (node.nodeType !== 1) return;
+        if (node.matches && node.matches(SELECTOR)) reveal(node);
+        if (node.querySelectorAll) node.querySelectorAll(SELECTOR).forEach(reveal);
+      });
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
 
 // ---------------------------------------------------------------- badge de notifications non lues (sidebar client)
 async function initNotifBadge() {
