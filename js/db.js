@@ -67,8 +67,8 @@ const DB = (() => {
 
   // Étape 1 : mot de passe. En cas de succès, renvoie { ok:true, requiresTwoFactor:true, userId,
   // emailSent, demoCode? } — aucune session n'est créée avant la vérification du code (étape 2).
-  async function login(identifier, password) {
-    return api('auth', { body: { action: 'login', identifier, password } });
+  async function login(identifier, password, turnstileToken) {
+    return api('auth', { body: { action: 'login', identifier, password, turnstileToken } });
   }
 
   // Étape 2 : code de connexion reçu par e-mail (ou affiché à l'écran en secours).
@@ -211,8 +211,8 @@ const DB = (() => {
   // ---------------------------------------------------------------- admin — connexion (deux étapes : identifiants, puis code affiché à l'écran)
   // Démo : aucun SMS n'est jamais envoyé. Le code est retourné directement par le serveur
   // pour être affiché à l'utilisateur, conformément à l'exigence de transparence totale.
-  async function adminLoginStep1(username, password) {
-    return api('admin', { body: { action: 'loginStep1', username, password } });
+  async function adminLoginStep1(username, password, turnstileToken) {
+    return api('admin', { body: { action: 'loginStep1', username, password, turnstileToken } });
   }
   async function adminLoginStep2(adminId, code) {
     const r = await api('admin', { body: { action: 'loginStep2', adminId, code } });

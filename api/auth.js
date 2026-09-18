@@ -163,7 +163,10 @@ module.exports = async (req, res) => {
       const allowed = await checkRateLimit({ key: `login:${getClientIp(req)}`, max: 10, windowMinutes: 15 });
       if (!allowed) return fail(res, 429, 'rate_limited');
 
-      const { identifier, password } = body;
+      const { identifier, password, turnstileToken } = body;
+      const captchaOk = await verifyTurnstile(turnstileToken, getClientIp(req));
+      if (!captchaOk) return fail(res, 400, 'captcha_failed');
+
       if (!identifier || !password) return fail(res, 400, 'missing_fields');
       const id = String(identifier).trim().toLowerCase();
       const rows = await sql`
@@ -383,6 +386,6 @@ module.exports = async (req, res) => {
     return fail(res, 400, 'unknown_action');
   } catch (err) {
     console.error(err);
-    return fail(res, 500, 'server_error', { message: err.message });
+    return fail(res, 500, 'server_error');
   }
 };

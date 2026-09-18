@@ -135,12 +135,15 @@ function generateTrxRef() {
   return `TRX-${letters}-${digits}`;
 }
 function generate2FACode() {
-  return String(Math.floor(100000 + Math.random() * 900000));
+  // crypto.randomInt (générateur cryptographique) plutôt que Math.random, qui n'offre aucune
+  // garantie d'imprévisibilité pour un secret à usage unique.
+  return String(crypto.randomInt(100000, 1000000));
 }
 
 // ---------------------------------------------------------------- sessions (table sessions, token bearer)
 const SESSION_HOURS = 12;
 const ADMIN_SESSION_MINUTES = 30;
+const ADMIN_SESSION_ABSOLUTE_HOURS = 4;
 
 async function createSession({ userId = null, isAdmin = false, adminId = null, role = null, name = null }) {
   const token = crypto.randomBytes(32).toString('hex');
@@ -168,7 +171,19 @@ async function getSession(token) {
 async function refreshSession(token, isAdmin) {
   const minutes = isAdmin ? ADMIN_SESSION_MINUTES : SESSION_HOURS * 60;
   const expiresAt = new Date(Date.now() + minutes * 60000).toISOString();
-  await sql`UPDATE sessions SET expires_at = ${expiresAt} WHERE token = ${token}`;
+  if (isAdmin) {
+    // Plafond absolu : une session admin utilisée en continu ne doit pas rester valide
+    // indéfiniment (jusqu'ici seule l'inactivité y mettait fin) — au-delà de
+    // ADMIN_SESSION_ABSOLUTE_HOURS depuis la connexion initiale, une reconnexion est exigée,
+    // même si l'activité ne s'est jamais arrêtée. Limite l'impact d'un jeton volé mais utilisé.
+    await sql`
+      UPDATE sessions
+      SET expires_at = LEAST(${expiresAt}::timestamptz, created_at + make_interval(hours => ${ADMIN_SESSION_ABSOLUTE_HOURS}))
+      WHERE token = ${token}
+    `;
+  } else {
+    await sql`UPDATE sessions SET expires_at = ${expiresAt} WHERE token = ${token}`;
+  }
 }
 
 async function destroySession(token) {
@@ -356,8 +371,11 @@ async function ensureSchema() {
       admin_id TEXT,
       role TEXT,
       name TEXT,
-      expires_at TIMESTAMPTZ NOT NULL
+      expires_at TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`;
+    // Migration : la colonne n'existe pas encore sur les bases déjà en production.
+    await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now()`;
     await sql`CREATE TABLE IF NOT EXISTS pending_2fa (
       admin_id TEXT PRIMARY KEY,
       code TEXT NOT NULL,

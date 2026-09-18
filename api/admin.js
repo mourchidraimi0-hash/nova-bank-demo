@@ -1,6 +1,6 @@
 const {
   sql, uid, hashPassword, verifyPassword, isStrongPassword, generate2FACode, generateTrxRef,
-  getClientIp, checkRateLimit,
+  getClientIp, checkRateLimit, verifyTurnstile,
   createSession, getSession, refreshSession, destroySession, destroyAllAdminSessions, getBearerToken,
   ensureSchema, logActivity, readJsonBody, send, fail
 } = require('./_lib/db');
@@ -191,7 +191,10 @@ module.exports = async (req, res) => {
       const allowed = await checkRateLimit({ key: `admin_login:${getClientIp(req)}`, max: 5, windowMinutes: 15 });
       if (!allowed) return fail(res, 429, 'rate_limited');
 
-      const { username, password } = body;
+      const { username, password, turnstileToken } = body;
+      const captchaOk = await verifyTurnstile(turnstileToken, getClientIp(req));
+      if (!captchaOk) return fail(res, 400, 'captcha_failed');
+
       if (!username || !password) return fail(res, 400, 'missing_fields');
       const rows = await sql`SELECT * FROM admins WHERE lower(username) = lower(${username}) LIMIT 1`;
       const admin = rows[0];
@@ -391,6 +394,6 @@ module.exports = async (req, res) => {
     return fail(res, 400, 'unknown_action');
   } catch (err) {
     console.error(err);
-    return fail(res, 500, 'server_error', { message: err.message });
+    return fail(res, 500, 'server_error');
   }
 };

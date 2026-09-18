@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body class="admin">
 <div class="form-page">
@@ -48,6 +49,8 @@
           <input type="password" id="password" class="form-control" autocomplete="current-password" required>
           <div class="field-error" id="error-password"></div>
         </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAEziNT2CiqosyUVl" style="margin-bottom:16px;"></div>
+        <div class="field-error" id="error-captcha"></div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-step1">Continuer</button>
       </form>
     </section>
@@ -122,25 +125,29 @@
 
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
+    const turnstileToken = window.turnstile ? window.turnstile.getResponse() : '';
 
     let hasError = false;
     if (!username) { setFieldError('username', 'Merci de renseigner votre identifiant.'); hasError = true; }
     if (!password) { setFieldError('password', 'Merci de renseigner votre mot de passe.'); hasError = true; }
+    if (!turnstileToken) { setFieldError('captcha', 'Merci de valider la vérification anti-robot.'); hasError = true; }
     if (hasError) return;
 
     const btn = document.getElementById('btn-step1');
     btn.disabled = true;
     btn.textContent = 'Vérification…';
 
-    const res = await DB.adminLoginStep1(username, password);
+    const res = await DB.adminLoginStep1(username, password, turnstileToken);
 
     btn.disabled = false;
     btn.textContent = 'Continuer';
 
     if (!res.ok) {
+      if (window.turnstile) window.turnstile.reset();
       if (res.error === 'invalid_credentials') showLoginError('Identifiant ou mot de passe incorrect.');
       else if (res.error === 'rate_limited') showLoginError('Trop de tentatives de connexion. Merci de patienter quelques minutes avant de réessayer.');
       else if (res.error === 'account_disabled') showLoginError('Ce compte administrateur a été désactivé. Contactez un Super Admin.');
+      else if (res.error === 'captcha_failed') showLoginError('La vérification anti-robot a échoué. Merci de recommencer.');
       else showLoginError('Une erreur est survenue. Merci de réessayer.');
       return;
     }
@@ -205,6 +212,7 @@
     e.preventDefault();
     pendingAdminId = null;
     passwordInput.value = '';
+    if (window.turnstile) window.turnstile.reset();
     step2.classList.add('hidden');
     step1.classList.remove('hidden');
     clearErrors();

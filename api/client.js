@@ -150,6 +150,6 @@ module.exports = async (req, res) => {
     return fail(res, 400, 'unknown_action');
   } catch (err) {
     console.error(err);
-    return fail(res, 500, 'server_error', { message: err.message });
+    return fail(res, 500, 'server_error');
   }
 };

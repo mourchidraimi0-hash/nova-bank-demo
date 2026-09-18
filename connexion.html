@@ -21,6 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 <nav class="navbar scrolled">
@@ -69,6 +70,9 @@
             <a href="#" id="forgot-link" class="text-sm">Forgot password?</a>
           </div>
         </div>
+
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAEziNT2CiqosyUVl" style="margin-bottom:16px;"></div>
+        <div class="field-error" id="error-captcha"></div>
 
         <button type="submit" class="btn btn-primary btn-block">Log In</button>
       </form>
@@ -212,22 +216,25 @@
 
     const identifier = document.getElementById('identifier').value.trim();
     const password = document.getElementById('password').value;
+    const turnstileToken = window.turnstile ? window.turnstile.getResponse() : '';
 
     let hasError = false;
     if (!identifier) { setFieldError('identifier', 'Please enter your username or email.'); hasError = true; }
     if (!password) { setFieldError('password', 'Please enter your password.'); hasError = true; }
+    if (!turnstileToken) { setFieldError('captcha', 'Please complete the anti-bot verification.'); hasError = true; }
     if (hasError) return;
 
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Logging in…';
 
-    const res = await DB.login(identifier, password);
+    const res = await DB.login(identifier, password, turnstileToken);
 
     submitBtn.disabled = false;
     submitBtn.textContent = 'Log In';
 
     if (!res.ok) {
+      if (window.turnstile) window.turnstile.reset();
       if (res.error === 'not_found') {
         showLoginError('No account matches this username or email.');
       } else if (res.error === 'wrong_password') {
@@ -236,6 +243,8 @@
         showLoginError('Your account has been suspended. Reason: ' + escapeHtml(res.reason || 'not specified') + '. Contact our support for more information.');
       } else if (res.error === 'rate_limited') {
         showLoginError('Too many login attempts. Please wait a few minutes before trying again.');
+      } else if (res.error === 'captcha_failed') {
+        showLoginError('Anti-bot verification failed. Please try again.');
       } else {
         showLoginError('An error occurred. Please try again.');
       }
@@ -310,6 +319,7 @@
     e.preventDefault();
     pendingUserId = null;
     document.getElementById('password').value = '';
+    if (window.turnstile) window.turnstile.reset();
     step2.classList.add('hidden');
     step1.classList.remove('hidden');
     clearErrors();
