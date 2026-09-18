@@ -52,10 +52,12 @@ function loginCodeEmailHtml(firstName, code) {
 
 // ---------------------------------------------------------------- mise en forme utilisateur (snake_case -> camelCase, identique au modèle historique)
 async function serializeUser(row) {
-  const [transactions, notifications, notes, savingsGoals, cards, loginHistory] = await Promise.all([
+  // Les notes internes (table "notes") sont volontairement exclues d'ici : ce sont des
+  // annotations réservées aux administrateurs (voir admin.js/serializeClient), jamais destinées
+  // au client concerné.
+  const [transactions, notifications, savingsGoals, cards, loginHistory] = await Promise.all([
     sql`SELECT * FROM transactions WHERE user_id = ${row.id} ORDER BY created_at DESC`,
     sql`SELECT * FROM notifications WHERE user_id = ${row.id} ORDER BY date DESC`,
-    sql`SELECT * FROM notes WHERE user_id = ${row.id} ORDER BY date DESC`,
     sql`SELECT * FROM savings_goals WHERE user_id = ${row.id} ORDER BY created_at ASC`,
     sql`SELECT * FROM cards WHERE user_id = ${row.id} ORDER BY created_at ASC`,
     sql`SELECT * FROM login_history WHERE user_id = ${row.id} ORDER BY date DESC LIMIT 20`
@@ -81,7 +83,6 @@ async function serializeUser(row) {
     loginHistory: loginHistory.map(h => ({ date: h.date, userAgent: h.user_agent })),
     transactions: transactions.map(serializeTransaction),
     notifications: notifications.map(n => ({ id: n.id, message: n.message, type: n.type, date: n.date, read: n.read })),
-    notes: notes.map(n => ({ author: n.author, role: n.role, text: n.text, date: n.date })),
     savingsGoals: savingsGoals.map(g => ({ id: g.id, name: g.name, targetAmount: Number(g.target_amount), currentAmount: Number(g.current_amount), icon: g.icon, createdAt: g.created_at })),
     cards: cards.map(c => ({ id: c.id, label: c.label, last4: c.last4, frozen: c.frozen, createdAt: c.created_at }))
   };
@@ -175,7 +176,11 @@ module.exports = async (req, res) => {
         LIMIT 1
       `;
       const user = rows[0];
-      if (!user) return fail(res, 401, 'not_found');
+      // Message unique ("invalid_credentials") que le compte existe ou non, et que le mot de
+      // passe soit correct ou non : distinguer "compte introuvable" de "mot de passe incorrect"
+      // permettrait à un attaquant de tester une liste d'identifiants pour savoir lesquels
+      // correspondent à un compte réel (énumération de comptes).
+      if (!user) return fail(res, 401, 'invalid_credentials');
 
       // Limite par compte en plus de la limite par IP : empêche un attaquant disposant de
       // plusieurs adresses IP de cibler un seul compte par force brute.
@@ -183,7 +188,7 @@ module.exports = async (req, res) => {
       if (!accountAllowed) return fail(res, 429, 'rate_limited');
 
       if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
-      if (!verifyPassword(password, user.password_hash)) return fail(res, 401, 'wrong_password');
+      if (!verifyPassword(password, user.password_hash)) return fail(res, 401, 'invalid_credentials');
 
       // ---------------------------------------------------------------- 2FA (code à usage unique par e-mail)
       // Mot de passe validé, mais aucune session n'est encore créée : elle ne le sera qu'après
@@ -286,26 +291,29 @@ module.exports = async (req, res) => {
         LIMIT 1
       `;
       const user = rows[0];
-      if (!user) return fail(res, 404, 'not_found');
-      if (user.status === 'suspended') return fail(res, 403, 'suspended', { reason: user.suspend_reason });
 
-      const resetToken = await createPasswordResetToken(user.id);
-      const resetLink = `${SITE_URL}/reinitialisation.html?token=${encodeURIComponent(resetToken)}`;
-      const emailResult = await sendEmail({
-        to: user.email,
-        subject: 'Réinitialisation de votre mot de passe — NOVA BANK',
-        html: passwordResetEmailHtml(user.first_name, resetLink)
-      });
-      if (!emailResult.ok) {
-        console.error(`E-mail de réinitialisation non envoyé pour ${user.email} : ${emailResult.error}`);
+      // Sécurité : la réponse est identique que le compte existe ou non (et qu'il soit suspendu
+      // ou non) — sinon un attaquant peut tester une liste d'identifiants pour savoir lesquels
+      // correspondent à un compte réel (énumération de comptes). Le jeton ne transite jamais
+      // dans la réponse API quand l'e-mail est effectivement parti, pour la même raison que
+      // demoCode côté 2FA : uniquement en secours si l'envoi a échoué.
+      let emailSent = false;
+      let resetToken;
+      if (user && user.status !== 'suspended') {
+        resetToken = await createPasswordResetToken(user.id);
+        const resetLink = `${SITE_URL}/reinitialisation.html?token=${encodeURIComponent(resetToken)}`;
+        const emailResult = await sendEmail({
+          to: user.email,
+          subject: 'Réinitialisation de votre mot de passe — NOVA BANK',
+          html: passwordResetEmailHtml(user.first_name, resetLink)
+        });
+        emailSent = emailResult.ok;
+        if (!emailResult.ok) {
+          console.error(`E-mail de réinitialisation non envoyé pour ${user.email} : ${emailResult.error}`);
+        }
+        await logActivity({ adminName: 'Client', action: 'demande_reinitialisation_mdp', detail: `Demande de réinitialisation pour ${user.account_number}` });
       }
-      await logActivity({ adminName: 'Client', action: 'demande_reinitialisation_mdp', detail: `Demande de réinitialisation pour ${user.account_number}` });
-      // Sécurité : le jeton ne doit jamais transiter dans la réponse API quand l'e-mail est
-      // effectivement parti — sinon n'importe qui connaissant l'identifiant d'un compte tiers
-      // pourrait lire son jeton de réinitialisation directement dans la requête réseau et
-      // prendre le contrôle du compte sans jamais accéder à sa boîte mail. Même principe que
-      // demoCode pour le 2FA de connexion : uniquement en secours si l'envoi a échoué.
-      return send(res, 200, { ok: true, emailSent: emailResult.ok, resetToken: emailResult.ok ? undefined : resetToken });
+      return send(res, 200, { ok: true, emailSent, resetToken: emailSent ? undefined : resetToken });
     }
 
     if (action === 'resetPassword') {

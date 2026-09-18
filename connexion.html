@@ -144,18 +144,8 @@
 
     try {
       const { resetToken, emailSent } = await DB.requestPasswordReset(identifier);
-      if (emailSent) {
-        // Sécurité : le jeton n'est jamais renvoyé par le serveur quand l'e-mail est parti —
-        // on ne construit donc aucun lien ici, seulement une confirmation d'envoi.
-        resetResult.innerHTML = `
-          <div class="alert alert-success" style="margin-top:12px;margin-bottom:0;">
-            <i class="fa-solid fa-circle-check"></i>
-            <div style="width:100%;">
-              An email with the reset link has just been sent to you.
-              <p class="text-sm text-muted mt-8" style="margin-bottom:0;">This link expires in 30 minutes and can only be used once.</p>
-            </div>
-          </div>`;
-      } else {
+      if (resetToken) {
+        // Compte valide mais e-mail non envoyé (limite du service de démo) : repli à l'écran.
         const link = window.location.origin + '/reinitialisation.html?token=' + encodeURIComponent(resetToken);
         resetResult.innerHTML = `
           <div class="alert alert-success" style="margin-top:12px;margin-bottom:0;">
@@ -170,6 +160,17 @@
         document.getElementById('reset-copy-btn').addEventListener('click', () => {
           if (navigator.clipboard) navigator.clipboard.writeText(link).catch(() => {});
         });
+      } else {
+        // Sécurité : même message que le compte existe ou non, et que l'e-mail soit parti ou
+        // non — ne jamais révéler si un identifiant correspond à un compte réel.
+        resetResult.innerHTML = `
+          <div class="alert alert-success" style="margin-top:12px;margin-bottom:0;">
+            <i class="fa-solid fa-circle-check"></i>
+            <div style="width:100%;">
+              If an account matches this identifier, a reset email has just been sent.
+              <p class="text-sm text-muted mt-8" style="margin-bottom:0;">This link expires in 30 minutes and can only be used once.</p>
+            </div>
+          </div>`;
       }
     } catch (err) {
       resetResult.innerHTML = `
@@ -235,10 +236,8 @@
 
     if (!res.ok) {
       if (window.turnstile) window.turnstile.reset();
-      if (res.error === 'not_found') {
-        showLoginError('No account matches this username or email.');
-      } else if (res.error === 'wrong_password') {
-        showLoginError('Incorrect password.');
+      if (res.error === 'invalid_credentials') {
+        showLoginError('Incorrect username/email or password.');
       } else if (res.error === 'suspended') {
         showLoginError('Your account has been suspended. Reason: ' + escapeHtml(res.reason || 'not specified') + '. Contact our support for more information.');
       } else if (res.error === 'rate_limited') {
