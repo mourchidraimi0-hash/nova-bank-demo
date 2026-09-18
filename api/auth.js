@@ -297,7 +297,12 @@ module.exports = async (req, res) => {
         console.error(`E-mail de réinitialisation non envoyé pour ${user.email} : ${emailResult.error}`);
       }
       await logActivity({ adminName: 'Client', action: 'demande_reinitialisation_mdp', detail: `Demande de réinitialisation pour ${user.account_number}` });
-      return send(res, 200, { ok: true, resetToken, emailSent: emailResult.ok });
+      // Sécurité : le jeton ne doit jamais transiter dans la réponse API quand l'e-mail est
+      // effectivement parti — sinon n'importe qui connaissant l'identifiant d'un compte tiers
+      // pourrait lire son jeton de réinitialisation directement dans la requête réseau et
+      // prendre le contrôle du compte sans jamais accéder à sa boîte mail. Même principe que
+      // demoCode pour le 2FA de connexion : uniquement en secours si l'envoi a échoué.
+      return send(res, 200, { ok: true, emailSent: emailResult.ok, resetToken: emailResult.ok ? undefined : resetToken });
     }
 
     if (action === 'resetPassword') {

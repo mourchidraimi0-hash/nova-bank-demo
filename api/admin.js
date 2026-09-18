@@ -239,6 +239,10 @@ module.exports = async (req, res) => {
     const actorName = session.name, actorRole = session.role, actorId = session.admin_id;
 
     if (action === 'suspendUser' || action === 'reactivateUser' || action === 'activateUser') {
+      // Le rôle support n'a pas le droit de gérer les comptes (suspension/réactivation) — ce
+      // contrôle n'existait jusqu'ici que côté client (boutons masqués), donc contournable par
+      // un appel direct à l'API. Voir DB.canManageAccounts côté client pour la même règle.
+      if (actorRole !== 'admin' && actorRole !== 'super_admin') return fail(res, 403, 'forbidden');
       const { userId, reason } = body;
       if (action === 'suspendUser' && !reason) return fail(res, 400, 'reason_required');
       const rows = await sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1`;
@@ -252,6 +256,7 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'requestMoreInfo') {
+      if (actorRole !== 'admin' && actorRole !== 'super_admin') return fail(res, 403, 'forbidden');
       const { userId, message } = body;
       if (!message) return fail(res, 400, 'missing_fields');
       const rows = await sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1`;
@@ -264,6 +269,9 @@ module.exports = async (req, res) => {
 
     // ---------------------------------------------------------------- ajustement de solde (motif obligatoire, jamais silencieux, journalisé)
     if (action === 'adjustBalance') {
+      // Un compte "support" ne doit jamais pouvoir créditer/débiter un solde — cette action
+      // touche directement l'argent d'un client et doit rester réservée à admin/super_admin.
+      if (actorRole !== 'admin' && actorRole !== 'super_admin') return fail(res, 403, 'forbidden');
       const { userId, amount, reason, displayName } = body;
       const amt = Number(amount);
       if (!amt || amt === 0) return fail(res, 400, 'invalid_amount');
@@ -298,6 +306,9 @@ module.exports = async (req, res) => {
 
     // ---------------------------------------------------------------- statut d'opération (règlement / rejet — réversion cohérente selon le type)
     if (action === 'updateTransactionStatus') {
+      // Confirmer/rejeter une opération déplace réellement de l'argent (voir plus bas) — réservé
+      // à admin/super_admin, comme adjustBalance.
+      if (actorRole !== 'admin' && actorRole !== 'super_admin') return fail(res, 403, 'forbidden');
       const { ref, status: newStatus } = body;
       const rows = await sql`SELECT * FROM transactions WHERE ref = ${ref} LIMIT 1`;
       const trx = rows[0];
